@@ -913,23 +913,15 @@
     if (view === 'shopping') loadShopping();
     if (view === 'settings') loadFamilyMembers();  // This does NOT call showEditProfile
 }
-        // ================================================================
-        //  INIT
-        // ================================================================
-        // Show login screen by default
-        document.getElementById('loginScreen').classList.remove('hidden');
-        document.getElementById('mainApp').classList.add('hidden');
-        // ================================================================
-//  INIT – Make sure modals are hidden on page load
 // ================================================================
-document.addEventListener('DOMContentLoaded', function() {
-    // Hide all modals
-    document.querySelectorAll('.modal').forEach(m => m.classList.add('hidden'));
-    // Show login screen
-    document.getElementById('loginScreen').classList.remove('hidden');
-    document.getElementById('mainApp').classList.add('hidden');
-    console.log('✅ NutriFlow loaded – modals hidden.');
-});
+//  INIT – Force everything to start correctly
+// ================================================================
+// Hide ALL modals immediately
+document.querySelectorAll('.modal').forEach(m => m.classList.add('hidden'));
+// Show login screen, hide main app
+document.getElementById('loginScreen').classList.remove('hidden');
+document.getElementById('mainApp').classList.add('hidden');
+console.log('✅ NutriFlow loaded – modals hidden.');
     </script>
 </body>
 </html>
