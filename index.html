@@ -9,7 +9,7 @@
 
     <style>
         /* ================================================================
-           CSS VARIABLES & THEMES
+           CSS VARIABLES & THEMES (same as before)
            ================================================================ */
         :root {
             --bg-primary: #f0fdf4;
@@ -111,7 +111,7 @@
         }
 
         /* ================================================================
-           BASE STYLES
+           BASE STYLES (same as before)
            ================================================================ */
         * {
             box-sizing: border-box;
@@ -131,9 +131,6 @@
             margin: 0 auto;
         }
 
-        /* ================================================================
-           COMPONENTS
-           ================================================================ */
         .card {
             background: var(--bg-card);
             padding: 1.5rem;
@@ -1017,18 +1014,6 @@
             border-radius: 9999px;
             display: inline-block;
         }
-        .family-calendar-grid .calendar-day .member-indicators {
-            position: absolute;
-            bottom: 1px;
-            right: 1px;
-            display: flex;
-            gap: 1px;
-        }
-        .family-calendar-grid .calendar-day .member-indicators .mini-dot {
-            width: 3px;
-            height: 3px;
-            border-radius: 9999px;
-        }
     </style>
 </head>
 <body>
@@ -1144,6 +1129,7 @@
                             <button class="btn btn-water btn-sm" onclick="addWater(500)">+500ml</button>
                             <button class="btn btn-water btn-sm" onclick="addWater(750)">+750ml</button>
                             <button class="btn btn-water btn-sm" onclick="addWater(1000)">+1000ml</button>
+                            <button class="btn btn-danger btn-sm" onclick="resetWater()">🗑️ Reset</button>
                         </div>
                     </div>
                 </div>
@@ -1156,14 +1142,21 @@
                             <span style="font-size:0.9rem;color:var(--text-secondary);">
                                 <span id="trainingCount"></span> this week
                             </span>
+                            <button class="btn btn-danger btn-sm" onclick="undoTraining()">↩️ Undo</button>
                         </div>
                         <div style="font-size:0.9rem;color:var(--text-secondary);">
                             🔥 Streak: <span id="streakCount" style="font-weight:700;color:var(--primary);">0</span> days
                         </div>
                     </div>
 
+                    <!-- Training Notes -->
+                    <div style="margin-top:0.5rem;">
+                        <label style="font-size:0.8rem;">📝 What did you train today?</label>
+                        <input id="trainingNotes" placeholder="e.g., Chest & Back, 45min cardio..." style="font-size:0.85rem;" />
+                    </div>
+
                     <!-- Compact Calendar -->
-                    <div class="calendar-compact">
+                    <div class="calendar-compact" style="margin-top:0.75rem;">
                         <div class="flex-between" style="margin-bottom:0.3rem;">
                             <span class="stat-label" style="font-size:0.6rem;">📅 Your Activity</span>
                             <div class="calendar-filter-buttons">
@@ -1249,7 +1242,7 @@
             </div>
 
             <!-- =============================================================
-            VIEW: PROGRESS (with Tabs)
+            VIEW: PROGRESS
             ============================================================= -->
             <div id="view-progress" class="hidden">
                 <h2>📈 Progress Tracker</h2>
@@ -1259,7 +1252,6 @@
                     <button data-tab="inbody" onclick="switchProgressTab('inbody')">📄 InBody Report</button>
                 </div>
 
-                <!-- Measurements Tab -->
                 <div id="progressTab-measurements">
                     <div class="card">
                         <div class="stat-label">Log New Measurement</div>
@@ -1277,7 +1269,6 @@
                     </div>
                 </div>
 
-                <!-- InBody Report Tab -->
                 <div id="progressTab-inbody" class="hidden">
                     <div class="card">
                         <div class="stat-label">📄 InBody Report</div>
@@ -1529,7 +1520,7 @@
         let familyMembers = [];
 
         // ================================================================
-        //  THEME ENGINE (Dropdown)
+        //  THEME ENGINE
         // ================================================================
         function toggleThemeDropdown() {
             document.getElementById('themeDropdownContent').classList.toggle('show');
@@ -1622,6 +1613,14 @@
             updateWaterProgress();
             showToast('💧 Added ' + amount + 'ml water');
             apiCall('logWater', { userId, familyCode, amount });
+        }
+
+        function resetWater() {
+            dailyWaterLog = 0;
+            document.getElementById('dashWater').textContent = '0';
+            updateWaterProgress();
+            showToast('🗑️ Water log reset');
+            apiCall('resetWater', { userId, familyCode });
         }
 
         function updateWaterProgress() {
@@ -1722,6 +1721,7 @@
                         `<div style="border-bottom:1px solid var(--border-color);padding:0.25rem 0;display:flex;justify-content:space-between;">
                             <span>${m.Meal_Type || 'Snack'}: ${m.Recipe_Name || '—'}</span>
                             <span style="font-weight:600;">${m.Calories || 0} kcal</span>
+                            <button class="btn btn-danger btn-sm" onclick="deleteMeal('${m.Recipe_ID}')" style="padding:0.1rem 0.3rem;font-size:0.6rem;">🗑️</button>
                         </div>`
                     ).join('');
                 }
@@ -1736,13 +1736,25 @@
             }
         }
 
+        // ================================================================
+        //  TRAINING
+        // ================================================================
         async function toggleTraining() {
             const btn = document.getElementById('trainingBtn');
             const isDone = btn.textContent.includes('Done');
             const newVal = !isDone;
-            const result = await apiCall('toggleTraining', { userId, familyCode, trained: newVal });
+            const notes = document.getElementById('trainingNotes').value.trim();
+
+            const result = await apiCall('toggleTraining', {
+                userId,
+                familyCode,
+                trained: newVal,
+                notes: notes
+            });
+
             if (result.success) {
                 showToast(newVal ? '✅ Training logged!' : 'Training unlogged.');
+                document.getElementById('trainingNotes').value = '';
                 loadDashboardData();
                 loadTrainingCalendar();
                 loadFamilyCalendar();
@@ -1751,8 +1763,36 @@
             }
         }
 
+        async function undoTraining() {
+            const result = await apiCall('undoTraining', { userId, familyCode });
+            if (result.success) {
+                showToast('↩️ Training undone');
+                loadDashboardData();
+                loadTrainingCalendar();
+                loadFamilyCalendar();
+            } else {
+                showToast('❌ ' + (result.error || 'Failed to undo training.'), 'error');
+            }
+        }
+
         // ================================================================
-        //  TRAINING CALENDAR (Compact)
+        //  DELETE MEAL
+        // ================================================================
+        async function deleteMeal(recipeId) {
+            if (!confirm('Delete this meal entry?')) return;
+            const result = await apiCall('deleteMeal', { userId, familyCode, recipeId });
+            if (result.success) {
+                showToast('🗑️ Meal deleted');
+                loadDashboardData();
+                loadTrainingCalendar();
+                loadFamilyCalendar();
+            } else {
+                showToast('❌ ' + (result.error || 'Failed to delete.'), 'error');
+            }
+        }
+
+        // ================================================================
+        //  TRAINING CALENDAR
         // ================================================================
         function setCalendarFilter(filter) {
             calendarFilter = filter;
@@ -1841,6 +1881,7 @@
                 html += `<div class="day-label">${d}</div>`;
             });
 
+            // Fill in empty days before the first day of the month
             for (let i = 0; i < firstDay; i++) {
                 html += `<div class="calendar-day empty"></div>`;
             }
@@ -1886,7 +1927,7 @@
 
             // Update family members list
             const membersContainer = document.getElementById('familyMembersList');
-            if (members.length === 0) {
+            if (!members || members.length === 0) {
                 membersContainer.innerHTML = '<p class="text-muted">No other family members yet.</p>';
             } else {
                 membersContainer.innerHTML = members.map(m =>
@@ -2231,7 +2272,7 @@
         }
 
         // ================================================================
-        //  PROGRESS (with Tabs)
+        //  PROGRESS
         // ================================================================
         let currentProgressTab = 'measurements';
 
@@ -2593,7 +2634,7 @@
             document.getElementById('loginScreen').classList.remove('hidden');
             document.getElementById('mainApp').classList.add('hidden');
             loadTheme();
-            console.log('✅ NutriFlow v4.0 loaded successfully!');
+            console.log('✅ NutriFlow v5.0 loaded successfully!');
         });
     </script>
 
