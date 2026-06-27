@@ -212,7 +212,7 @@
                         <p><strong>Target Protein:</strong> <span id="settingsProtein"></span> g</p>
                         <p><strong>Target Water:</strong> <span id="settingsWater"></span> ml</p>
                     </div>
-                    <button onclick="showEditProfile()" style="margin-top:1rem;background:#16A34A;color:white;border:none;padding:0.5rem 1rem;border-radius:0.5rem;cursor:pointer;">Edit Profile</button>
+                    <button onclick="document.getElementById('editProfileModal').classList.remove('hidden'); document.getElementById('editAge').value = userData.Age || ''; document.getElementById('editSex').value = userData.Sex || 'Male'; document.getElementById('editHeight').value = userData.Height_cm || ''; document.getElementById('editWeight').value = userData.Weight_kg || ''; document.getElementById('editActivity').value = userData.Activity_Level || 'Moderate'; document.getElementById('editGoal').value = userData.Goal || 'Maintain'; document.getElementById('editTraining').value = userData.Training_Days_Weekly || 3;" style="margin-top:1rem;background:#16A34A;color:white;border:none;padding:0.5rem 1rem;border-radius:0.5rem;cursor:pointer;">Edit Profile</button>
                 </div>
                 <div class="card">
                     <div class="stat-label">Family Members</div>
@@ -789,16 +789,11 @@
         }
     }
 }
-        function showEditProfile() {
-            document.getElementById('editAge').value = userData.Age || '';
-            document.getElementById('editSex').value = userData.Sex || 'Male';
-            document.getElementById('editHeight').value = userData.Height_cm || '';
-            document.getElementById('editWeight').value = userData.Weight_kg || '';
-            document.getElementById('editActivity').value = userData.Activity_Level || 'Moderate';
-            document.getElementById('editGoal').value = userData.Goal || 'Maintain';
-            document.getElementById('editTraining').value = userData.Training_Days_Weekly || 3;
-            document.getElementById('editProfileModal').classList.remove('hidden');
-        }
+       function showEditProfile() {
+    // DISABLED – temporarily prevent modal from opening
+    console.log('Edit Profile button clicked – modal disabled');
+    // Do nothing – modal stays hidden
+}
 
         async function submitEditProfile() {
             const result = await apiCall('updateProfile', {
