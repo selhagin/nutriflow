@@ -1,19 +1,16 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>NutriFlow · Family Nutrition OS</title>
-    <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js">
     </script>
 
     <style>
         /* ================================================================
-             1.  CSS VARIABLES & THEMES
-             ================================================================ */
-
-        /* ---------- Light Theme (Default) ---------- */
+           CSS VARIABLES & THEMES
+           ================================================================ */
         :root {
             --bg-primary: #f0fdf4;
             --bg-secondary: #ffffff;
@@ -28,25 +25,18 @@
             --shadow-lg: 0 20px 60px rgba(0, 0, 0, 0.08);
             --radius: 1rem;
             --radius-sm: 0.5rem;
-
-            /* Brand Colors */
             --primary: #0F766E;
             --primary-light: #14b8a6;
             --primary-dark: #0d5c56;
             --primary-bg: #dcfce7;
             --secondary: #F59E0B;
-            --secondary-light: #fbbf24;
             --accent: #2563EB;
-            --accent-light: #60a5fa;
-
-            /* Status */
             --success: #16A34A;
             --error: #dc2626;
             --warning: #F59E0B;
         }
 
-        /* ---------- Dark Theme ---------- */
-        [data-theme="dark"] {
+        [data-theme="midnight"] {
             --bg-primary: #0f172a;
             --bg-secondary: #1e293b;
             --bg-card: #1e293b;
@@ -59,62 +49,75 @@
             --shadow: 0 4px 6px rgba(0, 0, 0, 0.4);
             --shadow-lg: 0 20px 60px rgba(0, 0, 0, 0.6);
             --primary-bg: #134e4a;
+            --primary: #6366f1;
+            --primary-light: #818cf8;
+            --primary-dark: #4f46e5;
+            --secondary: #f472b6;
+            --accent: #60a5fa;
         }
 
-        /* ---------- Sunset Theme ---------- */
-        [data-theme="sunset"] {
-            --primary: #c2410c;
-            --primary-light: #ea580c;
-            --primary-dark: #9a3412;
+        [data-theme="sunrise"] {
+            --bg-primary: #fffbeb;
+            --bg-secondary: #ffffff;
+            --bg-card: #ffffff;
+            --bg-nav: #ffffff;
+            --bg-input: #fef3c7;
+            --text-primary: #451a03;
+            --text-secondary: #78350f;
+            --text-muted: #92400e;
+            --border-color: #fed7aa;
+            --primary: #e85d04;
+            --primary-light: #f48c06;
+            --primary-dark: #dc2f02;
             --primary-bg: #ffedd5;
             --secondary: #f59e0b;
             --accent: #d97706;
         }
 
-        [data-theme="sunset"][data-theme="dark"] {
-            --bg-primary: #1c1917;
-            --bg-secondary: #292524;
-            --bg-card: #292524;
-            --bg-nav: #292524;
-            --text-primary: #fef3c7;
-            --text-secondary: #d6d3d1;
-            --text-muted: #a8a29e;
-            --border-color: #44403c;
-            --primary-bg: #451a03;
-        }
-
-        /* ---------- Bloom Theme (Pink/Purple) ---------- */
-        [data-theme="bloom"] {
-            --primary: #7c3aed;
-            --primary-light: #8b5cf6;
-            --primary-dark: #5b21b6;
-            --primary-bg: #ede9fe;
-            --secondary: #ec4899;
+        [data-theme="rose"] {
+            --bg-primary: #fdf2f8;
+            --bg-secondary: #ffffff;
+            --bg-card: #ffffff;
+            --bg-nav: #ffffff;
+            --bg-input: #fce7f3;
+            --text-primary: #831843;
+            --text-secondary: #9d174d;
+            --text-muted: #be185d;
+            --border-color: #fbcfe8;
+            --primary: #e11d48;
+            --primary-light: #fb7185;
+            --primary-dark: #be123c;
+            --primary-bg: #fce7f3;
+            --secondary: #f59e0b;
             --accent: #8b5cf6;
         }
 
-        [data-theme="bloom"][data-theme="dark"] {
-            --bg-primary: #1e1b2e;
-            --bg-secondary: #2d2a44;
-            --bg-card: #2d2a44;
-            --bg-nav: #2d2a44;
-            --text-primary: #f3e8ff;
-            --text-secondary: #d8b4fe;
-            --text-muted: #a78bfa;
-            --border-color: #4c1d95;
-            --primary-bg: #2e1065;
+        [data-theme="steel"] {
+            --bg-primary: #f1f5f9;
+            --bg-secondary: #ffffff;
+            --bg-card: #ffffff;
+            --bg-nav: #ffffff;
+            --bg-input: #e2e8f0;
+            --text-primary: #0f172a;
+            --text-secondary: #334155;
+            --text-muted: #64748b;
+            --border-color: #cbd5e1;
+            --primary: #475569;
+            --primary-light: #94a3b8;
+            --primary-dark: #334155;
+            --primary-bg: #e2e8f0;
+            --secondary: #f59e0b;
+            --accent: #60a5fa;
         }
 
         /* ================================================================
-             2.  BASE STYLES
-             ================================================================ */
-
+           BASE STYLES
+           ================================================================ */
         * {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
         }
-
         body {
             font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
             background: var(--bg-primary);
@@ -123,16 +126,14 @@
             transition: background 0.3s, color 0.3s;
             min-height: 100vh;
         }
-
         .container {
             max-width: 1100px;
             margin: 0 auto;
         }
 
         /* ================================================================
-             3.  CARDS & COMPONENTS
-             ================================================================ */
-
+           COMPONENTS
+           ================================================================ */
         .card {
             background: var(--bg-card);
             padding: 1.5rem;
@@ -142,21 +143,12 @@
             margin-bottom: 1.5rem;
             transition: background 0.3s, border 0.3s, box-shadow 0.3s;
         }
-
-        .card-glass {
-            background: rgba(255, 255, 255, 0.05);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
         .flex {
             display: flex;
             flex-wrap: wrap;
             gap: 1rem;
             align-items: center;
         }
-
         .flex-between {
             display: flex;
             justify-content: space-between;
@@ -164,53 +156,46 @@
             flex-wrap: wrap;
             gap: 0.5rem;
         }
-
         .grid-3 {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
             gap: 1rem;
         }
-
         .grid-2 {
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 1rem;
         }
-
         @media (max-width: 768px) {
             .grid-2 {
                 grid-template-columns: 1fr;
             }
         }
-
         h1 {
             color: var(--primary);
             font-size: 2rem;
             font-weight: 800;
         }
-
         h2 {
             color: var(--text-primary);
             font-size: 1.5rem;
             font-weight: 700;
             margin-bottom: 1rem;
         }
-
         h3 {
             color: var(--text-primary);
             font-size: 1.1rem;
             font-weight: 600;
+            margin-top: 0.75rem;
+            margin-bottom: 0.5rem;
         }
-
         .text-muted {
             color: var(--text-muted);
             font-size: 0.85rem;
         }
-
         .text-primary {
             color: var(--primary);
         }
-
         .stat-label {
             font-size: 0.7rem;
             text-transform: uppercase;
@@ -218,20 +203,17 @@
             color: var(--text-muted);
             font-weight: 600;
         }
-
         .stat-value {
             font-size: 1.8rem;
             font-weight: 800;
             color: var(--text-primary);
             line-height: 1.2;
         }
-
         .stat-target {
             font-size: 0.85rem;
             color: var(--text-muted);
         }
 
-        /* Buttons */
         .btn {
             padding: 0.6rem 1.2rem;
             border: none;
@@ -244,59 +226,58 @@
             align-items: center;
             gap: 0.5rem;
         }
-
         .btn-primary {
             background: var(--primary);
             color: white;
         }
-
         .btn-primary:hover {
             background: var(--primary-dark);
             transform: translateY(-2px);
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
         }
-
         .btn-secondary {
             background: var(--secondary);
             color: white;
         }
-
         .btn-secondary:hover {
-            background: #d97706;
+            filter: brightness(0.9);
             transform: translateY(-2px);
         }
-
         .btn-outline {
             background: transparent;
             color: var(--primary);
             border: 2px solid var(--primary);
         }
-
         .btn-outline:hover {
             background: var(--primary);
             color: white;
         }
-
         .btn-danger {
             background: var(--error);
             color: white;
         }
-
         .btn-danger:hover {
             background: #b91c1c;
         }
-
         .btn-sm {
             padding: 0.3rem 0.8rem;
             font-size: 0.75rem;
         }
-
         .btn-lg {
             padding: 0.8rem 2rem;
             font-size: 1.1rem;
         }
+        .btn-water {
+            background: var(--accent);
+            color: white;
+            padding: 0.3rem 0.8rem;
+            font-size: 0.8rem;
+            border-radius: 9999px;
+        }
+        .btn-water:hover {
+            filter: brightness(0.9);
+        }
 
-        /* Progress Bar */
         .progress-bg {
             background: var(--border-color);
             border-radius: 9999px;
@@ -304,14 +285,12 @@
             margin-top: 0.5rem;
             overflow: hidden;
         }
-
         .progress-fill {
             height: 100%;
             border-radius: 9999px;
             transition: width 0.8s ease;
         }
 
-        /* Inputs */
         input,
         select,
         textarea {
@@ -324,14 +303,12 @@
             transition: border 0.2s, background 0.3s;
             width: 100%;
         }
-
         input:focus,
         select:focus {
             outline: none;
             border-color: var(--primary);
             box-shadow: 0 0 0 3px rgba(15, 118, 110, 0.15);
         }
-
         label {
             font-weight: 600;
             font-size: 0.85rem;
@@ -340,7 +317,6 @@
             margin-bottom: 0.2rem;
         }
 
-        /* Toast */
         .toast {
             position: fixed;
             bottom: 2rem;
@@ -355,14 +331,12 @@
             max-width: 380px;
             animation: slideUp 0.3s ease;
         }
-
         .toast.success {
             border-left: 4px solid var(--success);
         }
         .toast.error {
             border-left: 4px solid var(--error);
         }
-
         @keyframes slideUp {
             from {
                 opacity: 0;
@@ -373,15 +347,31 @@
                 transform: translateY(0);
             }
         }
-
         .hidden {
             display: none !important;
         }
+        .text-center {
+            text-align: center;
+        }
+        .mt-1 {
+            margin-top: 0.5rem;
+        }
+        .mt-2 {
+            margin-top: 1rem;
+        }
+        .mb-1 {
+            margin-bottom: 0.5rem;
+        }
+        .gap-1 {
+            gap: 0.5rem;
+        }
+        .w-full {
+            width: 100%;
+        }
 
         /* ================================================================
-             4.  LOGIN
-             ================================================================ */
-
+           LOGIN
+           ================================================================ */
         .login-card {
             max-width: 420px;
             margin: 3rem auto;
@@ -391,20 +381,17 @@
             box-shadow: var(--shadow-lg);
             border: 1px solid var(--border-color);
         }
-
         .login-card input {
             margin-bottom: 1rem;
         }
-
         .login-card .btn {
             width: 100%;
             justify-content: center;
         }
 
         /* ================================================================
-             5.  NAVIGATION
-             ================================================================ */
-
+           NAVIGATION
+           ================================================================ */
         .nav {
             display: flex;
             gap: 0.25rem;
@@ -416,7 +403,6 @@
             border: 1px solid var(--border-color);
             margin-bottom: 1.5rem;
         }
-
         .nav button {
             background: transparent;
             color: var(--text-secondary);
@@ -429,40 +415,83 @@
             transition: all 0.2s;
             white-space: nowrap;
         }
-
         .nav button:hover {
             background: var(--primary-bg);
             color: var(--primary);
         }
-
         .nav button.active {
             background: var(--primary);
             color: white;
         }
 
         /* ================================================================
-             6.  DASHBOARD STATS
-             ================================================================ */
-
-        .stat-ring {
+           THEME SELECTOR
+           ================================================================ */
+        .theme-selector {
             display: flex;
-            flex-direction: column;
+            gap: 0.75rem;
+            flex-wrap: wrap;
             align-items: center;
-            text-align: center;
+            padding: 0.5rem 0;
         }
-
-        .stat-ring .ring-value {
-            font-size: 1.4rem;
-            font-weight: 700;
-        }
-
-        .stat-ring .ring-label {
-            font-size: 0.7rem;
-            text-transform: uppercase;
+        .theme-selector .theme-label {
+            font-size: 0.75rem;
+            font-weight: 600;
             color: var(--text-muted);
             letter-spacing: 0.04em;
+            text-transform: uppercase;
+            margin-right: 0.5rem;
+        }
+        .theme-option {
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+            padding: 0.3rem 0.8rem 0.3rem 0.5rem;
+            border-radius: 9999px;
+            border: 2px solid var(--border-color);
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 0.75rem;
+            font-weight: 500;
+            color: var(--text-secondary);
+            background: var(--bg-card);
+        }
+        .theme-option:hover {
+            transform: scale(1.05);
+            border-color: var(--primary);
+        }
+        .theme-option.active {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(15, 118, 110, 0.15);
+            background: var(--primary-bg);
+            color: var(--primary);
+        }
+        .theme-swatch {
+            width: 1.2rem;
+            height: 1.2rem;
+            border-radius: 9999px;
+            display: inline-block;
+            border: 1px solid rgba(0, 0, 0, 0.1);
+        }
+        .theme-swatch.emerald {
+            background: linear-gradient(135deg, #0F766E, #14b8a6);
+        }
+        .theme-swatch.midnight {
+            background: linear-gradient(135deg, #6366f1, #818cf8);
+        }
+        .theme-swatch.sunrise {
+            background: linear-gradient(135deg, #e85d04, #f48c06);
+        }
+        .theme-swatch.rose {
+            background: linear-gradient(135deg, #e11d48, #fb7185);
+        }
+        .theme-swatch.steel {
+            background: linear-gradient(135deg, #475569, #94a3b8);
         }
 
+        /* ================================================================
+           DASHBOARD
+           ================================================================ */
         .training-btn {
             background: var(--primary);
             color: white;
@@ -478,63 +507,147 @@
             gap: 0.5rem;
             box-shadow: 0 4px 15px rgba(15, 118, 110, 0.3);
         }
-
         .training-btn:hover {
             transform: scale(1.05);
             box-shadow: 0 6px 25px rgba(15, 118, 110, 0.4);
         }
-
         .training-btn.done {
             background: var(--success);
             box-shadow: 0 4px 15px rgba(22, 163, 74, 0.3);
         }
+        .chart-container {
+            position: relative;
+            height: 200px;
+            width: 100%;
+        }
+
+        .water-buttons {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+            margin-top: 0.5rem;
+        }
 
         /* ================================================================
-             7.  WEEKLY PLANNER
-             ================================================================ */
+           TRAINING CALENDAR
+           ================================================================ */
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 0.2rem;
+        }
+        .calendar-grid .day-label {
+            font-size: 0.6rem;
+            text-align: center;
+            font-weight: 600;
+            color: var(--text-muted);
+            padding: 0.2rem;
+        }
+        .calendar-day {
+            aspect-ratio: 1;
+            border-radius: var(--radius-sm);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.7rem;
+            font-weight: 600;
+            background: var(--border-color);
+            color: var(--text-muted);
+            cursor: pointer;
+            transition: all 0.2s;
+            border: 2px solid transparent;
+        }
+        .calendar-day:hover {
+            transform: scale(1.1);
+        }
+        .calendar-day.trained {
+            background: var(--primary);
+            color: white;
+        }
+        .calendar-day.partial {
+            background: var(--secondary);
+            color: white;
+        }
+        .calendar-day.logged {
+            background: var(--primary-light);
+            color: white;
+        }
+        .calendar-day.empty {
+            background: transparent;
+            border-color: var(--border-color);
+        }
+        .calendar-day.today {
+            border-color: var(--primary);
+        }
+        .calendar-legend {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+            margin-top: 0.5rem;
+            font-size: 0.75rem;
+        }
+        .calendar-legend span {
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+        }
+        .calendar-legend .dot {
+            width: 0.8rem;
+            height: 0.8rem;
+            border-radius: 9999px;
+            display: inline-block;
+        }
+        .calendar-legend .dot.trained {
+            background: var(--primary);
+        }
+        .calendar-legend .dot.partial {
+            background: var(--secondary);
+        }
+        .calendar-legend .dot.logged {
+            background: var(--primary-light);
+        }
+        .calendar-legend .dot.empty {
+            background: var(--border-color);
+        }
 
+        /* ================================================================
+           WEEKLY PLANNER
+           ================================================================ */
         .week-grid {
             display: grid;
             grid-template-columns: repeat(7, 1fr);
             gap: 0.5rem;
         }
-
         @media (max-width: 1024px) {
             .week-grid {
                 grid-template-columns: repeat(4, 1fr);
             }
         }
-
         @media (max-width: 768px) {
             .week-grid {
                 grid-template-columns: repeat(2, 1fr);
             }
         }
-
         @media (max-width: 480px) {
             .week-grid {
                 grid-template-columns: 1fr;
             }
         }
-
         .day-card {
             background: var(--bg-card);
             padding: 0.6rem;
             border-radius: var(--radius-sm);
             border: 1px solid var(--border-color);
         }
-
         .day-card .day-label {
             font-weight: 700;
             font-size: 0.75rem;
             color: var(--primary);
             margin-bottom: 0.25rem;
         }
-
         .day-card .meal-row {
             margin-bottom: 0.2rem;
         }
-
         .day-card .meal-row label {
             font-size: 0.55rem;
             text-transform: uppercase;
@@ -542,7 +655,6 @@
             letter-spacing: 0.04em;
             font-weight: 600;
         }
-
         .day-card .meal-row select {
             font-size: 0.65rem;
             padding: 0.1rem 0.2rem;
@@ -554,15 +666,13 @@
         }
 
         /* ================================================================
-             8.  RECIPE CARDS & MODAL
-             ================================================================ */
-
+           RECIPES
+           ================================================================ */
         .recipe-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
             gap: 1rem;
         }
-
         .recipe-card {
             background: var(--bg-card);
             padding: 0.75rem;
@@ -571,30 +681,25 @@
             cursor: pointer;
             transition: all 0.2s;
         }
-
         .recipe-card:hover {
             transform: translateY(-4px);
             box-shadow: var(--shadow-lg);
             border-color: var(--primary);
         }
-
         .recipe-card .title {
             font-weight: 600;
             font-size: 0.95rem;
         }
-
         .recipe-card .cal {
             color: var(--primary);
             font-weight: 700;
         }
-
         .recipe-card .tags {
             display: flex;
             flex-wrap: wrap;
             gap: 0.2rem;
             margin-top: 0.3rem;
         }
-
         .recipe-card .tag {
             background: var(--primary-bg);
             font-size: 0.6rem;
@@ -603,7 +708,9 @@
             color: var(--primary);
         }
 
-        /* Recipe Modal */
+        /* ================================================================
+           MODAL
+           ================================================================ */
         .modal-overlay {
             position: fixed;
             inset: 0;
@@ -615,16 +722,14 @@
             z-index: 1000;
             padding: 1rem;
         }
-
         .modal-overlay.open {
             display: flex;
         }
-
         .modal-box {
             background: var(--bg-card);
             border-radius: 1.5rem;
             padding: 2rem;
-            max-width: 600px;
+            max-width: 650px;
             width: 100%;
             max-height: 90vh;
             overflow-y: auto;
@@ -632,7 +737,6 @@
             box-shadow: var(--shadow-lg);
             animation: slideUp 0.3s ease;
         }
-
         .modal-box .close-btn {
             float: right;
             background: transparent;
@@ -641,99 +745,75 @@
             color: var(--text-muted);
             cursor: pointer;
         }
-
         .modal-box .close-btn:hover {
             color: var(--text-primary);
         }
-
         .modal-box .ingredient-list {
             list-style: none;
             padding: 0;
         }
-
         .modal-box .ingredient-list li {
-            padding: 0.2rem 0;
+            padding: 0.3rem 0;
             border-bottom: 1px solid var(--border-color);
             font-size: 0.9rem;
+            display: flex;
+            justify-content: space-between;
         }
-
+        .modal-box .ingredient-list li .ing-qty {
+            font-weight: 600;
+            color: var(--primary);
+        }
         .modal-box .step-list {
             list-style: decimal;
             padding-left: 1.2rem;
         }
-
         .modal-box .step-list li {
             padding: 0.3rem 0;
             font-size: 0.9rem;
             border-bottom: 1px solid var(--border-color);
         }
-
         .modal-box .step-list li:last-child {
             border-bottom: none;
         }
-
-        /* ================================================================
-             9.  THEME SELECTOR
-             ================================================================ */
-
-        .theme-selector {
-            display: flex;
-            gap: 0.5rem;
-            flex-wrap: wrap;
-            align-items: center;
+        .modal-box .portion-notes {
+            background: var(--primary-bg);
+            padding: 0.75rem;
+            border-radius: var(--radius-sm);
+            margin-top: 0.5rem;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
         }
-
-        .theme-btn {
-            width: 2rem;
-            height: 2rem;
-            border-radius: 9999px;
-            border: 2px solid var(--border-color);
-            cursor: pointer;
-            transition: all 0.2s;
+        .modal-box .portion-notes strong {
+            color: var(--primary);
         }
-
-        .theme-btn:hover {
-            transform: scale(1.1);
-        }
-
-        .theme-btn.active {
-            border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(15, 118, 110, 0.2);
-        }
-
-        .theme-btn.light {
-            background: #f0fdf4;
-        }
-        .theme-btn.dark {
-            background: #0f172a;
-        }
-        .theme-btn.sunset {
-            background: #c2410c;
-        }
-        .theme-btn.bloom {
-            background: #7c3aed;
-        }
-
-        /* ================================================================
-             10. SETTINGS
-             ================================================================ */
-
-        .settings-grid {
+        .macro-grid {
             display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 1.5rem;
+            grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
+            gap: 0.5rem;
+            margin: 0.5rem 0;
+            padding: 0.5rem;
+            background: var(--bg-input);
+            border-radius: var(--radius-sm);
         }
-
-        @media (max-width: 768px) {
-            .settings-grid {
-                grid-template-columns: 1fr;
-            }
+        .macro-grid .macro-item {
+            text-align: center;
+            font-size: 0.85rem;
+        }
+        .macro-grid .macro-item .macro-value {
+            font-weight: 700;
+            font-size: 1rem;
+            display: block;
+            color: var(--text-primary);
+        }
+        .macro-grid .macro-item .macro-label {
+            font-size: 0.65rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
         }
 
         /* ================================================================
-             11. SHOPPING LIST
-             ================================================================ */
-
+           SHOPPING
+           ================================================================ */
         .shopping-item {
             display: flex;
             align-items: center;
@@ -741,79 +821,79 @@
             padding: 0.4rem 0;
             border-bottom: 1px solid var(--border-color);
         }
-
         .shopping-item:last-child {
             border-bottom: none;
         }
-
         .shopping-item .name {
             flex: 1;
             font-size: 0.9rem;
         }
-
         .shopping-item .qty {
             font-size: 0.8rem;
             color: var(--text-muted);
         }
-
         .shopping-item.purchased .name {
             text-decoration: line-through;
             color: var(--text-muted);
         }
 
         /* ================================================================
-             12. CHART CONTAINER
-             ================================================================ */
-
-        .chart-container {
-            position: relative;
-            height: 200px;
-            width: 100%;
+           SETTINGS
+           ================================================================ */
+        .settings-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+        }
+        @media (max-width: 768px) {
+            .settings-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        .edit-form {
+            margin-top: 1rem;
+            padding-top: 1rem;
+            border-top: 1px solid var(--border-color);
+        }
+        .edit-form .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.75rem;
         }
 
         /* ================================================================
-             13. RESPONSIVE HELPERS
-             ================================================================ */
-
-        .text-center {
-            text-align: center;
-        }
-
-        .mt-1 {
-            margin-top: 0.5rem;
-        }
-        .mt-2 {
-            margin-top: 1rem;
-        }
-        .mt-3 {
-            margin-top: 1.5rem;
-        }
-
-        .mb-1 {
-            margin-bottom: 0.5rem;
-        }
-        .mb-2 {
-            margin-bottom: 1rem;
-        }
-
-        .gap-1 {
-            gap: 0.5rem;
-        }
-        .gap-2 {
-            gap: 1rem;
-        }
-
-        .w-full {
+           PROGRESS
+           ================================================================ */
+        .progress-table {
             width: 100%;
+            font-size: 0.9rem;
+            border-collapse: collapse;
+        }
+        .progress-table th {
+            text-align: left;
+            padding: 0.5rem 0.25rem;
+            border-bottom: 1px solid var(--border-color);
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            color: var(--text-muted);
+        }
+        .progress-table td {
+            padding: 0.4rem 0.25rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+        .inbody-link {
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 500;
+        }
+        .inbody-link:hover {
+            text-decoration: underline;
         }
     </style>
 </head>
 <body>
 
     <div id="app">
-        <!-- =============================================================
-        TOAST
-        ============================================================= -->
         <div id="toast" class="toast hidden"></div>
 
         <!-- =============================================================
@@ -847,9 +927,7 @@
         ============================================================= -->
         <div id="mainApp" class="container hidden">
 
-            <!-- =============================================================
-            HEADER
-            ============================================================= -->
+            <!-- HEADER -->
             <header class="flex-between" style="background:var(--bg-card);padding:0.75rem 1.5rem;border-radius:var(--radius);box-shadow:var(--shadow);border:1px solid var(--border-color);margin-bottom:1rem;">
                 <div class="flex" style="gap:0.5rem;">
                     <h1 style="font-size:1.5rem;">NutriFlow</h1>
@@ -861,29 +939,35 @@
                 </div>
             </header>
 
-            <!-- =============================================================
-            THEME SELECTOR (in header)
-            ============================================================= -->
-            <div style="display:flex;gap:0.5rem;align-items:center;margin-bottom:0.5rem;flex-wrap:wrap;">
-                <span style="font-size:0.75rem;color:var(--text-muted);font-weight:600;">Theme:</span>
-                <button class="theme-btn light active" data-theme="light" onclick="setTheme('light')" title="Light"></button>
-                <button class="theme-btn dark" data-theme="dark" onclick="setTheme('dark')" title="Dark"></button>
-                <button class="theme-btn sunset" data-theme="sunset" onclick="setTheme('sunset')" title="Sunset"></button>
-                <button class="theme-btn bloom" data-theme="bloom" onclick="setTheme('bloom')" title="Bloom"></button>
-                <span style="font-size:0.7rem;color:var(--text-muted);margin-left:0.5rem;">💡 Click to change</span>
+            <!-- THEME SELECTOR -->
+            <div class="theme-selector">
+                <span class="theme-label">🎨 Theme</span>
+                <div class="theme-option active" data-theme="emerald" onclick="setTheme('emerald')">
+                    <span class="theme-swatch emerald"></span> Emerald
+                </div>
+                <div class="theme-option" data-theme="midnight" onclick="setTheme('midnight')">
+                    <span class="theme-swatch midnight"></span> Midnight
+                </div>
+                <div class="theme-option" data-theme="sunrise" onclick="setTheme('sunrise')">
+                    <span class="theme-swatch sunrise"></span> Sunrise
+                </div>
+                <div class="theme-option" data-theme="rose" onclick="setTheme('rose')">
+                    <span class="theme-swatch rose"></span> Rose
+                </div>
+                <div class="theme-option" data-theme="steel" onclick="setTheme('steel')">
+                    <span class="theme-swatch steel"></span> Steel
+                </div>
             </div>
 
-            <!-- =============================================================
-            NAVIGATION
-            ============================================================= -->
+            <!-- NAVIGATION (Settings moved to end) -->
             <nav class="nav">
                 <button class="active" data-view="dashboard" onclick="switchView('dashboard')">📊 Dashboard</button>
                 <button data-view="planner" onclick="switchView('planner')">📅 Planner</button>
                 <button data-view="recipes" onclick="switchView('recipes')">📖 Recipes</button>
                 <button data-view="progress" onclick="switchView('progress')">📈 Progress</button>
                 <button data-view="shopping" onclick="switchView('shopping')">🛒 Shopping</button>
-                <button data-view="settings" onclick="switchView('settings')">⚙️ Settings</button>
                 <button data-view="nutrition" onclick="switchView('nutrition')">📚 Nutrition Guide</button>
+                <button data-view="settings" onclick="switchView('settings')">⚙️ Settings</button>
             </nav>
 
             <!-- =============================================================
@@ -895,1057 +979,5 @@
                 <!-- Stats Row -->
                 <div class="grid-3" style="margin-bottom:1.5rem;">
                     <div class="card" style="text-align:center;">
-                        <div class="stat-label">Calories</div>
-                        <div><span class="stat-value" id="dashCalories">0</span> <span class="stat-target">/ <span id="dashCalTarget">0</span> kcal</span></div>
-                        <div class="progress-bg"><div id="calProgress" class="progress-fill" style="width:0%;background:var(--primary);"></div></div>
-                    </div>
-                    <div class="card" style="text-align:center;">
-                        <div class="stat-label">Protein</div>
-                        <div><span class="stat-value" id="dashProtein">0</span> <span class="stat-target">/ <span id="dashProtTarget">0</span> g</span></div>
-                        <div class="progress-bg"><div id="protProgress" class="progress-fill" style="width:0%;background:var(--secondary);"></div></div>
-                    </div>
-                    <div class="card" style="text-align:center;">
-                        <div class="stat-label">Water</div>
-                        <div><span class="stat-value" id="dashWater">0</span> <span class="stat-target">/ <span id="dashWaterTarget">0</span> ml</span></div>
-                        <div class="progress-bg"><div id="waterProgress" class="progress-fill" style="width:0%;background:var(--accent);"></div></div>
-                    </div>
-                </div>
-
-                <!-- Training + Streak -->
-                <div class="flex-between" style="margin-bottom:1.5rem;flex-wrap:wrap;gap:1rem;">
-                    <div class="flex" style="gap:1rem;">
-                        <button id="trainingBtn" class="training-btn" onclick="toggleTraining()">💪 Log Training</button>
-                        <span style="font-size:0.9rem;color:var(--text-secondary);">
-                            <span id="trainingCount"></span> this week
-                        </span>
-                    </div>
-                    <div style="font-size:0.9rem;color:var(--text-secondary);">
-                        🔥 Streak: <span id="streakCount" style="font-weight:700;color:var(--primary);">0</span> days
-                    </div>
-                </div>
-
-                <!-- Charts Row -->
-                <div class="grid-2">
-                    <div class="card">
-                        <div class="stat-label">📉 Weight Trend (7 days)</div>
-                        <div class="chart-container">
-                            <canvas id="weightChart"></canvas>
-                        </div>
-                    </div>
-                    <div class="card">
-                        <div class="stat-label">📊 Calories: Intake vs Target</div>
-                        <div class="chart-container">
-                            <canvas id="calorieChart"></canvas>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Today's Meals -->
-                <div class="card">
-                    <div class="stat-label">🍽️ Today's Meals</div>
-                    <div id="todayMeals"><p class="text-muted">No meals logged yet.</p></div>
-                </div>
-            </div>
-
-            <!-- =============================================================
-            VIEW: PLANNER
-            ============================================================= -->
-            <div id="view-planner" class="hidden">
-                <div class="flex-between">
-                    <h2>📅 Weekly Planner</h2>
-                    <div class="flex" style="gap:0.5rem;">
-                        <button class="btn btn-outline btn-sm" onclick="weekOffset--; loadPlanner();">‹</button>
-                        <span id="weekLabel" style="font-weight:600;font-size:0.9rem;"></span>
-                        <button class="btn btn-outline btn-sm" onclick="weekOffset++; loadPlanner();">›</button>
-                        <button class="btn btn-primary btn-sm" onclick="savePlanner()">💾 Save Week</button>
-                    </div>
-                </div>
-                <div id="plannerGrid" class="week-grid" style="margin-top:1rem;"></div>
-            </div>
-
-            <!-- =============================================================
-            VIEW: RECIPES
-            ============================================================= -->
-            <div id="view-recipes" class="hidden">
-                <h2>📖 Recipe Library</h2>
-                <div class="flex" style="margin-bottom:1rem;">
-                    <input id="recipeSearch" placeholder="Search recipes..." oninput="filterRecipes()" style="flex:1;" />
-                    <select id="recipeCategory" onchange="filterRecipes()" style="max-width:200px;">
-                        <option value="">All Categories</option>
-                    </select>
-                </div>
-                <div id="recipeGrid" class="recipe-grid"></div>
-            </div>
-
-            <!-- =============================================================
-            VIEW: PROGRESS
-            ============================================================= -->
-            <div id="view-progress" class="hidden">
-                <h2>📈 Progress Tracker</h2>
-                <div class="card">
-                    <div class="stat-label">Log New Measurement</div>
-                    <div class="grid-3">
-                        <div><label>Weight (kg)</label><input id="progWeight" type="number" step="0.1" /></div>
-                        <div><label>Waist (cm)</label><input id="progWaist" type="number" step="0.5" /></div>
-                        <div><label>Body Fat %</label><input id="progBodyFat" type="number" step="0.5" /></div>
-                    </div>
-                    <button class="btn btn-primary mt-1" onclick="saveProgress()">💾 Save Entry</button>
-                    <p id="progressStatus" class="mt-1"></p>
-                </div>
-                <div class="card">
-                    <div class="stat-label">Recent Entries</div>
-                    <div id="progressHistory"><p class="text-muted">No entries yet.</p></div>
-                </div>
-            </div>
-
-            <!-- =============================================================
-            VIEW: SHOPPING
-            ============================================================= -->
-            <div id="view-shopping" class="hidden">
-                <div class="flex-between">
-                    <h2>🛒 Shopping List</h2>
-                    <button class="btn btn-secondary btn-sm" onclick="generateShoppingList()">⟳ Generate from Planner</button>
-                </div>
-                <div id="shoppingList" class="card"></div>
-            </div>
-
-            <!-- =============================================================
-            VIEW: SETTINGS
-            ============================================================= -->
-            <div id="view-settings" class="hidden">
-                <h2>⚙️ Settings</h2>
-                <div class="settings-grid">
-                    <div class="card">
-                        <div class="stat-label">👤 Profile</div>
-                        <div id="profileInfo" style="margin-top:0.5rem;">
-                            <p><strong>Name:</strong> <span id="settingsName"></span></p>
-                            <p><strong>Family:</strong> <span id="settingsFamily"></span></p>
-                            <p><strong>Age:</strong> <span id="settingsAge"></span></p>
-                            <p><strong>Sex:</strong> <span id="settingsSex"></span></p>
-                            <p><strong>Goal:</strong> <span id="settingsGoal"></span></p>
-                            <p><strong>Target Calories:</strong> <span id="settingsCalories"></span> kcal</p>
-                            <p><strong>Target Protein:</strong> <span id="settingsProtein"></span> g</p>
-                            <p><strong>Target Water:</strong> <span id="settingsWater"></span> ml</p>
-                        </div>
-                        <button class="btn btn-primary btn-sm mt-1" onclick="toggleEditForm()">✏️ Edit Profile</button>
-
-                        <!-- Inline Edit Form -->
-                        <div id="editForm" class="hidden" style="margin-top:1rem;padding-top:1rem;border-top:1px solid var(--border-color);">
-                            <div class="grid-2">
-                                <div><label>Age</label><input id="editAge" type="number" /></div>
-                                <div><label>Sex</label><select id="editSex"><option>Male</option><option>Female</option></select></div>
-                                <div><label>Height (cm)</label><input id="editHeight" type="number" /></div>
-                                <div><label>Weight (kg)</label><input id="editWeight" type="number" /></div>
-                                <div><label>Activity Level</label><select id="editActivity"><option>Sedentary</option><option>Light</option><option>Moderate</option><option>Active</option><option>Very Active</option></select></div>
-                                <div><label>Goal</label><select id="editGoal"><option>Fat Loss - Slow</option><option>Fat Loss - Standard</option><option>Fat Loss - Aggressive</option><option>Maintain</option><option>Lean Bulk</option><option>Muscle Gain</option><option>Child Growth</option></select></div>
-                            </div>
-                            <div><label>Training Days / Week</label><input id="editTraining" type="number" /></div>
-                            <div class="flex" style="margin-top:0.5rem;">
-                                <button class="btn btn-danger btn-sm" onclick="toggleEditForm()">Cancel</button>
-                                <button class="btn btn-primary btn-sm" onclick="submitEditProfile()">Update</button>
-                            </div>
-                            <p id="editProfileStatus" class="mt-1"></p>
-                        </div>
-                    </div>
-
-                    <div class="card">
-                        <div class="stat-label">👨‍👩‍👧‍👦 Family Members</div>
-                        <div id="familyMembers" style="margin-top:0.5rem;"><p class="text-muted">Loading...</p></div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- =============================================================
-            VIEW: NUTRITION GUIDE
-            ============================================================= -->
-            <div id="view-nutrition" class="hidden">
-                <h2>📚 Nutrition Guide</h2>
-                <div class="card">
-                    <h3>💡 Understanding Your Targets</h3>
-                    <p style="color:var(--text-secondary);">Your calorie and protein targets are calculated using the <strong>Mifflin-St Jeor</strong> equation, adjusted for your goal. Water intake is based on your weight (35ml/kg).</p>
-                </div>
-                <div class="grid-2">
-                    <div class="card">
-                        <h3>🏋️ Protein Guide</h3>
-                        <ul style="list-style:none;padding:0;color:var(--text-secondary);font-size:0.9rem;">
-                            <li style="padding:0.3rem 0;border-bottom:1px solid var(--border-color);">🟢 <strong>General Health:</strong> 0.8–1.0 g/kg</li>
-                            <li style="padding:0.3rem 0;border-bottom:1px solid var(--border-color);">🟡 <strong>Active / Fat Loss:</strong> 1.6–1.8 g/kg</li>
-                            <li style="padding:0.3rem 0;border-bottom:1px solid var(--border-color);">🔴 <strong>Muscle Gain:</strong> 1.8–2.2 g/kg</li>
-                            <li style="padding:0.3rem 0;">💡 <strong>Your target:</strong> <span id="guideProteinTarget" style="font-weight:700;color:var(--primary);">--</span> g/day</li>
-                        </ul>
-                    </div>
-                    <div class="card">
-                        <h3>💧 Water Guide</h3>
-                        <ul style="list-style:none;padding:0;color:var(--text-secondary);font-size:0.9rem;">
-                            <li style="padding:0.3rem 0;border-bottom:1px solid var(--border-color);">🧊 <strong>Minimum:</strong> 30 ml/kg</li>
-                            <li style="padding:0.3rem 0;border-bottom:1px solid var(--border-color);">🏃 <strong>Active / Hot climate:</strong> 35–40 ml/kg</li>
-                            <li style="padding:0.3rem 0;">💡 <strong>Your target:</strong> <span id="guideWaterTarget" style="font-weight:700;color:var(--primary);">--</span> ml/day</li>
-                        </ul>
-                    </div>
-                    <div class="card">
-                        <h3>🧬 Macro Splits</h3>
-                        <ul style="list-style:none;padding:0;color:var(--text-secondary);font-size:0.9rem;">
-                            <li style="padding:0.3rem 0;border-bottom:1px solid var(--border-color);">🥩 <strong>Protein:</strong> 25–40%</li>
-                            <li style="padding:0.3rem 0;border-bottom:1px solid var(--border-color);">🍞 <strong>Carbs:</strong> 30–50%</li>
-                            <li style="padding:0.3rem 0;">🥑 <strong>Fats:</strong> 20–35%</li>
-                        </ul>
-                    </div>
-                    <div class="card">
-                        <h3>📊 BMI Categories</h3>
-                        <ul style="list-style:none;padding:0;color:var(--text-secondary);font-size:0.9rem;">
-                            <li style="padding:0.3rem 0;border-bottom:1px solid var(--border-color);">🟢 <strong>Normal:</strong> 18.5–24.9</li>
-                            <li style="padding:0.3rem 0;border-bottom:1px solid var(--border-color);">🟡 <strong>Overweight:</strong> 25–29.9</li>
-                            <li style="padding:0.3rem 0;">🔴 <strong>Obese:</strong> 30+</li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
-
-        </div>
-
-        <!-- =============================================================
-        MODALS
-        ============================================================= -->
-
-        <!-- Create Profile Modal -->
-        <div id="createProfileModal" class="modal-overlay">
-            <div class="modal-box">
-                <button class="close-btn" onclick="closeModal('createProfileModal')">✕</button>
-                <h2>Create Profile</h2>
-                <p class="text-muted">Join an existing family with your Family Code.</p>
-                <label>Name *</label><input id="newProfileName" placeholder="Full name" />
-                <label>Family Code *</label><input id="newProfileFamilyCode" placeholder="e.g. HAGIN" />
-                <label>Age</label><input id="newProfileAge" type="number" placeholder="30" />
-                <label>Sex</label><select id="newProfileSex"><option value="">—</option><option>Male</option><option>Female</option></select>
-                <label>Height (cm)</label><input id="newProfileHeight" type="number" placeholder="175" />
-                <label>Weight (kg)</label><input id="newProfileWeight" type="number" placeholder="75" />
-                <label>Activity Level</label><select id="newProfileActivity"><option value="">—</option><option>Sedentary</option><option>Light</option><option>Moderate</option><option>Active</option><option>Very Active</option></select>
-                <label>Goal</label><select id="newProfileGoal"><option value="">—</option><option>Fat Loss - Slow</option><option>Fat Loss - Standard</option><option>Fat Loss - Aggressive</option><option>Maintain</option><option>Lean Bulk</option><option>Muscle Gain</option><option>Child Growth</option></select>
-                <label>Training Days / Week</label><input id="newProfileTraining" type="number" placeholder="3" />
-                <div class="flex" style="margin-top:1rem;justify-content:flex-end;">
-                    <button class="btn btn-danger btn-sm" onclick="closeModal('createProfileModal')">Cancel</button>
-                    <button class="btn btn-primary btn-sm" onclick="submitCreateProfile()">Create</button>
-                </div>
-                <p id="createProfileStatus" class="mt-1"></p>
-            </div>
-        </div>
-
-        <!-- Create Family Modal -->
-        <div id="createFamilyModal" class="modal-overlay">
-            <div class="modal-box">
-                <button class="close-btn" onclick="closeModal('createFamilyModal')">✕</button>
-                <h2>Create New Family</h2>
-                <p class="text-muted">Start your own family nutrition hub.</p>
-                <label>Family Code *</label><input id="newFamilyCode" placeholder="e.g. SMITH" />
-                <label>Family Name</label><input id="newFamilyName" placeholder="The Smiths" />
-                <label>Your Name *</label><input id="newFamilyAdminName" placeholder="Admin name" />
-                <label>Email</label><input id="newFamilyEmail" type="email" placeholder="admin@example.com" />
-                <div class="flex" style="margin-top:1rem;justify-content:flex-end;">
-                    <button class="btn btn-danger btn-sm" onclick="closeModal('createFamilyModal')">Cancel</button>
-                    <button class="btn btn-primary btn-sm" onclick="submitCreateFamily()">Create Family</button>
-                </div>
-                <p id="createFamilyStatus" class="mt-1"></p>
-            </div>
-        </div>
-
-        <!-- Recipe Detail Modal -->
-        <div id="recipeModal" class="modal-overlay">
-            <div class="modal-box">
-                <button class="close-btn" onclick="closeModal('recipeModal')">✕</button>
-                <h2 id="recipeModalTitle">Recipe Name</h2>
-                <p id="recipeModalMeta" class="text-muted" style="margin-bottom:0.5rem;"></p>
-                <div id="recipeModalContent">
-                    <p>Loading...</p>
-                </div>
-                <div class="flex" style="margin-top:1rem;justify-content:flex-end;">
-                    <button class="btn btn-primary btn-sm" id="recipeModalLogBtn" onclick="logRecipeFromModal()">🍽️ Log this</button>
-                </div>
-            </div>
-        </div>
-
-    </div>
-
-    <script>
-        // ================================================================
-        //  CONFIGURATION
-        // ================================================================
-        const APP_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyqPM0ZWWtd77h6ZDyM40DhEiW4noWjOAwI5mg1lavcce9mzE5Nc-Z7BpPs25AMgTtBJw/exec';
-
-        // ================================================================
-        //  STATE
-        // ================================================================
-        let userId = '';
-        let userData = {};
-        let familyCode = '';
-        let userName = '';
-        let weekOffset = 0;
-        let allRecipes = [];
-        let mealRecipes = { Breakfast_ID: [], Snack_1_ID: [], Lunch_ID: [], Snack_2_ID: [], Dinner_ID: [], Dessert_ID: [] };
-        let plannerData = {};
-        let shoppingItems = [];
-        let progressHistory = [];
-        let weightChart = null;
-        let calorieChart = null;
-        let currentRecipeId = '';
-
-        // ================================================================
-        //  THEME ENGINE
-        // ================================================================
-        function setTheme(theme) {
-            document.documentElement.setAttribute('data-theme', theme);
-            localStorage.setItem('nutriflow-theme', theme);
-            document.querySelectorAll('.theme-btn').forEach(b => {
-                b.classList.toggle('active', b.dataset.theme === theme);
-            });
-        }
-
-        function loadTheme() {
-            const saved = localStorage.getItem('nutriflow-theme') || 'light';
-            setTheme(saved);
-        }
-
-        // ================================================================
-        //  API HELPER
-        // ================================================================
-        async function apiCall(action, payload = {}) {
-            const formData = new URLSearchParams();
-            formData.append('action', action);
-            for (const key in payload) {
-                if (payload[key] !== undefined && payload[key] !== null) {
-                    formData.append(key, payload[key]);
-                }
-            }
-            try {
-                const res = await fetch(APP_SCRIPT_URL, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                    body: formData
-                });
-                if (!res.ok) throw new Error('HTTP error ' + res.status);
-                return await res.json();
-            } catch (err) {
-                console.error('API error:', err);
-                return { success: false, error: err.message };
-            }
-        }
-
-        // ================================================================
-        //  TOAST
-        // ================================================================
-        function showToast(msg, type = 'success') {
-            const toast = document.getElementById('toast');
-            toast.textContent = msg;
-            toast.className = 'toast ' + type;
-            toast.classList.remove('hidden');
-            setTimeout(() => toast.classList.add('hidden'), 4000);
-        }
-
-        // ================================================================
-        //  MODALS
-        // ================================================================
-        function closeModal(id) {
-            document.getElementById(id).classList.remove('open');
-        }
-
-        function openModal(id) {
-            document.getElementById(id).classList.add('open');
-        }
-
-        // ================================================================
-        //  LOGIN
-        // ================================================================
-        async function handleSignIn() {
-            const familyCodeInput = document.getElementById('loginFamilyCode').value.trim();
-            const nameInput = document.getElementById('loginName').value.trim();
-            const statusEl = document.getElementById('loginStatus');
-
-            if (!familyCodeInput || !nameInput) {
-                statusEl.textContent = 'Please enter Family Code and Name.';
-                statusEl.className = 'error';
-                return;
-            }
-
-            statusEl.textContent = 'Checking...';
-            statusEl.className = '';
-            const result = await apiCall('signIn', { familyCode: familyCodeInput, name: nameInput });
-
-            if (result.success) {
-                familyCode = familyCodeInput;
-                userName = nameInput;
-                userId = result.userId || '';
-                userData = result.userData || {};
-                statusEl.textContent = '✅ Welcome, ' + userName + '!';
-                statusEl.className = 'success';
-                document.getElementById('loginScreen').classList.add('hidden');
-                document.getElementById('mainApp').classList.remove('hidden');
-                document.getElementById('userNameDisplay').textContent = userName;
-                document.getElementById('familyCodeDisplay').textContent = familyCode;
-                loadDashboardData();
-                loadPlanner();
-                loadRecipes();
-                loadProgress();
-                loadShopping();
-                loadFamilyMembers();
-                loadNutritionGuide();
-                loadTheme();
-            } else {
-                statusEl.textContent = '❌ ' + (result.error || 'Invalid credentials.');
-                statusEl.className = 'error';
-            }
-        }
-
-        function handleLogout() {
-            document.getElementById('loginScreen').classList.remove('hidden');
-            document.getElementById('mainApp').classList.add('hidden');
-            userId = '';
-            userData = {};
-            familyCode = '';
-            userName = '';
-        }
-
-        // ================================================================
-        //  DASHBOARD
-        // ================================================================
-        async function loadDashboardData() {
-            if (!userId) return;
-            const result = await apiCall('getDashboard', { userId, familyCode });
-            if (result.success) {
-                document.getElementById('dashCalories').textContent = result.dailyCalories || 0;
-                document.getElementById('dashProtein').textContent = result.dailyProtein || 0;
-                document.getElementById('dashWater').textContent = result.dailyWater || 0;
-                document.getElementById('dashCalTarget').textContent = userData.Target_Calories || 0;
-                document.getElementById('dashProtTarget').textContent = userData.Protein_Target_g || 0;
-                document.getElementById('dashWaterTarget').textContent = userData.Water_Target_ml || 0;
-
-                const calPct = userData.Target_Calories ? Math.min((result.dailyCalories / userData.Target_Calories) * 100,
-                    100) : 0;
-                const protPct = userData.Protein_Target_g ? Math.min((result.dailyProtein / userData.Protein_Target_g) *
-                    100, 100) : 0;
-                const waterPct = userData.Water_Target_ml ? Math.min((result.dailyWater / userData.Water_Target_ml) *
-                    100, 100) : 0;
-                document.getElementById('calProgress').style.width = calPct + '%';
-                document.getElementById('protProgress').style.width = protPct + '%';
-                document.getElementById('waterProgress').style.width = waterPct + '%';
-
-                const trained = result.trainedToday || false;
-                const btn = document.getElementById('trainingBtn');
-                btn.textContent = trained ? '✅ Done' : '💪 Log Training';
-                btn.classList.toggle('done', trained);
-
-                document.getElementById('trainingCount').textContent = (result.trainingDaysThisWeek || 0) + '/' + (userData
-                    .Training_Days_Weekly || 3);
-
-                // Streak
-                document.getElementById('streakCount').textContent = result.streak || 0;
-
-                const meals = result.todayMeals || [];
-                const container = document.getElementById('todayMeals');
-                if (meals.length === 0) {
-                    container.innerHTML = '<p class="text-muted">No meals logged yet today.</p>';
-                } else {
-                    container.innerHTML = meals.map(m =>
-                        `<div style="border-bottom:1px solid var(--border-color);padding:0.25rem 0;display:flex;justify-content:space-between;">
-                            <span>${m.Meal_Type || 'Snack'}: ${m.Recipe_Name || '—'}</span>
-                            <span style="font-weight:600;">${m.Calories || 0} kcal</span>
-                        </div>`
-                    ).join('');
-                }
-
-                // Charts
-                renderWeightChart(result.weightHistory || []);
-                renderCalorieChart(result.calorieHistory || []);
-            }
-        }
-
-        async function toggleTraining() {
-            const btn = document.getElementById('trainingBtn');
-            const isDone = btn.textContent.includes('Done');
-            const newVal = !isDone;
-            const result = await apiCall('toggleTraining', { userId, familyCode, trained: newVal });
-            if (result.success) {
-                showToast(newVal ? '✅ Training logged!' : 'Training unlogged.');
-                loadDashboardData();
-            } else {
-                showToast('❌ ' + (result.error || 'Failed to update training.'), 'error');
-            }
-        }
-
-        // ================================================================
-        //  CHARTS
-        // ================================================================
-        function renderWeightChart(history) {
-            const canvas = document.getElementById('weightChart');
-            if (!canvas) return;
-            const ctx = canvas.getContext('2d');
-            if (weightChart) { weightChart.destroy();
-                weightChart = null; }
-
-            const labels = history.map(h => h.Date).slice(-7);
-            const data = history.map(h => parseFloat(h.Weight_kg) || 0).slice(-7);
-
-            weightChart = new Chart(ctx, {
-                type: 'line',
-                data: {
-                    labels: labels,
-                    datasets: [{
-                        label: 'Weight (kg)',
-                        data: data,
-                        borderColor: '#0F766E',
-                        backgroundColor: 'rgba(15, 118, 110, 0.1)',
-                        fill: true,
-                        tension: 0.3,
-                        pointRadius: 4,
-                        pointBackgroundColor: '#0F766E',
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: { legend: { display: false } },
-                    scales: {
-                        x: { grid: { display: false }, ticks: { color: '#94a3b8', font: { size: 8 } } },
-                        y: { grid: { color: 'rgba(0,0,0,0.05)' }, ticks: { color: '#94a3b8', font: { size: 8 } } }
-                    }
-                }
-            });
-        }
-
-        function renderCalorieChart(history) {
-            const canvas = document.getElementById('calorieChart');
-            if (!canvas) return;
-            const ctx = canvas.getContext('2d');
-            if (calorieChart) { calorieChart.destroy();
-                calorieChart = null; }
-
-            const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
-            const intake = history.slice(-7).map(h => parseInt(h.calories) || 0);
-            const target = new Array(7).fill(parseInt(userData.Target_Calories) || 2000);
-
-            calorieChart = new Chart(ctx, {
-                type: 'bar',
-                data: {
-                    labels: days,
-                    datasets: [{
-                        label: 'Intake',
-                        data: intake,
-                        backgroundColor: '#0F766E',
-                        borderRadius: 4,
-                    }, {
-                        label: 'Target',
-                        data: target,
-                        backgroundColor: 'rgba(245, 158, 11, 0.3)',
-                        borderRadius: 4,
-                        borderColor: '#F59E0B',
-                        borderWidth: 2,
-                        type: 'line',
-                        pointRadius: 0,
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: { legend: { display: false } },
-                    scales: {
-                        x: { grid: { display: false }, ticks: { color: '#94a3b8', font: { size: 8 } } },
-                        y: { grid: { color: 'rgba(0,0,0,0.05)' }, ticks: { color: '#94a3b8', font: { size: 8 } } }
-                    }
-                }
-            });
-        }
-
-        // ================================================================
-        //  PLANNER
-        // ================================================================
-        function getWeekDays() {
-            const now = new Date();
-            const start = new Date(now);
-            start.setDate(now.getDate() - now.getDay() + (now.getDay() === 0 ? -6 : 1) + weekOffset * 7);
-            const days = [];
-            for (let i = 0; i < 7; i++) {
-                const d = new Date(start);
-                d.setDate(start.getDate() + i);
-                days.push({ date: d.toISOString().slice(0, 10), label: d.toLocaleDateString('en', { weekday: 'short',
-                        month: 'short', day: 'numeric' }) });
-            }
-            return days;
-        }
-
-        async function loadPlanner() {
-            if (!userId) return;
-            const weekDays = getWeekDays();
-            const weekStart = weekDays[0]?.date || '';
-            document.getElementById('weekLabel').textContent = weekDays.length ? weekDays[0].date + ' – ' + weekDays[6].date :
-                '';
-
-            const result = await apiCall('getPlanner', { familyCode, weekStart });
-            if (result.success) {
-                const data = result.plannerData || {};
-                weekDays.forEach(d => {
-                    plannerData[d.date] = data[d.date] || { Breakfast_ID: '', Snack_1_ID: '', Lunch_ID: '',
-                        Snack_2_ID: '', Dinner_ID: '', Dessert_ID: '' };
-                });
-                await loadMealRecipes();
-                renderPlanner(weekDays);
-            }
-        }
-
-        async function renderPlanner(weekDays) {
-            const grid = document.getElementById('plannerGrid');
-            const slots = [
-                { key: 'Breakfast_ID', label: 'Breakfast' },
-                { key: 'Snack_1_ID', label: 'Snack 1' },
-                { key: 'Lunch_ID', label: 'Lunch' },
-                { key: 'Snack_2_ID', label: 'Snack 2' },
-                { key: 'Dinner_ID', label: 'Dinner' },
-                { key: 'Dessert_ID', label: 'Dessert' },
-            ];
-            let html = '';
-            weekDays.forEach(day => {
-                html += `<div class="day-card">`;
-                html += `<div class="day-label">${day.label}</div>`;
-                slots.forEach(slot => {
-                    const val = plannerData[day.date]?.[slot.key] || '';
-                    html += `<div class="meal-row">`;
-                    html += `<label>${slot.label}</label>`;
-                    html += `<select onchange="plannerData['${day.date}']['${slot.key}']=this.value">`;
-                    html += `<option value="">—</option>`;
-                    (mealRecipes[slot.key] || []).forEach(r => {
-                        html += `<option value="${r.Recipe_ID}" ${r.Recipe_ID === val ? 'selected' : ''}>${r.Recipe_Name}</option>`;
-                    });
-                    html += `</select>`;
-                    html += `</div>`;
-                });
-                html += `</div>`;
-            });
-            grid.innerHTML = html;
-        }
-
-        async function loadMealRecipes() {
-            const types = ['Breakfast', 'Snack', 'Lunch', 'Dinner', 'Dessert'];
-            for (const t of types) {
-                const result = await apiCall('getRecipes', { type: 'adult', mealType: t });
-                if (result.success) {
-                    const key = t === 'Breakfast' ? 'Breakfast_ID' : t === 'Snack' ? 'Snack_1_ID' : t === 'Lunch' ?
-                        'Lunch_ID' : t === 'Dinner' ? 'Dinner_ID' : 'Dessert_ID';
-                    mealRecipes[key] = result.recipes || [];
-                    if (t === 'Snack') mealRecipes['Snack_2_ID'] = result.recipes || [];
-                }
-            }
-        }
-
-        async function savePlanner() {
-            const weekDays = getWeekDays();
-            const weekStart = weekDays[0]?.date || '';
-            const entries = [];
-            for (const [date, meals] of Object.entries(plannerData)) {
-                for (const [slot, recipeId] of Object.entries(meals)) {
-                    if (recipeId) entries.push({ date, slot, recipeId });
-                }
-            }
-            const result = await apiCall('savePlanner', { familyCode, weekStart, entries: JSON.stringify(entries) });
-            if (result.success) {
-                showToast('✅ Week plan saved!');
-                loadShopping();
-            } else {
-                showToast('❌ ' + (result.error || 'Failed to save.'), 'error');
-            }
-        }
-
-        // ================================================================
-        //  RECIPES
-        // ================================================================
-        async function loadRecipes() {
-            const adult = await apiCall('getRecipes', { type: 'adult' });
-            if (adult.success) {
-                allRecipes = adult.recipes || [];
-                const cats = new Set();
-                allRecipes.forEach(r => { if (r.Category) cats.add(r.Category); });
-                document.getElementById('recipeCategory').innerHTML = '<option value="">All Categories</option>' + Array.from(
-                    cats).map(c => `<option value="${c}">${c}</option>`).join('');
-                filterRecipes();
-            }
-        }
-
-        function filterRecipes() {
-            const search = document.getElementById('recipeSearch').value.toLowerCase().trim();
-            const category = document.getElementById('recipeCategory').value;
-            let list = allRecipes.filter(r => {
-                if (search && !r.Recipe_Name.toLowerCase().includes(search)) return false;
-                if (category && r.Category !== category) return false;
-                return true;
-            });
-            const grid = document.getElementById('recipeGrid');
-            if (!list.length) { grid.innerHTML = '<p class="text-muted">No recipes found.</p>'; return; }
-            grid.innerHTML = list.map(r => `
-                <div class="recipe-card" onclick="openRecipeDetail('${r.Recipe_ID}')">
-                    <div class="title">${r.Recipe_Name}</div>
-                    <div style="font-size:0.8rem;color:var(--text-secondary);">${r.Category || ''} · ${r.Meal_Type || ''}</div>
-                    <div style="margin:0.25rem 0;">
-                        <span class="cal">${r.Calories || 0} kcal</span>
-                        <span>P ${r.Protein_g || 0}g</span>
-                        <span>C ${r.Carbs_g || 0}g</span>
-                        <span>F ${r.Fat_g || 0}g</span>
-                    </div>
-                    <div class="tags">${(r.Tags || '').split(';').filter(t => t.trim()).map(t => `<span class="tag">${t.trim()}</span>`).join('')}</div>
-                </div>
-            `).join('');
-        }
-
-        // ================================================================
-        //  RECIPE DETAIL MODAL
-        // ================================================================
-        async function openRecipeDetail(recipeId) {
-            currentRecipeId = recipeId;
-            const recipe = allRecipes.find(r => r.Recipe_ID === recipeId);
-            if (!recipe) { showToast('Recipe not found', 'error'); return; }
-
-            document.getElementById('recipeModalTitle').textContent = recipe.Recipe_Name || 'Recipe';
-            document.getElementById('recipeModalMeta').textContent =
-                `${recipe.Category || ''} · ${recipe.Meal_Type || ''} · ${recipe.Calories || 0} kcal · ${recipe.Carb_Level || ''}`;
-
-            const content = document.getElementById('recipeModalContent');
-            content.innerHTML = '<p>Loading ingredients...</p>';
-
-            // Fetch ingredients and methods from the server
-            const ingredientsResult = await apiCall('getRecipeIngredients', { recipeId });
-            const methodsResult = await apiCall('getRecipeMethods', { recipeId });
-
-            let html = '';
-
-            // Nutrition
-            html += `<div style="display:flex;gap:0.5rem;flex-wrap:wrap;margin:0.5rem 0;padding:0.5rem;background:var(--bg-input);border-radius:var(--radius-sm);">
-                <span><strong>🔥</strong> ${recipe.Calories || 0} kcal</span>
-                <span><strong>💪</strong> ${recipe.Protein_g || 0}g</span>
-                <span><strong>🍞</strong> ${recipe.Carbs_g || 0}g</span>
-                <span><strong>🥑</strong> ${recipe.Fat_g || 0}g</span>
-                <span><strong>🌾</strong> ${recipe.Fiber_g || 0}g</span>
-            </div>`;
-
-            // Ingredients
-            if (ingredientsResult.success && ingredientsResult.ingredients.length) {
-                html += `<h3 style="margin-top:0.5rem;">🛒 Ingredients</h3><ul class="ingredient-list">`;
-                ingredientsResult.ingredients.forEach(i => {
-                    html +=
-                        `<li>${i.Ingredient_Name} — <strong>${i.Quantity || ''} ${i.Unit || ''}</strong> ${i.Ingredient_Group ? '· ' + i.Ingredient_Group : ''}</li>`;
-                });
-                html += `</ul>`;
-            } else {
-                html += `<p class="text-muted">No ingredients listed.</p>`;
-            }
-
-            // Methods
-            if (methodsResult.success && methodsResult.methods.length) {
-                html += `<h3 style="margin-top:0.5rem;">📝 Method</h3><ol class="step-list">`;
-                methodsResult.methods.forEach(m => {
-                    html += `<li>${m.Instruction || ''}</li>`;
-                });
-                html += `</ol>`;
-            } else {
-                html += `<p class="text-muted">No instructions available.</p>`;
-            }
-
-            content.innerHTML = html;
-            document.getElementById('recipeModalLogBtn').onclick = () => logRecipeFromModal(recipeId);
-            openModal('recipeModal');
-        }
-
-        async function logRecipeFromModal(recipeId) {
-            const id = recipeId || currentRecipeId;
-            if (!id) { showToast('No recipe selected', 'error'); return; }
-            const result = await apiCall('logMeal', { userId, familyCode, recipeId: id, mealType: 'Snack', servings: 1 });
-            if (result.success) {
-                showToast('✅ Meal logged!');
-                closeModal('recipeModal');
-                loadDashboardData();
-            } else {
-                showToast('❌ ' + (result.error || 'Failed to log.'), 'error');
-            }
-        }
-
-        // ================================================================
-        //  PROGRESS
-        // ================================================================
-        async function loadProgress() {
-            if (!userId) return;
-            const result = await apiCall('getProgress', { userId });
-            if (result.success) {
-                progressHistory = result.history || [];
-                const container = document.getElementById('progressHistory');
-                if (!progressHistory.length) { container.innerHTML = '<p class="text-muted">No entries yet.</p>'; return; }
-                container.innerHTML = `<table style="width:100%;font-size:0.9rem;">
-                    <thead><tr style="text-align:left;border-bottom:1px solid var(--border-color);"><th>Date</th><th>Weight</th><th>Waist</th><th>BF%</th></tr></thead>
-                    <tbody>${progressHistory.slice(0,10).map(p => `
-                        <tr style="border-bottom:1px solid var(--border-color);">
-                            <td>${p.Date}</td>
-                            <td>${p.Weight_kg || '—'}</td>
-                            <td>${p.Waist_cm || '—'}</td>
-                            <td>${p.Body_Fat_Percent || '—'}</td>
-                        </tr>
-                    `).join('')}</tbody>
-                </table>`;
-            }
-        }
-
-        async function saveProgress() {
-            const weight = parseFloat(document.getElementById('progWeight').value);
-            const waist = parseFloat(document.getElementById('progWaist').value);
-            const bodyFat = parseFloat(document.getElementById('progBodyFat').value);
-            if (!weight && !waist && !bodyFat) {
-                document.getElementById('progressStatus').textContent = 'Please enter at least one measurement.';
-                document.getElementById('progressStatus').className = 'error';
-                return;
-            }
-            const result = await apiCall('saveProgress', { userId, familyCode, weight: weight || null, waist: waist ||
-                    null, bodyFat: bodyFat || null });
-            if (result.success) {
-                document.getElementById('progressStatus').textContent = '✅ Saved!';
-                document.getElementById('progressStatus').className = 'success';
-                document.getElementById('progWeight').value = '';
-                document.getElementById('progWaist').value = '';
-                document.getElementById('progBodyFat').value = '';
-                loadProgress();
-                loadDashboardData();
-                showToast('Progress saved!');
-            } else {
-                document.getElementById('progressStatus').textContent = '❌ ' + (result.error || 'Failed to save.');
-                document.getElementById('progressStatus').className = 'error';
-            }
-        }
-
-        // ================================================================
-        //  SHOPPING
-        // ================================================================
-        async function loadShopping() {
-            if (!userId) return;
-            const weekDays = getWeekDays();
-            const weekStart = weekDays[0]?.date || '';
-            const result = await apiCall('getShopping', { familyCode, weekStart });
-            if (result.success) {
-                shoppingItems = result.items || [];
-                const container = document.getElementById('shoppingList');
-                if (!shoppingItems.length) { container.innerHTML = '<p class="text-muted">No items. Generate from your weekly planner.</p>'; return; }
-                container.innerHTML = shoppingItems.map(item => `
-                    <div class="shopping-item ${item.Purchased_YesNo === 'Yes' ? 'purchased' : ''}">
-                        <input type="checkbox" ${item.Purchased_YesNo === 'Yes' ? 'checked' : ''} onchange="updateShoppingItem('${item.Ingredient_Name}', this.checked)" />
-                        <span class="name">${item.Ingredient_Name}</span>
-                        <span class="qty">${item.Quantity_Needed || 1} ${item.Unit || ''}</span>
-                    </div>
-                `).join('') + `
-                    <div style="margin-top:1rem;display:flex;gap:0.5rem;">
-                        <button class="btn btn-outline btn-sm" onclick="markAllPurchased()">Mark all purchased</button>
-                        <button class="btn btn-danger btn-sm" onclick="clearPurchased()">Clear purchased</button>
-                    </div>
-                `;
-            }
-        }
-
-        async function updateShoppingItem(ingredient, purchased) {
-            await apiCall('updateShoppingItem', { familyCode, ingredient, purchased });
-            loadShopping();
-        }
-
-        async function markAllPurchased() {
-            for (const item of shoppingItems) {
-                if (item.Purchased_YesNo !== 'Yes') {
-                    await updateShoppingItem(item.Ingredient_Name, true);
-                }
-            }
-            loadShopping();
-            showToast('✅ All marked purchased!');
-        }
-
-        async function clearPurchased() {
-            for (const item of shoppingItems) {
-                if (item.Purchased_YesNo === 'Yes') {
-                    await updateShoppingItem(item.Ingredient_Name, false);
-                }
-            }
-            loadShopping();
-            showToast('Cleared purchased items.');
-        }
-
-        async function generateShoppingList() {
-            await savePlanner();
-            loadShopping();
-            showToast('🛒 Shopping list updated!');
-        }
-
-        // ================================================================
-        //  SETTINGS
-        // ================================================================
-        async function loadFamilyMembers() {
-            if (!userId) return;
-            document.getElementById('settingsName').textContent = userName || '—';
-            document.getElementById('settingsFamily').textContent = familyCode || '—';
-            document.getElementById('settingsAge').textContent = userData.Age || '—';
-            document.getElementById('settingsSex').textContent = userData.Sex || '—';
-            document.getElementById('settingsGoal').textContent = userData.Goal || '—';
-            document.getElementById('settingsCalories').textContent = userData.Target_Calories || '—';
-            document.getElementById('settingsProtein').textContent = userData.Protein_Target_g || '—';
-            document.getElementById('settingsWater').textContent = userData.Water_Target_ml || '—';
-
-            const result = await apiCall('getFamilyMembers', { familyCode });
-            if (result.success) {
-                const members = result.members || [];
-                const container = document.getElementById('familyMembers');
-                if (!members.length) { container.innerHTML = '<p class="text-muted">No other members.</p>'; return; }
-                container.innerHTML = members.map(m =>
-                    `<div style="display:flex;justify-content:space-between;border-bottom:1px solid var(--border-color);padding:0.25rem 0;">
-                        <span>${m.Name}</span>
-                        <span style="color:var(--text-muted);font-size:0.8rem;">${m.Goal || '—'}</span>
-                    </div>`
-                ).join('');
-            }
-        }
-
-        function toggleEditForm() {
-            const form = document.getElementById('editForm');
-            if (form.classList.contains('hidden')) {
-                document.getElementById('editAge').value = userData.Age || '';
-                document.getElementById('editSex').value = userData.Sex || 'Male';
-                document.getElementById('editHeight').value = userData.Height_cm || '';
-                document.getElementById('editWeight').value = userData.Weight_kg || '';
-                document.getElementById('editActivity').value = userData.Activity_Level || 'Moderate';
-                document.getElementById('editGoal').value = userData.Goal || 'Maintain';
-                document.getElementById('editTraining').value = userData.Training_Days_Weekly || 3;
-                form.classList.remove('hidden');
-            } else {
-                form.classList.add('hidden');
-                document.getElementById('editProfileStatus').textContent = '';
-            }
-        }
-
-        async function submitEditProfile() {
-            if (!userId) {
-                document.getElementById('editProfileStatus').textContent = '❌ Please sign in again.';
-                document.getElementById('editProfileStatus').className = 'error';
-                return;
-            }
-            const payload = {
-                userId: userId,
-                age: parseInt(document.getElementById('editAge').value) || null,
-                sex: document.getElementById('editSex').value,
-                height: parseFloat(document.getElementById('editHeight').value) || null,
-                weight: parseFloat(document.getElementById('editWeight').value) || null,
-                activity: document.getElementById('editActivity').value,
-                goal: document.getElementById('editGoal').value,
-                trainingDays: parseInt(document.getElementById('editTraining').value) || 3
-            };
-            const result = await apiCall('updateProfile', payload);
-            if (result.success) {
-                document.getElementById('editProfileStatus').textContent = '✅ Updated!';
-                document.getElementById('editProfileStatus').className = 'success';
-                userData = result.userData || userData;
-                toggleEditForm();
-                showToast('Profile updated successfully!');
-                loadDashboardData();
-                loadFamilyMembers();
-                loadNutritionGuide();
-            } else {
-                document.getElementById('editProfileStatus').textContent = '❌ ' + (result.error || 'Update failed.');
-                document.getElementById('editProfileStatus').className = 'error';
-            }
-        }
-
-        // ================================================================
-        //  NUTRITION GUIDE
-        // ================================================================
-        function loadNutritionGuide() {
-            document.getElementById('guideProteinTarget').textContent = userData.Protein_Target_g || '--';
-            document.getElementById('guideWaterTarget').textContent = userData.Water_Target_ml || '--';
-        }
-
-        // ================================================================
-        //  CREATE PROFILE / FAMILY
-        // ================================================================
-        function showCreateProfile() { openModal('createProfileModal'); }
-
-        function showCreateFamily() { openModal('createFamilyModal'); }
-
-        async function submitCreateProfile() {
-            const data = {
-                name: document.getElementById('newProfileName').value.trim(),
-                familyCode: document.getElementById('newProfileFamilyCode').value.trim().toUpperCase(),
-                age: parseInt(document.getElementById('newProfileAge').value) || null,
-                sex: document.getElementById('newProfileSex').value,
-                height: parseFloat(document.getElementById('newProfileHeight').value) || null,
-                weight: parseFloat(document.getElementById('newProfileWeight').value) || null,
-                activity: document.getElementById('newProfileActivity').value,
-                goal: document.getElementById('newProfileGoal').value,
-                trainingDays: parseInt(document.getElementById('newProfileTraining').value) || 3
-            };
-            if (!data.name || !data.familyCode) {
-                document.getElementById('createProfileStatus').textContent = 'Name and Family Code are required.';
-                document.getElementById('createProfileStatus').className = 'error';
-                return;
-            }
-            const result = await apiCall('createProfile', data);
-            if (result.success) {
-                document.getElementById('createProfileStatus').textContent = '✅ Profile created! You can now sign in.';
-                document.getElementById('createProfileStatus').className = 'success';
-                closeModal('createProfileModal');
-                document.getElementById('loginFamilyCode').value = data.familyCode;
-                document.getElementById('loginName').value = data.name;
-                showToast('Profile created! Please sign in.');
-            } else {
-                document.getElementById('createProfileStatus').textContent = '❌ ' + (result.error || 'Failed to create profile.');
-                document.getElementById('createProfileStatus').className = 'error';
-            }
-        }
-
-        async function submitCreateFamily() {
-            const data = {
-                code: document.getElementById('newFamilyCode').value.trim().toUpperCase(),
-                name: document.getElementById('newFamilyName').value.trim(),
-                adminName: document.getElementById('newFamilyAdminName').value.trim(),
-                email: document.getElementById('newFamilyEmail').value.trim()
-            };
-            if (!data.code || !data.adminName) {
-                document.getElementById('createFamilyStatus').textContent = 'Family Code and Admin Name are required.';
-                document.getElementById('createFamilyStatus').className = 'error';
-                return;
-            }
-            const result = await apiCall('createFamily', data);
-            if (result.success) {
-                document.getElementById('createFamilyStatus').textContent = '✅ Family created! You can now sign in.';
-                document.getElementById('createFamilyStatus').className = 'success';
-                closeModal('createFamilyModal');
-                document.getElementById('loginFamilyCode').value = data.code;
-                document.getElementById('loginName').value = data.adminName;
-                showToast('Family created! Please sign in.');
-            } else {
-                document.getElementById('createFamilyStatus').textContent = '❌ ' + (result.error || 'Failed to create family.');
-                document.getElementById('createFamilyStatus').className = 'error';
-            }
-        }
-
-        // ================================================================
-        //  NAVIGATION
-        // ================================================================
-        function switchView(view) {
-            document.querySelectorAll('[id^="view-"]').forEach(el => el.classList.add('hidden'));
-            document.getElementById('view-' + view).classList.remove('hidden');
-            document.querySelectorAll('.nav button').forEach(b => b.classList.remove('active'));
-            document.querySelector(`.nav button[data-view="${view}"]`).classList.add('active');
-
-            if (view === 'dashboard') loadDashboardData();
-            if (view === 'planner') loadPlanner();
-            if (view === 'recipes') loadRecipes();
-            if (view === 'progress') loadProgress();
-            if (view === 'shopping') loadShopping();
-            if (view === 'settings') loadFamilyMembers();
-            if (view === 'nutrition') loadNutritionGuide();
-        }
-
-        // ================================================================
-        //  INIT
-        // ================================================================
-        document.addEventListener('DOMContentLoaded', function() {
-            document.getElementById('loginScreen').classList.remove('hidden');
-            document.getElementById('mainApp').classList.add('hidden');
-            loadTheme();
-            console.log('✅ NutriFlow v2.0 loaded successfully!');
-        });
-    </script>
-</body>
-</html>
+                        <div class="stat-label">🔥 Calories</div>
+                        <div><span class="stat-value" id="dashCalories">
