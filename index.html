@@ -1812,22 +1812,21 @@ document.getElementById('dashTDEE').textContent = tdee > 0 ? Math.round(tdee) : 
             }
         }
 
-        async function undoTraining() {
+       async function undoTraining() {
   const result = await apiCall('undoTraining', { userId, familyCode });
   if (result.success) {
     if (result.message && result.message.includes('No training log')) {
       showToast('ℹ️ ' + result.message, 'info');
     } else {
-      showToast('↩️ ' + (result.message || 'Training undone'));
+      showToast('↩️ Training undone');
+      loadDashboardData();
+      loadTrainingCalendar();
+      loadFamilyCalendar();
     }
-    loadDashboardData();
-    loadTrainingCalendar();
-    loadFamilyCalendar();
   } else {
     showToast('❌ ' + (result.error || 'Failed to undo training.'), 'error');
   }
 }
-
         // ================================================================
         //  DELETE MEAL
         // ================================================================
@@ -1856,56 +1855,59 @@ document.getElementById('dashTDEE').textContent = tdee > 0 ? Math.round(tdee) : 
         }
 
         async function loadTrainingCalendar() {
-            if (!userId) return;
-            const result = await apiCall('getCalendarData', { userId, familyCode });
-            if (result.success) {
-                renderTrainingCalendar(result.calendarData || []);
-            }
-        }
+  if (!userId) return;
+  const result = await apiCall('getCalendarData', { userId, familyCode });
+  if (result.success) {
+    renderTrainingCalendar(result.calendarData || []);
+  } else {
+    console.warn('Calendar data error:', result.error);
+  }
+}
 
         function renderTrainingCalendar(calendarData) {
-            const grid = document.getElementById('calendarGrid');
-            const now = new Date();
-            const year = now.getFullYear();
-            const month = now.getMonth();
-            const firstDay = new Date(year, month, 1).getDay();
-            const daysInMonth = new Date(year, month + 1, 0).getDate();
+  const grid = document.getElementById('calendarGrid');
+  const now = new Date();
+  const year = now.getFullYear();
+  const month = now.getMonth();
+  const firstDay = new Date(year, month, 1).getDay();
+  const daysInMonth = new Date(year, month + 1, 0).getDate();
 
-            let html = '';
-            const dayLabels = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-            dayLabels.forEach(d => {
-                html += `<div class="day-label">${d}</div>`;
-            });
+  let html = '';
+  const dayLabels = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+  dayLabels.forEach(d => {
+    html += `<div class="day-label">${d}</div>`;
+  });
 
-            for (let i = 0; i < firstDay; i++) {
-                html += `<div class="calendar-day empty"></div>`;
-            }
+  // Empty cells before the first day
+  for (let i = 0; i < firstDay; i++) {
+    html += `<div class="calendar-day empty"></div>`;
+  }
 
-            for (let day = 1; day <= daysInMonth; day++) {
-                const dateStr = `${year}-${String(month+1).padStart(2,'0')}-${String(day).padStart(2,'0')}`;
-                const isToday = dateStr === now.toISOString().slice(0, 10);
-                const dayData = calendarData.find(d => d.date === dateStr);
-                let status = 'empty';
-                let label = day;
+  // Days of the month
+  for (let day = 1; day <= daysInMonth; day++) {
+    const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+    const isToday = dateStr === now.toISOString().slice(0, 10);
+    const dayData = calendarData.find(d => d.date === dateStr);
+    let status = 'empty';
+    let label = day;
 
-                if (dayData) {
-                    if (calendarFilter === 'training' && dayData.trained) status = 'trained';
-                    else if (calendarFilter === 'meals' && dayData.meals) status = 'logged';
-                    else if (calendarFilter === 'progress' && dayData.progress) status = 'partial';
-                    else if (calendarFilter === 'all') {
-                        if (dayData.trained) status = 'trained';
-                        else if (dayData.meals) status = 'logged';
-                        else if (dayData.progress) status = 'partial';
-                    }
-                    if (dayData.trained && calendarFilter === 'all') status = 'trained';
-                }
+    if (dayData) {
+      if (calendarFilter === 'training' && dayData.trained) status = 'trained';
+      else if (calendarFilter === 'meals' && dayData.meals) status = 'logged';
+      else if (calendarFilter === 'progress' && dayData.progress) status = 'partial';
+      else if (calendarFilter === 'all') {
+        if (dayData.trained) status = 'trained';
+        else if (dayData.meals) status = 'logged';
+        else if (dayData.progress) status = 'partial';
+      }
+      if (dayData.trained && calendarFilter === 'all') status = 'trained';
+    }
 
-                html += `<div class="calendar-day ${status} ${isToday ? 'today' : ''}">${label}</div>`;
-            }
+    html += `<div class="calendar-day ${status} ${isToday ? 'today' : ''}">${label}</div>`;
+  }
 
-            grid.innerHTML = html;
-        }
-
+  grid.innerHTML = html;
+}
         // ================================================================
         //  FAMILY CALENDAR
         // ================================================================
