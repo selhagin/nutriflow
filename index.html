@@ -402,6 +402,7 @@
             box-shadow: var(--shadow);
             border: 1px solid var(--border-color);
             margin-bottom: 1.5rem;
+            align-items: center;
         }
         .nav button {
             background: transparent;
@@ -423,70 +424,70 @@
             background: var(--primary);
             color: white;
         }
+        .nav .nav-spacer {
+            flex: 1;
+        }
 
-        /* ================================================================
-           THEME SELECTOR
-           ================================================================ */
-        .theme-selector {
-            display: flex;
-            gap: 0.75rem;
-            flex-wrap: wrap;
-            align-items: center;
-            padding: 0.5rem 0;
+        /* Theme Dropdown */
+        .theme-dropdown {
+            position: relative;
+            display: inline-block;
         }
-        .theme-selector .theme-label {
-            font-size: 0.75rem;
-            font-weight: 600;
-            color: var(--text-muted);
-            letter-spacing: 0.04em;
-            text-transform: uppercase;
-            margin-right: 0.5rem;
-        }
-        .theme-option {
+        .theme-dropdown .dropdown-btn {
+            background: var(--bg-card);
+            color: var(--text-secondary);
+            border: 1px solid var(--border-color);
+            padding: 0.4rem 0.8rem;
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            font-size: 0.8rem;
             display: flex;
             align-items: center;
             gap: 0.3rem;
-            padding: 0.3rem 0.8rem 0.3rem 0.5rem;
-            border-radius: 9999px;
-            border: 2px solid var(--border-color);
-            cursor: pointer;
-            transition: all 0.2s;
-            font-size: 0.75rem;
-            font-weight: 500;
-            color: var(--text-secondary);
+        }
+        .theme-dropdown .dropdown-btn:hover {
+            background: var(--primary-bg);
+            border-color: var(--primary);
+        }
+        .theme-dropdown .dropdown-content {
+            display: none;
+            position: absolute;
+            right: 0;
+            top: 100%;
             background: var(--bg-card);
+            min-width: 140px;
+            box-shadow: var(--shadow-lg);
+            border-radius: var(--radius-sm);
+            border: 1px solid var(--border-color);
+            z-index: 10;
+            padding: 0.3rem;
         }
-        .theme-option:hover {
-            transform: scale(1.05);
-            border-color: var(--primary);
+        .theme-dropdown .dropdown-content.show {
+            display: block;
         }
-        .theme-option.active {
-            border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(15, 118, 110, 0.15);
+        .theme-dropdown .dropdown-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.3rem 0.6rem;
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+        }
+        .theme-dropdown .dropdown-item:hover {
             background: var(--primary-bg);
             color: var(--primary);
         }
-        .theme-swatch {
-            width: 1.2rem;
-            height: 1.2rem;
+        .theme-dropdown .dropdown-item.active {
+            background: var(--primary-bg);
+            color: var(--primary);
+        }
+        .theme-dropdown .dropdown-item .swatch {
+            width: 1rem;
+            height: 1rem;
             border-radius: 9999px;
-            display: inline-block;
             border: 1px solid rgba(0, 0, 0, 0.1);
-        }
-        .theme-swatch.emerald {
-            background: linear-gradient(135deg, #0F766E, #14b8a6);
-        }
-        .theme-swatch.midnight {
-            background: linear-gradient(135deg, #6366f1, #818cf8);
-        }
-        .theme-swatch.sunrise {
-            background: linear-gradient(135deg, #e85d04, #f48c06);
-        }
-        .theme-swatch.rose {
-            background: linear-gradient(135deg, #e11d48, #fb7185);
-        }
-        .theme-swatch.steel {
-            background: linear-gradient(135deg, #475569, #94a3b8);
         }
 
         /* ================================================================
@@ -526,88 +527,114 @@
             gap: 0.5rem;
             flex-wrap: wrap;
             margin-top: 0.5rem;
+            justify-content: center;
         }
 
         /* ================================================================
-           TRAINING CALENDAR
+           CALENDAR (Compact)
            ================================================================ */
-        .calendar-grid {
+        .calendar-compact {
+            max-width: 500px;
+            margin: 0 auto;
+        }
+        .calendar-compact .calendar-grid {
             display: grid;
             grid-template-columns: repeat(7, 1fr);
-            gap: 0.2rem;
+            gap: 0.1rem;
         }
-        .calendar-grid .day-label {
-            font-size: 0.6rem;
+        .calendar-compact .calendar-grid .day-label {
+            font-size: 0.5rem;
             text-align: center;
             font-weight: 600;
             color: var(--text-muted);
-            padding: 0.2rem;
+            padding: 0.1rem;
         }
-        .calendar-day {
+        .calendar-compact .calendar-day {
             aspect-ratio: 1;
-            border-radius: var(--radius-sm);
+            border-radius: 0.2rem;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 0.7rem;
+            font-size: 0.6rem;
             font-weight: 600;
             background: var(--border-color);
             color: var(--text-muted);
             cursor: pointer;
             transition: all 0.2s;
-            border: 2px solid transparent;
+            border: 1px solid transparent;
         }
-        .calendar-day:hover {
+        .calendar-compact .calendar-day:hover {
             transform: scale(1.1);
+            z-index: 2;
         }
-        .calendar-day.trained {
+        .calendar-compact .calendar-day.trained {
             background: var(--primary);
             color: white;
         }
-        .calendar-day.partial {
-            background: var(--secondary);
-            color: white;
-        }
-        .calendar-day.logged {
+        .calendar-compact .calendar-day.logged {
             background: var(--primary-light);
             color: white;
         }
-        .calendar-day.empty {
-            background: transparent;
-            border-color: var(--border-color);
+        .calendar-compact .calendar-day.partial {
+            background: var(--secondary);
+            color: white;
         }
-        .calendar-day.today {
+        .calendar-compact .calendar-day.multiple {
+            background: #8b5cf6;
+            color: white;
+        }
+        .calendar-compact .calendar-day.empty {
+            background: var(--border-color);
+            color: var(--text-muted);
+        }
+        .calendar-compact .calendar-day.today {
             border-color: var(--primary);
+            border-width: 2px;
         }
-        .calendar-legend {
+        .calendar-compact .calendar-legend {
             display: flex;
-            gap: 1rem;
+            gap: 0.75rem;
             flex-wrap: wrap;
-            margin-top: 0.5rem;
-            font-size: 0.75rem;
+            margin-top: 0.3rem;
+            font-size: 0.65rem;
+            justify-content: center;
         }
-        .calendar-legend span {
+        .calendar-compact .calendar-legend span {
             display: flex;
             align-items: center;
-            gap: 0.3rem;
+            gap: 0.2rem;
         }
-        .calendar-legend .dot {
-            width: 0.8rem;
-            height: 0.8rem;
+        .calendar-compact .calendar-legend .dot {
+            width: 0.6rem;
+            height: 0.6rem;
             border-radius: 9999px;
             display: inline-block;
         }
-        .calendar-legend .dot.trained {
+
+        .calendar-filter-buttons {
+            display: flex;
+            gap: 0.2rem;
+            flex-wrap: wrap;
+        }
+        .calendar-filter-buttons .filter-btn {
+            padding: 0.15rem 0.5rem;
+            font-size: 0.65rem;
+            border-radius: 9999px;
+            border: 1px solid var(--border-color);
+            background: transparent;
+            color: var(--text-muted);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .calendar-filter-buttons .filter-btn:hover {
+            background: var(--primary-bg);
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+        .calendar-filter-buttons .filter-btn.active {
             background: var(--primary);
-        }
-        .calendar-legend .dot.partial {
-            background: var(--secondary);
-        }
-        .calendar-legend .dot.logged {
-            background: var(--primary-light);
-        }
-        .calendar-legend .dot.empty {
-            background: var(--border-color);
+            color: white;
+            border-color: var(--primary);
         }
 
         /* ================================================================
@@ -838,32 +865,33 @@
         }
 
         /* ================================================================
-           SETTINGS
+           PROGRESS TABS
            ================================================================ */
-        .settings-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 1.5rem;
+        .progress-tabs {
+            display: flex;
+            gap: 0.25rem;
+            margin-bottom: 1rem;
         }
-        @media (max-width: 768px) {
-            .settings-grid {
-                grid-template-columns: 1fr;
-            }
+        .progress-tabs button {
+            padding: 0.4rem 1.2rem;
+            border: none;
+            border-radius: var(--radius-sm);
+            background: var(--border-color);
+            color: var(--text-secondary);
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.85rem;
+            transition: all 0.2s;
         }
-        .edit-form {
-            margin-top: 1rem;
-            padding-top: 1rem;
-            border-top: 1px solid var(--border-color);
+        .progress-tabs button.active {
+            background: var(--primary);
+            color: white;
         }
-        .edit-form .grid-2 {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 0.75rem;
+        .progress-tabs button:hover:not(.active) {
+            background: var(--primary-bg);
+            color: var(--primary);
         }
 
-        /* ================================================================
-           PROGRESS
-           ================================================================ */
         .progress-table {
             width: 100%;
             font-size: 0.9rem;
@@ -888,6 +916,118 @@
         }
         .inbody-link:hover {
             text-decoration: underline;
+        }
+
+        /* ================================================================
+           SETTINGS
+           ================================================================ */
+        .settings-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+        }
+        @media (max-width: 768px) {
+            .settings-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        .edit-form {
+            margin-top: 1rem;
+            padding-top: 1rem;
+            border-top: 1px solid var(--border-color);
+        }
+        .edit-form .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.75rem;
+        }
+        .family-calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 0.1rem;
+            max-width: 500px;
+            margin: 0 auto;
+        }
+        .family-calendar-grid .day-label {
+            font-size: 0.5rem;
+            text-align: center;
+            font-weight: 600;
+            color: var(--text-muted);
+            padding: 0.1rem;
+        }
+        .family-calendar-grid .calendar-day {
+            aspect-ratio: 1;
+            border-radius: 0.2rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.6rem;
+            font-weight: 600;
+            background: var(--border-color);
+            color: var(--text-muted);
+            cursor: pointer;
+            transition: all 0.2s;
+            border: 1px solid transparent;
+            position: relative;
+        }
+        .family-calendar-grid .calendar-day:hover {
+            transform: scale(1.1);
+            z-index: 2;
+        }
+        .family-calendar-grid .calendar-day.trained {
+            background: var(--primary);
+            color: white;
+        }
+        .family-calendar-grid .calendar-day.logged {
+            background: var(--primary-light);
+            color: white;
+        }
+        .family-calendar-grid .calendar-day.partial {
+            background: var(--secondary);
+            color: white;
+        }
+        .family-calendar-grid .calendar-day.multiple {
+            background: #8b5cf6;
+            color: white;
+        }
+        .family-calendar-grid .calendar-day.empty {
+            background: var(--border-color);
+            color: var(--text-muted);
+        }
+        .family-calendar-grid .calendar-day.today {
+            border-color: var(--primary);
+            border-width: 2px;
+        }
+        .family-calendar-grid .calendar-legend {
+            display: flex;
+            gap: 0.75rem;
+            flex-wrap: wrap;
+            margin-top: 0.3rem;
+            font-size: 0.65rem;
+            justify-content: center;
+        }
+        .family-calendar-grid .calendar-legend span {
+            display: flex;
+            align-items: center;
+            gap: 0.2rem;
+        }
+        .family-calendar-grid .calendar-legend .dot {
+            width: 0.6rem;
+            height: 0.6rem;
+            border-radius: 9999px;
+            display: inline-block;
+        }
+        .family-calendar-grid .calendar-day .member-indicators {
+            position: absolute;
+            bottom: 1px;
+            right: 1px;
+            display: flex;
+            gap: 1px;
+        }
+        .family-calendar-grid .calendar-day .member-indicators .mini-dot {
+            width: 3px;
+            height: 3px;
+            border-radius: 9999px;
         }
     </style>
 </head>
@@ -939,35 +1079,42 @@
                 </div>
             </header>
 
-            <!-- THEME SELECTOR -->
-            <div class="theme-selector">
-                <span class="theme-label">🎨 Theme</span>
-                <div class="theme-option active" data-theme="emerald" onclick="setTheme('emerald')">
-                    <span class="theme-swatch emerald"></span> Emerald
-                </div>
-                <div class="theme-option" data-theme="midnight" onclick="setTheme('midnight')">
-                    <span class="theme-swatch midnight"></span> Midnight
-                </div>
-                <div class="theme-option" data-theme="sunrise" onclick="setTheme('sunrise')">
-                    <span class="theme-swatch sunrise"></span> Sunrise
-                </div>
-                <div class="theme-option" data-theme="rose" onclick="setTheme('rose')">
-                    <span class="theme-swatch rose"></span> Rose
-                </div>
-                <div class="theme-option" data-theme="steel" onclick="setTheme('steel')">
-                    <span class="theme-swatch steel"></span> Steel
-                </div>
-            </div>
-
-            <!-- NAVIGATION (Settings moved to end) -->
+            <!-- NAVIGATION (with Theme Dropdown) -->
             <nav class="nav">
                 <button class="active" data-view="dashboard" onclick="switchView('dashboard')">📊 Dashboard</button>
                 <button data-view="planner" onclick="switchView('planner')">📅 Planner</button>
                 <button data-view="recipes" onclick="switchView('recipes')">📖 Recipes</button>
                 <button data-view="progress" onclick="switchView('progress')">📈 Progress</button>
                 <button data-view="shopping" onclick="switchView('shopping')">🛒 Shopping</button>
+                <button data-view="family" onclick="switchView('family')">🏠 Family</button>
                 <button data-view="nutrition" onclick="switchView('nutrition')">📚 Nutrition Guide</button>
                 <button data-view="settings" onclick="switchView('settings')">⚙️ Settings</button>
+
+                <span class="nav-spacer"></span>
+
+                <!-- Theme Dropdown -->
+                <div class="theme-dropdown">
+                    <button class="dropdown-btn" onclick="toggleThemeDropdown()">
+                        🎨 <span id="currentThemeLabel">Emerald</span> ▾
+                    </button>
+                    <div class="dropdown-content" id="themeDropdownContent">
+                        <div class="dropdown-item active" data-theme="emerald" onclick="setTheme('emerald')">
+                            <span class="swatch" style="background:linear-gradient(135deg,#0F766E,#14b8a6);"></span> Emerald
+                        </div>
+                        <div class="dropdown-item" data-theme="midnight" onclick="setTheme('midnight')">
+                            <span class="swatch" style="background:linear-gradient(135deg,#6366f1,#818cf8);"></span> Midnight
+                        </div>
+                        <div class="dropdown-item" data-theme="sunrise" onclick="setTheme('sunrise')">
+                            <span class="swatch" style="background:linear-gradient(135deg,#e85d04,#f48c06);"></span> Sunrise
+                        </div>
+                        <div class="dropdown-item" data-theme="rose" onclick="setTheme('rose')">
+                            <span class="swatch" style="background:linear-gradient(135deg,#e11d48,#fb7185);"></span> Rose
+                        </div>
+                        <div class="dropdown-item" data-theme="steel" onclick="setTheme('steel')">
+                            <span class="swatch" style="background:linear-gradient(135deg,#475569,#94a3b8);"></span> Steel
+                        </div>
+                    </div>
+                </div>
             </nav>
 
             <!-- =============================================================
@@ -992,7 +1139,7 @@
                         <div class="stat-label">💧 Water</div>
                         <div><span class="stat-value" id="dashWater">0</span> <span class="stat-target">/ <span id="dashWaterTarget">0</span> ml</span></div>
                         <div class="progress-bg"><div id="waterProgress" class="progress-fill" style="width:0%;background:var(--accent);"></div></div>
-                        <div class="water-buttons" style="justify-content:center;margin-top:0.5rem;">
+                        <div class="water-buttons">
                             <button class="btn btn-water btn-sm" onclick="addWater(250)">+250ml</button>
                             <button class="btn btn-water btn-sm" onclick="addWater(500)">+500ml</button>
                             <button class="btn btn-water btn-sm" onclick="addWater(750)">+750ml</button>
@@ -1001,7 +1148,7 @@
                     </div>
                 </div>
 
-                <!-- Training + Calendar -->
+                <!-- Training -->
                 <div class="card">
                     <div class="flex-between" style="margin-bottom:0.75rem;">
                         <div class="flex" style="gap:1rem;">
@@ -1015,23 +1162,23 @@
                         </div>
                     </div>
 
-                    <!-- Training Calendar -->
-                    <div style="margin-top:0.5rem;">
-                        <div class="flex-between">
-                            <span class="stat-label">📅 Training Calendar</span>
-                            <div class="flex" style="gap:0.3rem;">
-                                <button class="btn btn-sm btn-outline" id="calendarFilterAll" onclick="setCalendarFilter('all')" style="padding:0.15rem 0.5rem;">All</button>
-                                <button class="btn btn-sm btn-outline" id="calendarFilterTraining" onclick="setCalendarFilter('training')" style="padding:0.15rem 0.5rem;">🏋️</button>
-                                <button class="btn btn-sm btn-outline" id="calendarFilterMeals" onclick="setCalendarFilter('meals')" style="padding:0.15rem 0.5rem;">🍽️</button>
-                                <button class="btn btn-sm btn-outline" id="calendarFilterProgress" onclick="setCalendarFilter('progress')" style="padding:0.15rem 0.5rem;">📊</button>
+                    <!-- Compact Calendar -->
+                    <div class="calendar-compact">
+                        <div class="flex-between" style="margin-bottom:0.3rem;">
+                            <span class="stat-label" style="font-size:0.6rem;">📅 Your Activity</span>
+                            <div class="calendar-filter-buttons">
+                                <button class="filter-btn active" data-filter="all" onclick="setCalendarFilter('all')">All</button>
+                                <button class="filter-btn" data-filter="training" onclick="setCalendarFilter('training')">🏋️ Training</button>
+                                <button class="filter-btn" data-filter="meals" onclick="setCalendarFilter('meals')">🍽️ Meals</button>
+                                <button class="filter-btn" data-filter="progress" onclick="setCalendarFilter('progress')">📊 Progress</button>
                             </div>
                         </div>
-                        <div id="calendarGrid" class="calendar-grid" style="margin-top:0.5rem;"></div>
+                        <div id="calendarGrid" class="calendar-grid"></div>
                         <div class="calendar-legend">
-                            <span><span class="dot trained"></span> Trained</span>
-                            <span><span class="dot logged"></span> Meal Logged</span>
-                            <span><span class="dot partial"></span> Progress Logged</span>
-                            <span><span class="dot empty"></span> No Activity</span>
+                            <span><span class="dot" style="background:var(--primary);"></span> Trained</span>
+                            <span><span class="dot" style="background:var(--primary-light);"></span> Meal Logged</span>
+                            <span><span class="dot" style="background:var(--secondary);"></span> Progress</span>
+                            <span><span class="dot" style="background:var(--border-color);"></span> No Activity</span>
                         </div>
                     </div>
                 </div>
@@ -1102,27 +1249,48 @@
             </div>
 
             <!-- =============================================================
-            VIEW: PROGRESS
+            VIEW: PROGRESS (with Tabs)
             ============================================================= -->
             <div id="view-progress" class="hidden">
                 <h2>📈 Progress Tracker</h2>
-                <div class="card">
-                    <div class="stat-label">Log New Measurement</div>
-                    <div class="grid-3">
-                        <div><label>Weight (kg)</label><input id="progWeight" type="number" step="0.1" /></div>
-                        <div><label>Waist (cm)</label><input id="progWaist" type="number" step="0.5" /></div>
-                        <div><label>Body Fat %</label><input id="progBodyFat" type="number" step="0.1" /></div>
-                    </div>
-                    <div style="margin-top:0.5rem;">
-                        <label>📎 InBody Report Link (Google Drive URL)</label>
-                        <input id="progInBodyLink" type="url" placeholder="https://drive.google.com/file/d/..." />
-                    </div>
-                    <button class="btn btn-primary mt-1" onclick="saveProgress()">💾 Save Entry</button>
-                    <p id="progressStatus" class="mt-1"></p>
+
+                <div class="progress-tabs">
+                    <button class="active" data-tab="measurements" onclick="switchProgressTab('measurements')">📏 Measurements</button>
+                    <button data-tab="inbody" onclick="switchProgressTab('inbody')">📄 InBody Report</button>
                 </div>
-                <div class="card">
-                    <div class="stat-label">Recent Entries</div>
-                    <div id="progressHistory"><p class="text-muted">No entries yet.</p></div>
+
+                <!-- Measurements Tab -->
+                <div id="progressTab-measurements">
+                    <div class="card">
+                        <div class="stat-label">Log New Measurement</div>
+                        <div class="grid-3">
+                            <div><label>Weight (kg)</label><input id="progWeight" type="number" step="0.1" /></div>
+                            <div><label>Waist (cm)</label><input id="progWaist" type="number" step="0.5" /></div>
+                            <div><label>Body Fat %</label><input id="progBodyFat" type="number" step="0.1" /></div>
+                        </div>
+                        <button class="btn btn-primary mt-1" onclick="saveProgress()">💾 Save Entry</button>
+                        <p id="progressStatus" class="mt-1"></p>
+                    </div>
+                    <div class="card">
+                        <div class="stat-label">Recent Entries</div>
+                        <div id="progressHistory"><p class="text-muted">No entries yet.</p></div>
+                    </div>
+                </div>
+
+                <!-- InBody Report Tab -->
+                <div id="progressTab-inbody" class="hidden">
+                    <div class="card">
+                        <div class="stat-label">📄 InBody Report</div>
+                        <p class="text-muted" style="margin-bottom:0.5rem;">Upload your InBody report to Google Drive and paste the shareable link below.</p>
+                        <label>Google Drive Link</label>
+                        <input id="progInBodyLink" type="url" placeholder="https://drive.google.com/file/d/..." />
+                        <button class="btn btn-primary mt-1" onclick="saveInBodyLink()">💾 Save Link</button>
+                        <p id="inBodyStatus" class="mt-1"></p>
+                    </div>
+                    <div class="card">
+                        <div class="stat-label">Previous Reports</div>
+                        <div id="inBodyHistory"><p class="text-muted">No reports yet.</p></div>
+                    </div>
                 </div>
             </div>
 
@@ -1138,6 +1306,47 @@
                     </div>
                 </div>
                 <div id="shoppingList" class="card"></div>
+            </div>
+
+            <!-- =============================================================
+            VIEW: FAMILY
+            ============================================================= -->
+            <div id="view-family" class="hidden">
+                <h2>🏠 Family Calendar</h2>
+                <p class="text-muted" style="margin-bottom:1rem;">See what everyone in your family has been up to.</p>
+
+                <div class="card">
+                    <div class="flex-between" style="margin-bottom:0.5rem;">
+                        <span class="stat-label">📅 Family Activity</span>
+                        <div style="display:flex;gap:0.3rem;flex-wrap:wrap;">
+                            <button class="btn btn-sm btn-outline" onclick="loadFamilyCalendar('all')" style="padding:0.15rem 0.5rem;">All</button>
+                            <button class="btn btn-sm btn-outline" onclick="loadFamilyCalendar('training')" style="padding:0.15rem 0.5rem;">🏋️ Training</button>
+                            <button class="btn btn-sm btn-outline" onclick="loadFamilyCalendar('meals')" style="padding:0.15rem 0.5rem;">🍽️ Meals</button>
+                            <button class="btn btn-sm btn-outline" onclick="loadFamilyCalendar('progress')" style="padding:0.15rem 0.5rem;">📊 Progress</button>
+                        </div>
+                    </div>
+                    <div class="family-calendar-grid" id="familyCalendarGrid">
+                        <div class="day-label">Sun</div>
+                        <div class="day-label">Mon</div>
+                        <div class="day-label">Tue</div>
+                        <div class="day-label">Wed</div>
+                        <div class="day-label">Thu</div>
+                        <div class="day-label">Fri</div>
+                        <div class="day-label">Sat</div>
+                    </div>
+                    <div class="calendar-legend">
+                        <span><span class="dot" style="background:var(--primary);"></span> Training</span>
+                        <span><span class="dot" style="background:var(--primary-light);"></span> Meal Logged</span>
+                        <span><span class="dot" style="background:var(--secondary);"></span> Progress</span>
+                        <span><span class="dot" style="background:#8b5cf6;"></span> Multiple</span>
+                        <span><span class="dot" style="background:var(--border-color);"></span> No Activity</span>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="stat-label">👨‍👩‍👧‍👦 Family Members</div>
+                    <div id="familyMembersList"><p class="text-muted">Loading...</p></div>
+                </div>
             </div>
 
             <!-- =============================================================
@@ -1317,16 +1526,39 @@
         let currentRecipeId = '';
         let dailyWaterLog = 0;
         let calendarFilter = 'all';
+        let familyMembers = [];
 
         // ================================================================
-        //  THEME ENGINE
+        //  THEME ENGINE (Dropdown)
         // ================================================================
+        function toggleThemeDropdown() {
+            document.getElementById('themeDropdownContent').classList.toggle('show');
+        }
+
         function setTheme(theme) {
-            document.documentElement.setAttribute('data-theme', theme === 'emerald' ? 'light' : theme);
+            const themeMap = {
+                emerald: 'light',
+                midnight: 'midnight',
+                sunrise: 'sunrise',
+                rose: 'rose',
+                steel: 'steel'
+            };
+            document.documentElement.setAttribute('data-theme', themeMap[theme] || 'light');
             localStorage.setItem('nutriflow-theme', theme);
-            document.querySelectorAll('.theme-option').forEach(b => {
-                b.classList.toggle('active', b.dataset.theme === theme);
+
+            document.querySelectorAll('.dropdown-item').forEach(item => {
+                item.classList.toggle('active', item.dataset.theme === theme);
             });
+
+            const labels = {
+                emerald: 'Emerald',
+                midnight: 'Midnight',
+                sunrise: 'Sunrise',
+                rose: 'Rose',
+                steel: 'Steel'
+            };
+            document.getElementById('currentThemeLabel').textContent = labels[theme] || 'Emerald';
+            document.getElementById('themeDropdownContent').classList.remove('show');
         }
 
         function loadTheme() {
@@ -1384,20 +1616,17 @@
         // ================================================================
         //  WATER LOGGING
         // ================================================================
-        let waterLogged = 0;
-
         function addWater(amount) {
-            waterLogged += amount;
-            document.getElementById('dashWater').textContent = waterLogged;
+            dailyWaterLog += amount;
+            document.getElementById('dashWater').textContent = dailyWaterLog;
             updateWaterProgress();
             showToast('💧 Added ' + amount + 'ml water');
-            // Save to backend
             apiCall('logWater', { userId, familyCode, amount });
         }
 
         function updateWaterProgress() {
             const target = parseInt(document.getElementById('dashWaterTarget').textContent) || 2000;
-            const pct = Math.min((waterLogged / target) * 100, 100);
+            const pct = Math.min((dailyWaterLog / target) * 100, 100);
             document.getElementById('waterProgress').style.width = pct + '%';
         }
 
@@ -1439,6 +1668,7 @@
                 loadNutritionGuide();
                 loadTheme();
                 loadTrainingCalendar();
+                loadFamilyCalendar();
             } else {
                 statusEl.textContent = '❌ ' + (result.error || 'Invalid credentials.');
                 statusEl.className = 'error';
@@ -1503,7 +1733,6 @@
                 // Render charts
                 renderWeightChart(result.weightHistory || []);
                 renderCalorieChart(result.calorieHistory || []);
-                renderTrainingCalendar(result.calendarData || []);
             }
         }
 
@@ -1516,19 +1745,20 @@
                 showToast(newVal ? '✅ Training logged!' : 'Training unlogged.');
                 loadDashboardData();
                 loadTrainingCalendar();
+                loadFamilyCalendar();
             } else {
                 showToast('❌ ' + (result.error || 'Failed to update training.'), 'error');
             }
         }
 
         // ================================================================
-        //  TRAINING CALENDAR
+        //  TRAINING CALENDAR (Compact)
         // ================================================================
         function setCalendarFilter(filter) {
             calendarFilter = filter;
-            document.querySelectorAll('[id^="calendarFilter"]').forEach(b => b.classList.remove('active'));
-            document.getElementById('calendarFilter' + filter.charAt(0).toUpperCase() + filter.slice(1)).classList.add(
-            'active');
+            document.querySelectorAll('.filter-btn').forEach(b => {
+                b.classList.toggle('active', b.dataset.filter === filter);
+            });
             loadTrainingCalendar();
         }
 
@@ -1584,6 +1814,91 @@
         }
 
         // ================================================================
+        //  FAMILY CALENDAR
+        // ================================================================
+        let familyCalendarFilter = 'all';
+
+        async function loadFamilyCalendar(filter = 'all') {
+            familyCalendarFilter = filter;
+            if (!userId) return;
+            const result = await apiCall('getFamilyCalendar', { familyCode });
+            if (result.success) {
+                renderFamilyCalendar(result.calendarData || [], result.members || []);
+            }
+        }
+
+        function renderFamilyCalendar(calendarData, members) {
+            const grid = document.getElementById('familyCalendarGrid');
+            const now = new Date();
+            const year = now.getFullYear();
+            const month = now.getMonth();
+            const firstDay = new Date(year, month, 1).getDay();
+            const daysInMonth = new Date(year, month + 1, 0).getDate();
+
+            let html = '';
+            const dayLabels = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+            dayLabels.forEach(d => {
+                html += `<div class="day-label">${d}</div>`;
+            });
+
+            for (let i = 0; i < firstDay; i++) {
+                html += `<div class="calendar-day empty"></div>`;
+            }
+
+            for (let day = 1; day <= daysInMonth; day++) {
+                const dateStr = `${year}-${String(month+1).padStart(2,'0')}-${String(day).padStart(2,'0')}`;
+                const isToday = dateStr === now.toISOString().slice(0, 10);
+                const dayData = calendarData.find(d => d.date === dateStr);
+
+                let status = 'empty';
+                let label = day;
+                let tooltip = '';
+
+                if (dayData) {
+                    const trained = dayData.trained || [];
+                    const meals = dayData.meals || [];
+                    const progress = dayData.progress || [];
+
+                    if (familyCalendarFilter === 'training') {
+                        status = trained.length > 0 ? 'trained' : 'empty';
+                        tooltip = trained.length > 0 ? trained.join(', ') : '';
+                    } else if (familyCalendarFilter === 'meals') {
+                        status = meals.length > 0 ? 'logged' : 'empty';
+                        tooltip = meals.length > 0 ? meals.join(', ') : '';
+                    } else if (familyCalendarFilter === 'progress') {
+                        status = progress.length > 0 ? 'partial' : 'empty';
+                        tooltip = progress.length > 0 ? progress.join(', ') : '';
+                    } else {
+                        const count = trained.length + meals.length + progress.length;
+                        if (count > 1) { status = 'multiple';
+                            tooltip = `Trained: ${trained.join(', ')} | Meals: ${meals.join(', ')} | Progress: ${progress.join(', ')}`; } else if (
+                            trained.length > 0) { status = 'trained';
+                            tooltip = trained.join(', '); } else if (meals.length > 0) { status = 'logged';
+                            tooltip = meals.join(', '); } else if (progress.length > 0) { status = 'partial';
+                            tooltip = progress.join(', '); }
+                    }
+                }
+
+                html += `<div class="calendar-day ${status} ${isToday ? 'today' : ''}" title="${tooltip}">${label}</div>`;
+            }
+
+            grid.innerHTML = html;
+
+            // Update family members list
+            const membersContainer = document.getElementById('familyMembersList');
+            if (members.length === 0) {
+                membersContainer.innerHTML = '<p class="text-muted">No other family members yet.</p>';
+            } else {
+                membersContainer.innerHTML = members.map(m =>
+                    `<div style="display:flex;justify-content:space-between;border-bottom:1px solid var(--border-color);padding:0.25rem 0;">
+                        <span>${m.name}</span>
+                        <span style="color:var(--text-muted);font-size:0.8rem;">${m.goal || '—'}</span>
+                    </div>`
+                ).join('');
+            }
+        }
+
+        // ================================================================
         //  CHARTS
         // ================================================================
         function renderWeightChart(history) {
@@ -1593,10 +1908,10 @@
             if (weightChart) { weightChart.destroy();
                 weightChart = null; }
 
-            const range = parseInt(document.getElementById('chartRange').value);
+            const range = document.getElementById('chartRange').value;
             let filtered = history;
             if (range !== 'all') {
-                filtered = history.slice(-range);
+                filtered = history.slice(-parseInt(range));
             }
 
             const labels = filtered.map(h => h.Date);
@@ -1854,13 +2169,11 @@
             const content = document.getElementById('recipeModalContent');
             content.innerHTML = '<p>Loading ingredients...</p>';
 
-            // Fetch ingredients and methods from the server
             const ingredientsResult = await apiCall('getRecipeIngredients', { recipeId });
             const methodsResult = await apiCall('getRecipeMethods', { recipeId });
 
             let html = '';
 
-            // Nutrition
             html += `<div class="macro-grid">
                 <div class="macro-item"><span class="macro-value">🔥 ${recipe.Calories || 0}</span><span class="macro-label">Calories</span></div>
                 <div class="macro-item"><span class="macro-value">💪 ${recipe.Protein_g || 0}g</span><span class="macro-label">Protein</span></div>
@@ -1872,7 +2185,6 @@
                 <div class="macro-item"><span class="macro-value">📊 ${recipe.Difficulty || ''}</span><span class="macro-label">Difficulty</span></div>
             </div>`;
 
-            // Ingredients
             if (ingredientsResult.success && ingredientsResult.ingredients.length) {
                 html += `<h3>🛒 Ingredients</h3><ul class="ingredient-list">`;
                 ingredientsResult.ingredients.forEach(i => {
@@ -1884,7 +2196,6 @@
                 html += `<p class="text-muted">No ingredients listed.</p>`;
             }
 
-            // Methods
             if (methodsResult.success && methodsResult.methods.length) {
                 html += `<h3>📝 Method</h3><ol class="step-list">`;
                 methodsResult.methods.forEach(m => {
@@ -1895,7 +2206,6 @@
                 html += `<p class="text-muted">No instructions available.</p>`;
             }
 
-            // Portion notes (fallback if ingredients are missing)
             if (recipe.Adult_Portion_Notes && (!ingredientsResult.success || !ingredientsResult.ingredients.length)) {
                 html += `<div class="portion-notes"><strong>📋 Portion Notes:</strong> ${recipe.Adult_Portion_Notes}</div>`;
             }
@@ -1913,20 +2223,35 @@
                 showToast('✅ Meal logged!');
                 closeModal('recipeModal');
                 loadDashboardData();
+                loadTrainingCalendar();
+                loadFamilyCalendar();
             } else {
                 showToast('❌ ' + (result.error || 'Failed to log.'), 'error');
             }
         }
 
         // ================================================================
-        //  PROGRESS
+        //  PROGRESS (with Tabs)
         // ================================================================
+        let currentProgressTab = 'measurements';
+
+        function switchProgressTab(tab) {
+            currentProgressTab = tab;
+            document.querySelectorAll('.progress-tabs button').forEach(b => {
+                b.classList.toggle('active', b.dataset.tab === tab);
+            });
+            document.getElementById('progressTab-measurements').classList.toggle('hidden', tab !== 'measurements');
+            document.getElementById('progressTab-inbody').classList.toggle('hidden', tab !== 'inbody');
+            if (tab === 'inbody') loadInBodyHistory();
+        }
+
         async function loadProgress() {
             if (!userId) return;
             const result = await apiCall('getProgress', { userId });
             if (result.success) {
                 progressHistory = result.history || [];
                 renderProgress();
+                loadInBodyHistory();
             }
         }
 
@@ -1934,27 +2259,37 @@
             const container = document.getElementById('progressHistory');
             if (!progressHistory.length) { container.innerHTML = '<p class="text-muted">No entries yet.</p>'; return; }
             container.innerHTML = `<table class="progress-table">
-                <thead><tr><th>Date</th><th>Weight</th><th>Waist</th><th>BF%</th><th>InBody Report</th></tr></thead>
+                <thead><tr><th>Date</th><th>Weight</th><th>Waist</th><th>BF%</th></tr></thead>
                 <tbody>${progressHistory.slice(0,10).map(p => `
                     <tr>
                         <td>${p.Date}</td>
                         <td>${p.Weight_kg || '—'}</td>
                         <td>${p.Waist_cm || '—'}</td>
                         <td>${p.Body_Fat_Percent || '—'}</td>
-                        <td>${p.InBody_Link ? `<a href="${p.InBody_Link}" target="_blank" class="inbody-link">📎 View Report</a>` : '—'}</td>
                     </tr>
                 `).join('')}</tbody>
             </table>`;
+        }
+
+        function loadInBodyHistory() {
+            const container = document.getElementById('inBodyHistory');
+            const reports = progressHistory.filter(p => p.InBody_Link);
+            if (!reports.length) { container.innerHTML = '<p class="text-muted">No InBody reports uploaded yet.</p>'; return; }
+            container.innerHTML = reports.map(p =>
+                `<div style="display:flex;justify-content:space-between;border-bottom:1px solid var(--border-color);padding:0.25rem 0;">
+                    <span>${p.Date}</span>
+                    <a href="${p.InBody_Link}" target="_blank" class="inbody-link">📎 View Report</a>
+                </div>`
+            ).join('');
         }
 
         async function saveProgress() {
             const weight = parseFloat(document.getElementById('progWeight').value);
             const waist = parseFloat(document.getElementById('progWaist').value);
             const bodyFat = parseFloat(document.getElementById('progBodyFat').value);
-            const inBodyLink = document.getElementById('progInBodyLink').value.trim();
 
-            if (!weight && !waist && !bodyFat && !inBodyLink) {
-                document.getElementById('progressStatus').textContent = 'Please enter at least one measurement or a link.';
+            if (!weight && !waist && !bodyFat) {
+                document.getElementById('progressStatus').textContent = 'Please enter at least one measurement.';
                 document.getElementById('progressStatus').className = 'error';
                 return;
             }
@@ -1964,8 +2299,7 @@
                 familyCode,
                 weight: weight || null,
                 waist: waist || null,
-                bodyFat: bodyFat || null,
-                inBodyLink: inBodyLink || null
+                bodyFat: bodyFat || null
             });
 
             if (result.success) {
@@ -1974,14 +2308,40 @@
                 document.getElementById('progWeight').value = '';
                 document.getElementById('progWaist').value = '';
                 document.getElementById('progBodyFat').value = '';
-                document.getElementById('progInBodyLink').value = '';
                 loadProgress();
                 loadDashboardData();
                 loadTrainingCalendar();
+                loadFamilyCalendar();
                 showToast('Progress saved!');
             } else {
                 document.getElementById('progressStatus').textContent = '❌ ' + (result.error || 'Failed to save.');
                 document.getElementById('progressStatus').className = 'error';
+            }
+        }
+
+        async function saveInBodyLink() {
+            const link = document.getElementById('progInBodyLink').value.trim();
+            if (!link) {
+                document.getElementById('inBodyStatus').textContent = 'Please enter a Google Drive link.';
+                document.getElementById('inBodyStatus').className = 'error';
+                return;
+            }
+
+            const result = await apiCall('saveInBodyLink', {
+                userId,
+                familyCode,
+                link: link
+            });
+
+            if (result.success) {
+                document.getElementById('inBodyStatus').textContent = '✅ Link saved!';
+                document.getElementById('inBodyStatus').className = 'success';
+                document.getElementById('progInBodyLink').value = '';
+                loadProgress();
+                showToast('📄 InBody report saved!');
+            } else {
+                document.getElementById('inBodyStatus').textContent = '❌ ' + (result.error || 'Failed to save.');
+                document.getElementById('inBodyStatus').className = 'error';
             }
         }
 
@@ -2052,11 +2412,9 @@
             const name = prompt('Enter item name:');
             if (name && name.trim()) {
                 const qty = prompt('Enter quantity (e.g., 200g, 2 pieces):') || '1';
-                const result = apiCall('addShoppingItem', { familyCode, ingredient: name.trim(), quantity: qty });
-                if (result.success) {
-                    loadShopping();
-                    showToast('✅ Added: ' + name);
-                }
+                apiCall('addShoppingItem', { familyCode, ingredient: name.trim(), quantity: qty });
+                loadShopping();
+                showToast('✅ Added: ' + name);
             }
         }
 
@@ -2076,10 +2434,10 @@
 
             const result = await apiCall('getFamilyMembers', { familyCode });
             if (result.success) {
-                const members = result.members || [];
+                familyMembers = result.members || [];
                 const container = document.getElementById('familyMembers');
-                if (!members.length) { container.innerHTML = '<p class="text-muted">No other members.</p>'; return; }
-                container.innerHTML = members.map(m =>
+                if (!familyMembers.length) { container.innerHTML = '<p class="text-muted">No other members.</p>'; return; }
+                container.innerHTML = familyMembers.map(m =>
                     `<div style="display:flex;justify-content:space-between;border-bottom:1px solid var(--border-color);padding:0.25rem 0;">
                         <span>${m.Name}</span>
                         <span style="color:var(--text-muted);font-size:0.8rem;">${m.Goal || '—'}</span>
@@ -2223,6 +2581,7 @@
             if (view === 'recipes') loadRecipes();
             if (view === 'progress') loadProgress();
             if (view === 'shopping') loadShopping();
+            if (view === 'family') loadFamilyCalendar();
             if (view === 'settings') loadFamilyMembers();
             if (view === 'nutrition') loadNutritionGuide();
         }
@@ -2234,7 +2593,7 @@
             document.getElementById('loginScreen').classList.remove('hidden');
             document.getElementById('mainApp').classList.add('hidden');
             loadTheme();
-            console.log('✅ NutriFlow v3.0 loaded successfully!');
+            console.log('✅ NutriFlow v4.0 loaded successfully!');
         });
     </script>
 
