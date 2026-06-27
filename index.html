@@ -759,34 +759,36 @@
         //  SETTINGS
         // ================================================================
         async function loadFamilyMembers() {
-            if (!userId) return;
-            
-            // Populate profile info
-            document.getElementById('settingsName').textContent = userName || '—';
-            document.getElementById('settingsFamily').textContent = familyCode || '—';
-            document.getElementById('settingsAge').textContent = userData.Age || '—';
-            document.getElementById('settingsSex').textContent = userData.Sex || '—';
-            document.getElementById('settingsGoal').textContent = userData.Goal || '—';
-            document.getElementById('settingsCalories').textContent = userData.Target_Calories || '—';
-            document.getElementById('settingsProtein').textContent = userData.Protein_Target_g || '—';
-            document.getElementById('settingsWater').textContent = userData.Water_Target_ml || '—';
-            
-            // Load family members
-            const result = await apiCall('getFamilyMembers', { familyCode: familyCode });
-            if (result.success) {
-                const members = result.members || [];
-                const container = document.getElementById('familyMembers');
-                if (members.length === 0) {
-                    container.innerHTML = '<p style="color:#94a3b8;">No other members.</p>';
-                } else {
-                    container.innerHTML = members.map(m => `<div style="display:flex;justify-content:space-between;border-bottom:1px solid #f1f5f9;padding:0.25rem 0;">
-                        <span>${m.Name}</span>
-                        <span style="color:#94a3b8;font-size:0.8rem;">${m.Goal || '—'}</span>
-                    </div>`).join('');
-                }
-            }
+    if (!userId) {
+        console.warn('No userId found – please sign in again.');
+        return;
+    }
+    
+    // Populate profile info (but DON'T open the modal)
+    document.getElementById('settingsName').textContent = userName || '—';
+    document.getElementById('settingsFamily').textContent = familyCode || '—';
+    document.getElementById('settingsAge').textContent = userData.Age || '—';
+    document.getElementById('settingsSex').textContent = userData.Sex || '—';
+    document.getElementById('settingsGoal').textContent = userData.Goal || '—';
+    document.getElementById('settingsCalories').textContent = userData.Target_Calories || '—';
+    document.getElementById('settingsProtein').textContent = userData.Protein_Target_g || '—';
+    document.getElementById('settingsWater').textContent = userData.Water_Target_ml || '—';
+    
+    // Load family members
+    const result = await apiCall('getFamilyMembers', { familyCode: familyCode });
+    if (result.success) {
+        const members = result.members || [];
+        const container = document.getElementById('familyMembers');
+        if (members.length === 0) {
+            container.innerHTML = '<p style="color:#94a3b8;">No other members.</p>';
+        } else {
+            container.innerHTML = members.map(m => `<div style="display:flex;justify-content:space-between;border-bottom:1px solid #f1f5f9;padding:0.25rem 0;">
+                <span>${m.Name}</span>
+                <span style="color:#94a3b8;font-size:0.8rem;">${m.Goal || '—'}</span>
+            </div>`).join('');
         }
-
+    }
+}
         function showEditProfile() {
             document.getElementById('editAge').value = userData.Age || '';
             document.getElementById('editSex').value = userData.Sex || 'Male';
@@ -898,19 +900,18 @@
             document.getElementById(id).classList.add('hidden');
         }
 
-        function switchView(view) {
+       function switchView(view) {
     document.querySelectorAll('[id^="view-"]').forEach(el => el.classList.add('hidden'));
     document.getElementById('view-' + view).classList.remove('hidden');
     document.querySelectorAll('.nav button').forEach(b => b.classList.remove('active'));
     document.querySelector(`.nav button[data-view="${view}"]`).classList.add('active');
     
-    // Load data for the selected view (but don't open modals)
     if (view === 'dashboard') loadDashboardData();
     if (view === 'planner') loadPlanner();
     if (view === 'recipes') loadRecipes();
     if (view === 'progress') loadProgress();
     if (view === 'shopping') loadShopping();
-    if (view === 'settings') loadFamilyMembers();
+    if (view === 'settings') loadFamilyMembers();  // This does NOT call showEditProfile
 }
         // ================================================================
         //  INIT
