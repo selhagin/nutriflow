@@ -1,178 +1,987 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>NutriFlow</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NutriFlow · Family Nutrition OS</title>
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js">
+    </script>
+
     <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-        body { font-family: system-ui, sans-serif; background: #f0fdf4; padding: 1rem; }
-        .container { max-width: 900px; margin: 0 auto; }
-        .card { background: white; padding: 1.5rem; border-radius: 1rem; box-shadow: 0 4px 6px rgba(0,0,0,0.1); margin-bottom: 1.5rem; }
-        h1 { color: #16A34A; }
-        h2 { color: #0f172a; margin-bottom: 0.5rem; }
-        .flex { display: flex; flex-wrap: wrap; gap: 1rem; align-items: center; }
-        .flex-between { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; }
-        .grid-3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1rem; }
-        .stat { background: #f8fafc; padding: 1rem; border-radius: 0.75rem; border: 1px solid #f1f5f9; }
-        .stat-label { font-size: 0.75rem; text-transform: uppercase; color: #94a3b8; font-weight: 600; }
-        .stat-value { font-size: 1.5rem; font-weight: 700; color: #0f172a; }
-        .stat-target { font-size: 0.85rem; color: #64748b; }
-        .progress-bg { background: #e2e8f0; border-radius: 9999px; height: 0.5rem; margin-top: 0.5rem; overflow: hidden; }
-        .progress-fill { height: 100%; border-radius: 9999px; transition: width 0.6s; }
-        input, select, button { padding: 0.5rem 0.75rem; border: 1px solid #e2e8f0; border-radius: 0.5rem; font-size: 0.9rem; }
-        button { background: #16A34A; color: white; cursor: pointer; border: none; font-weight: 600; }
-        button:hover { background: #15803d; }
-        .btn-secondary { background: #2563EB; }
-        .btn-secondary:hover { background: #1d4ed8; }
-        .error { color: #dc2626; }
-        .success { color: #16A34A; }
-        .hidden { display: none; }
-        .login-card { max-width: 400px; margin: 4rem auto; background: white; padding: 2rem; border-radius: 1.5rem; box-shadow: 0 20px 60px rgba(0,0,0,0.08); }
-        .login-card input { width: 100%; margin-bottom: 1rem; }
-        .login-card button { width: 100%; }
-        .nav { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 1rem; background: white; padding: 0.5rem; border-radius: 0.75rem; box-shadow: 0 1px 3px rgba(0,0,0,0.06); }
-        .nav button { background: transparent; color: #475569; border: none; padding: 0.5rem 1rem; border-radius: 0.5rem; cursor: pointer; }
-        .nav button.active { background: #dcfce7; color: #16A34A; }
-        .nav button:hover { background: #f1f5f9; }
-        .toast { position: fixed; bottom: 2rem; right: 2rem; background: #0f172a; color: white; padding: 0.75rem 1.5rem; border-radius: 0.75rem; z-index: 9999; }
-        .toast.success { background: #16A34A; }
-        .toast.error { background: #dc2626; }
-        .recipe-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 1rem; }
-        .recipe-card { background: #f8fafc; padding: 0.75rem; border-radius: 0.5rem; border: 1px solid #f1f5f9; }
-        .recipe-card .title { font-weight: 600; }
-        .recipe-card .cal { color: #16A34A; font-weight: 700; }
-        .tag { background: #e2e8f0; font-size: 0.65rem; padding: 0.1rem 0.4rem; border-radius: 9999px; display: inline-block; margin: 0.1rem; }
-        .week-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 0.5rem; }
-        @media (max-width: 768px) { .week-grid { grid-template-columns: repeat(2, 1fr); } }
-        .day-card { background: #f8fafc; padding: 0.5rem; border-radius: 0.5rem; border: 1px solid #f1f5f9; }
-        .day-card .day-label { font-weight: 600; font-size: 0.8rem; }
-        .day-card select { font-size: 0.7rem; padding: 0.1rem; width: 100%; }
-        .shopping-item { display: flex; align-items: center; gap: 0.5rem; padding: 0.3rem 0; border-bottom: 1px solid #f1f5f9; }
-        .shopping-item .name { flex: 1; }
-        .shopping-item .qty { color: #64748b; font-size: 0.8rem; }
-        .purchased .name { text-decoration: line-through; color: #94a3b8; }
-        .edit-form { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-top: 1rem; }
-        .edit-form label { font-weight: 600; font-size: 0.85rem; color: #334155; }
-        .edit-form input, .edit-form select { width: 100%; }
-        .edit-form .full-width { grid-column: 1 / -1; }
-        .edit-form .btn-row { grid-column: 1 / -1; display: flex; gap: 0.5rem; justify-content: flex-end; margin-top: 0.5rem; }
-        .edit-form .btn-row .cancel-btn { background: #e2e8f0; color: #475569; }
-        .edit-form .btn-row .cancel-btn:hover { background: #cbd5e1; }
+        /* ================================================================
+             1.  CSS VARIABLES & THEMES
+             ================================================================ */
+
+        /* ---------- Light Theme (Default) ---------- */
+        :root {
+            --bg-primary: #f0fdf4;
+            --bg-secondary: #ffffff;
+            --bg-card: #ffffff;
+            --bg-nav: #ffffff;
+            --bg-input: #f8fafc;
+            --text-primary: #0f172a;
+            --text-secondary: #475569;
+            --text-muted: #94a3b8;
+            --border-color: #e2e8f0;
+            --shadow: 0 4px 6px rgba(0, 0, 0, 0.06);
+            --shadow-lg: 0 20px 60px rgba(0, 0, 0, 0.08);
+            --radius: 1rem;
+            --radius-sm: 0.5rem;
+
+            /* Brand Colors */
+            --primary: #0F766E;
+            --primary-light: #14b8a6;
+            --primary-dark: #0d5c56;
+            --primary-bg: #dcfce7;
+            --secondary: #F59E0B;
+            --secondary-light: #fbbf24;
+            --accent: #2563EB;
+            --accent-light: #60a5fa;
+
+            /* Status */
+            --success: #16A34A;
+            --error: #dc2626;
+            --warning: #F59E0B;
+        }
+
+        /* ---------- Dark Theme ---------- */
+        [data-theme="dark"] {
+            --bg-primary: #0f172a;
+            --bg-secondary: #1e293b;
+            --bg-card: #1e293b;
+            --bg-nav: #1e293b;
+            --bg-input: #0f172a;
+            --text-primary: #f8fafc;
+            --text-secondary: #cbd5e1;
+            --text-muted: #94a3b8;
+            --border-color: #334155;
+            --shadow: 0 4px 6px rgba(0, 0, 0, 0.4);
+            --shadow-lg: 0 20px 60px rgba(0, 0, 0, 0.6);
+            --primary-bg: #134e4a;
+        }
+
+        /* ---------- Sunset Theme ---------- */
+        [data-theme="sunset"] {
+            --primary: #c2410c;
+            --primary-light: #ea580c;
+            --primary-dark: #9a3412;
+            --primary-bg: #ffedd5;
+            --secondary: #f59e0b;
+            --accent: #d97706;
+        }
+
+        [data-theme="sunset"][data-theme="dark"] {
+            --bg-primary: #1c1917;
+            --bg-secondary: #292524;
+            --bg-card: #292524;
+            --bg-nav: #292524;
+            --text-primary: #fef3c7;
+            --text-secondary: #d6d3d1;
+            --text-muted: #a8a29e;
+            --border-color: #44403c;
+            --primary-bg: #451a03;
+        }
+
+        /* ---------- Bloom Theme (Pink/Purple) ---------- */
+        [data-theme="bloom"] {
+            --primary: #7c3aed;
+            --primary-light: #8b5cf6;
+            --primary-dark: #5b21b6;
+            --primary-bg: #ede9fe;
+            --secondary: #ec4899;
+            --accent: #8b5cf6;
+        }
+
+        [data-theme="bloom"][data-theme="dark"] {
+            --bg-primary: #1e1b2e;
+            --bg-secondary: #2d2a44;
+            --bg-card: #2d2a44;
+            --bg-nav: #2d2a44;
+            --text-primary: #f3e8ff;
+            --text-secondary: #d8b4fe;
+            --text-muted: #a78bfa;
+            --border-color: #4c1d95;
+            --primary-bg: #2e1065;
+        }
+
+        /* ================================================================
+             2.  BASE STYLES
+             ================================================================ */
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            padding: 1rem;
+            transition: background 0.3s, color 0.3s;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+
+        /* ================================================================
+             3.  CARDS & COMPONENTS
+             ================================================================ */
+
+        .card {
+            background: var(--bg-card);
+            padding: 1.5rem;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border-color);
+            margin-bottom: 1.5rem;
+            transition: background 0.3s, border 0.3s, box-shadow 0.3s;
+        }
+
+        .card-glass {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .flex {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        .flex-between {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+
+        .grid-3 {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 1rem;
+        }
+
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+
+        @media (max-width: 768px) {
+            .grid-2 {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        h1 {
+            color: var(--primary);
+            font-size: 2rem;
+            font-weight: 800;
+        }
+
+        h2 {
+            color: var(--text-primary);
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+        }
+
+        h3 {
+            color: var(--text-primary);
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+
+        .text-muted {
+            color: var(--text-muted);
+            font-size: 0.85rem;
+        }
+
+        .text-primary {
+            color: var(--primary);
+        }
+
+        .stat-label {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            color: var(--text-muted);
+            font-weight: 600;
+        }
+
+        .stat-value {
+            font-size: 1.8rem;
+            font-weight: 800;
+            color: var(--text-primary);
+            line-height: 1.2;
+        }
+
+        .stat-target {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+
+        /* Buttons */
+        .btn {
+            padding: 0.6rem 1.2rem;
+            border: none;
+            border-radius: var(--radius-sm);
+            font-weight: 600;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .btn-secondary {
+            background: var(--secondary);
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #d97706;
+            transform: translateY(-2px);
+        }
+
+        .btn-outline {
+            background: transparent;
+            color: var(--primary);
+            border: 2px solid var(--primary);
+        }
+
+        .btn-outline:hover {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-danger {
+            background: var(--error);
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #b91c1c;
+        }
+
+        .btn-sm {
+            padding: 0.3rem 0.8rem;
+            font-size: 0.75rem;
+        }
+
+        .btn-lg {
+            padding: 0.8rem 2rem;
+            font-size: 1.1rem;
+        }
+
+        /* Progress Bar */
+        .progress-bg {
+            background: var(--border-color);
+            border-radius: 9999px;
+            height: 0.5rem;
+            margin-top: 0.5rem;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            border-radius: 9999px;
+            transition: width 0.8s ease;
+        }
+
+        /* Inputs */
+        input,
+        select,
+        textarea {
+            padding: 0.5rem 0.75rem;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-sm);
+            font-size: 0.9rem;
+            background: var(--bg-input);
+            color: var(--text-primary);
+            transition: border 0.2s, background 0.3s;
+            width: 100%;
+        }
+
+        input:focus,
+        select:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(15, 118, 110, 0.15);
+        }
+
+        label {
+            font-weight: 600;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            display: block;
+            margin-bottom: 0.2rem;
+        }
+
+        /* Toast */
+        .toast {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            background: var(--bg-card);
+            color: var(--text-primary);
+            padding: 0.8rem 1.5rem;
+            border-radius: var(--radius-sm);
+            box-shadow: var(--shadow-lg);
+            z-index: 9999;
+            border: 1px solid var(--border-color);
+            max-width: 380px;
+            animation: slideUp 0.3s ease;
+        }
+
+        .toast.success {
+            border-left: 4px solid var(--success);
+        }
+        .toast.error {
+            border-left: 4px solid var(--error);
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        /* ================================================================
+             4.  LOGIN
+             ================================================================ */
+
+        .login-card {
+            max-width: 420px;
+            margin: 3rem auto;
+            background: var(--bg-card);
+            padding: 2.5rem 2rem;
+            border-radius: 1.5rem;
+            box-shadow: var(--shadow-lg);
+            border: 1px solid var(--border-color);
+        }
+
+        .login-card input {
+            margin-bottom: 1rem;
+        }
+
+        .login-card .btn {
+            width: 100%;
+            justify-content: center;
+        }
+
+        /* ================================================================
+             5.  NAVIGATION
+             ================================================================ */
+
+        .nav {
+            display: flex;
+            gap: 0.25rem;
+            flex-wrap: wrap;
+            background: var(--bg-nav);
+            padding: 0.4rem;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border-color);
+            margin-bottom: 1.5rem;
+        }
+
+        .nav button {
+            background: transparent;
+            color: var(--text-secondary);
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            font-weight: 500;
+            font-size: 0.85rem;
+            transition: all 0.2s;
+            white-space: nowrap;
+        }
+
+        .nav button:hover {
+            background: var(--primary-bg);
+            color: var(--primary);
+        }
+
+        .nav button.active {
+            background: var(--primary);
+            color: white;
+        }
+
+        /* ================================================================
+             6.  DASHBOARD STATS
+             ================================================================ */
+
+        .stat-ring {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+
+        .stat-ring .ring-value {
+            font-size: 1.4rem;
+            font-weight: 700;
+        }
+
+        .stat-ring .ring-label {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            letter-spacing: 0.04em;
+        }
+
+        .training-btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 9999px;
+            font-weight: 700;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            box-shadow: 0 4px 15px rgba(15, 118, 110, 0.3);
+        }
+
+        .training-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 6px 25px rgba(15, 118, 110, 0.4);
+        }
+
+        .training-btn.done {
+            background: var(--success);
+            box-shadow: 0 4px 15px rgba(22, 163, 74, 0.3);
+        }
+
+        /* ================================================================
+             7.  WEEKLY PLANNER
+             ================================================================ */
+
+        .week-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 0.5rem;
+        }
+
+        @media (max-width: 1024px) {
+            .week-grid {
+                grid-template-columns: repeat(4, 1fr);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .week-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 480px) {
+            .week-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .day-card {
+            background: var(--bg-card);
+            padding: 0.6rem;
+            border-radius: var(--radius-sm);
+            border: 1px solid var(--border-color);
+        }
+
+        .day-card .day-label {
+            font-weight: 700;
+            font-size: 0.75rem;
+            color: var(--primary);
+            margin-bottom: 0.25rem;
+        }
+
+        .day-card .meal-row {
+            margin-bottom: 0.2rem;
+        }
+
+        .day-card .meal-row label {
+            font-size: 0.55rem;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            letter-spacing: 0.04em;
+            font-weight: 600;
+        }
+
+        .day-card .meal-row select {
+            font-size: 0.65rem;
+            padding: 0.1rem 0.2rem;
+            border: 1px solid var(--border-color);
+            border-radius: 0.2rem;
+            width: 100%;
+            background: var(--bg-input);
+            color: var(--text-primary);
+        }
+
+        /* ================================================================
+             8.  RECIPE CARDS & MODAL
+             ================================================================ */
+
+        .recipe-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 1rem;
+        }
+
+        .recipe-card {
+            background: var(--bg-card);
+            padding: 0.75rem;
+            border-radius: var(--radius-sm);
+            border: 1px solid var(--border-color);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .recipe-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-lg);
+            border-color: var(--primary);
+        }
+
+        .recipe-card .title {
+            font-weight: 600;
+            font-size: 0.95rem;
+        }
+
+        .recipe-card .cal {
+            color: var(--primary);
+            font-weight: 700;
+        }
+
+        .recipe-card .tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.2rem;
+            margin-top: 0.3rem;
+        }
+
+        .recipe-card .tag {
+            background: var(--primary-bg);
+            font-size: 0.6rem;
+            padding: 0.05rem 0.4rem;
+            border-radius: 9999px;
+            color: var(--primary);
+        }
+
+        /* Recipe Modal */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(4px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            padding: 1rem;
+        }
+
+        .modal-overlay.open {
+            display: flex;
+        }
+
+        .modal-box {
+            background: var(--bg-card);
+            border-radius: 1.5rem;
+            padding: 2rem;
+            max-width: 600px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            border: 1px solid var(--border-color);
+            box-shadow: var(--shadow-lg);
+            animation: slideUp 0.3s ease;
+        }
+
+        .modal-box .close-btn {
+            float: right;
+            background: transparent;
+            border: none;
+            font-size: 1.5rem;
+            color: var(--text-muted);
+            cursor: pointer;
+        }
+
+        .modal-box .close-btn:hover {
+            color: var(--text-primary);
+        }
+
+        .modal-box .ingredient-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .modal-box .ingredient-list li {
+            padding: 0.2rem 0;
+            border-bottom: 1px solid var(--border-color);
+            font-size: 0.9rem;
+        }
+
+        .modal-box .step-list {
+            list-style: decimal;
+            padding-left: 1.2rem;
+        }
+
+        .modal-box .step-list li {
+            padding: 0.3rem 0;
+            font-size: 0.9rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .modal-box .step-list li:last-child {
+            border-bottom: none;
+        }
+
+        /* ================================================================
+             9.  THEME SELECTOR
+             ================================================================ */
+
+        .theme-selector {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .theme-btn {
+            width: 2rem;
+            height: 2rem;
+            border-radius: 9999px;
+            border: 2px solid var(--border-color);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .theme-btn:hover {
+            transform: scale(1.1);
+        }
+
+        .theme-btn.active {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(15, 118, 110, 0.2);
+        }
+
+        .theme-btn.light {
+            background: #f0fdf4;
+        }
+        .theme-btn.dark {
+            background: #0f172a;
+        }
+        .theme-btn.sunset {
+            background: #c2410c;
+        }
+        .theme-btn.bloom {
+            background: #7c3aed;
+        }
+
+        /* ================================================================
+             10. SETTINGS
+             ================================================================ */
+
+        .settings-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+        }
+
+        @media (max-width: 768px) {
+            .settings-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* ================================================================
+             11. SHOPPING LIST
+             ================================================================ */
+
+        .shopping-item {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.4rem 0;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .shopping-item:last-child {
+            border-bottom: none;
+        }
+
+        .shopping-item .name {
+            flex: 1;
+            font-size: 0.9rem;
+        }
+
+        .shopping-item .qty {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+
+        .shopping-item.purchased .name {
+            text-decoration: line-through;
+            color: var(--text-muted);
+        }
+
+        /* ================================================================
+             12. CHART CONTAINER
+             ================================================================ */
+
+        .chart-container {
+            position: relative;
+            height: 200px;
+            width: 100%;
+        }
+
+        /* ================================================================
+             13. RESPONSIVE HELPERS
+             ================================================================ */
+
+        .text-center {
+            text-align: center;
+        }
+
+        .mt-1 {
+            margin-top: 0.5rem;
+        }
+        .mt-2 {
+            margin-top: 1rem;
+        }
+        .mt-3 {
+            margin-top: 1.5rem;
+        }
+
+        .mb-1 {
+            margin-bottom: 0.5rem;
+        }
+        .mb-2 {
+            margin-bottom: 1rem;
+        }
+
+        .gap-1 {
+            gap: 0.5rem;
+        }
+        .gap-2 {
+            gap: 1rem;
+        }
+
+        .w-full {
+            width: 100%;
+        }
     </style>
 </head>
 <body>
+
     <div id="app">
+        <!-- =============================================================
+        TOAST
+        ============================================================= -->
         <div id="toast" class="toast hidden"></div>
 
-        <!-- LOGIN -->
+        <!-- =============================================================
+        LOGIN
+        ============================================================= -->
         <div id="loginScreen" class="container">
             <div class="login-card">
-                <h1 style="text-align:center;">NutriFlow</h1>
-                <p style="text-align:center;color:#64748b;">Family Nutrition OS</p>
+                <div class="text-center">
+                    <h1 style="font-size:2.5rem;">NutriFlow</h1>
+                    <p class="text-muted" style="margin-bottom:1.5rem;">Family Nutrition OS</p>
+                </div>
                 <div>
                     <label>Family Code</label>
                     <input id="loginFamilyCode" value="Hagin" />
                     <label>Your Name</label>
                     <input id="loginName" value="Salah El Hagin" />
-                    <button onclick="handleSignIn()">Sign In</button>
-                    <p id="loginStatus" style="text-align:center;margin-top:0.5rem;"></p>
-                    <div style="text-align:center;margin-top:1rem;">
-                        <button onclick="showCreateProfile()" style="background:transparent;color:#16A34A;border:2px solid #16A34A;width:auto;">Create Profile</button>
-                        <button onclick="showCreateFamily()" style="background:transparent;color:#2563EB;border:none;width:auto;">+ Create New Family</button>
+                    <button class="btn btn-primary btn-lg" onclick="handleSignIn()" style="width:100%;justify-content:center;margin-top:0.5rem;">
+                        🚀 Sign In
+                    </button>
+                    <p id="loginStatus" class="text-center mt-1" style="font-size:0.9rem;"></p>
+                    <div class="text-center mt-2" style="display:flex;gap:0.5rem;justify-content:center;flex-wrap:wrap;">
+                        <button class="btn btn-outline btn-sm" onclick="showCreateProfile()">Create Profile</button>
+                        <button class="btn btn-secondary btn-sm" onclick="showCreateFamily()">+ New Family</button>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- MAIN APP -->
+        <!-- =============================================================
+        MAIN APP
+        ============================================================= -->
         <div id="mainApp" class="container hidden">
-            <!-- Header -->
-            <div class="flex-between" style="background:white;padding:1rem;border-radius:0.75rem;margin-bottom:1rem;box-shadow:0 1px 3px rgba(0,0,0,0.06);">
-                <div class="flex">
+
+            <!-- =============================================================
+            HEADER
+            ============================================================= -->
+            <header class="flex-between" style="background:var(--bg-card);padding:0.75rem 1.5rem;border-radius:var(--radius);box-shadow:var(--shadow);border:1px solid var(--border-color);margin-bottom:1rem;">
+                <div class="flex" style="gap:0.5rem;">
                     <h1 style="font-size:1.5rem;">NutriFlow</h1>
-                    <span style="background:#dcfce7;color:#16A34A;padding:0.1rem 0.5rem;border-radius:9999px;font-size:0.75rem;" id="familyCodeDisplay"></span>
+                    <span style="background:var(--primary-bg);color:var(--primary);padding:0.1rem 0.6rem;border-radius:9999px;font-size:0.7rem;font-weight:700;" id="familyCodeDisplay"></span>
                 </div>
-                <div class="flex">
-                    <span id="userNameDisplay"></span>
-                    <button onclick="handleLogout()" style="background:transparent;color:#94a3b8;padding:0.25rem 0.5rem;">✕</button>
+                <div class="flex" style="gap:0.5rem;">
+                    <span style="font-weight:600;font-size:0.9rem;" id="userNameDisplay"></span>
+                    <button onclick="handleLogout()" style="background:transparent;border:none;color:var(--text-muted);font-size:1.2rem;cursor:pointer;">✕</button>
                 </div>
+            </header>
+
+            <!-- =============================================================
+            THEME SELECTOR (in header)
+            ============================================================= -->
+            <div style="display:flex;gap:0.5rem;align-items:center;margin-bottom:0.5rem;flex-wrap:wrap;">
+                <span style="font-size:0.75rem;color:var(--text-muted);font-weight:600;">Theme:</span>
+                <button class="theme-btn light active" data-theme="light" onclick="setTheme('light')" title="Light"></button>
+                <button class="theme-btn dark" data-theme="dark" onclick="setTheme('dark')" title="Dark"></button>
+                <button class="theme-btn sunset" data-theme="sunset" onclick="setTheme('sunset')" title="Sunset"></button>
+                <button class="theme-btn bloom" data-theme="bloom" onclick="setTheme('bloom')" title="Bloom"></button>
+                <span style="font-size:0.7rem;color:var(--text-muted);margin-left:0.5rem;">💡 Click to change</span>
             </div>
 
-            <!-- Navigation -->
-            <div class="nav">
+            <!-- =============================================================
+            NAVIGATION
+            ============================================================= -->
+            <nav class="nav">
                 <button class="active" data-view="dashboard" onclick="switchView('dashboard')">📊 Dashboard</button>
                 <button data-view="planner" onclick="switchView('planner')">📅 Planner</button>
                 <button data-view="recipes" onclick="switchView('recipes')">📖 Recipes</button>
                 <button data-view="progress" onclick="switchView('progress')">📈 Progress</button>
                 <button data-view="shopping" onclick="switchView('shopping')">🛒 Shopping</button>
                 <button data-view="settings" onclick="switchView('settings')">⚙️ Settings</button>
-            </div>
+                <button data-view="nutrition" onclick="switchView('nutrition')">📚 Nutrition Guide</button>
+            </nav>
 
-            <!-- DASHBOARD -->
+            <!-- =============================================================
+            VIEW: DASHBOARD
+            ============================================================= -->
             <div id="view-dashboard">
-                <h2>Dashboard</h2>
-                <div class="grid-3">
-                    <div class="stat">
+                <h2>📊 Dashboard</h2>
+
+                <!-- Stats Row -->
+                <div class="grid-3" style="margin-bottom:1.5rem;">
+                    <div class="card" style="text-align:center;">
                         <div class="stat-label">Calories</div>
                         <div><span class="stat-value" id="dashCalories">0</span> <span class="stat-target">/ <span id="dashCalTarget">0</span> kcal</span></div>
-                        <div class="progress-bg"><div id="calProgress" class="progress-fill" style="width:0%;background:#16A34A;"></div></div>
+                        <div class="progress-bg"><div id="calProgress" class="progress-fill" style="width:0%;background:var(--primary);"></div></div>
                     </div>
-                    <div class="stat">
+                    <div class="card" style="text-align:center;">
                         <div class="stat-label">Protein</div>
                         <div><span class="stat-value" id="dashProtein">0</span> <span class="stat-target">/ <span id="dashProtTarget">0</span> g</span></div>
-                        <div class="progress-bg"><div id="protProgress" class="progress-fill" style="width:0%;background:#2563EB;"></div></div>
+                        <div class="progress-bg"><div id="protProgress" class="progress-fill" style="width:0%;background:var(--secondary);"></div></div>
                     </div>
-                    <div class="stat">
+                    <div class="card" style="text-align:center;">
                         <div class="stat-label">Water</div>
                         <div><span class="stat-value" id="dashWater">0</span> <span class="stat-target">/ <span id="dashWaterTarget">0</span> ml</span></div>
-                        <div class="progress-bg"><div id="waterProgress" class="progress-fill" style="width:0%;background:#F59E0B;"></div></div>
+                        <div class="progress-bg"><div id="waterProgress" class="progress-fill" style="width:0%;background:var(--accent);"></div></div>
                     </div>
                 </div>
-                <div class="card">
-                    <div class="flex-between">
-                        <span class="stat-label">Today's Training</span>
-                        <div class="flex">
-                            <button id="trainingBtn" onclick="toggleTraining()">⭕ Log</button>
-                            <span id="trainingCount"></span>
+
+                <!-- Training + Streak -->
+                <div class="flex-between" style="margin-bottom:1.5rem;flex-wrap:wrap;gap:1rem;">
+                    <div class="flex" style="gap:1rem;">
+                        <button id="trainingBtn" class="training-btn" onclick="toggleTraining()">💪 Log Training</button>
+                        <span style="font-size:0.9rem;color:var(--text-secondary);">
+                            <span id="trainingCount"></span> this week
+                        </span>
+                    </div>
+                    <div style="font-size:0.9rem;color:var(--text-secondary);">
+                        🔥 Streak: <span id="streakCount" style="font-weight:700;color:var(--primary);">0</span> days
+                    </div>
+                </div>
+
+                <!-- Charts Row -->
+                <div class="grid-2">
+                    <div class="card">
+                        <div class="stat-label">📉 Weight Trend (7 days)</div>
+                        <div class="chart-container">
+                            <canvas id="weightChart"></canvas>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <div class="stat-label">📊 Calories: Intake vs Target</div>
+                        <div class="chart-container">
+                            <canvas id="calorieChart"></canvas>
                         </div>
                     </div>
                 </div>
+
+                <!-- Today's Meals -->
                 <div class="card">
-                    <div class="stat-label">Today's Meals</div>
-                    <div id="todayMeals"><p style="color:#94a3b8;">No meals logged yet.</p></div>
+                    <div class="stat-label">🍽️ Today's Meals</div>
+                    <div id="todayMeals"><p class="text-muted">No meals logged yet.</p></div>
                 </div>
             </div>
 
-            <!-- PLANNER -->
+            <!-- =============================================================
+            VIEW: PLANNER
+            ============================================================= -->
             <div id="view-planner" class="hidden">
                 <div class="flex-between">
-                    <h2>Weekly Planner</h2>
-                    <div class="flex">
-                        <button onclick="weekOffset--; loadPlanner();">‹</button>
-                        <span id="weekLabel"></span>
-                        <button onclick="weekOffset++; loadPlanner();">›</button>
-                        <button class="btn-secondary" onclick="savePlanner()">Save Week</button>
+                    <h2>📅 Weekly Planner</h2>
+                    <div class="flex" style="gap:0.5rem;">
+                        <button class="btn btn-outline btn-sm" onclick="weekOffset--; loadPlanner();">‹</button>
+                        <span id="weekLabel" style="font-weight:600;font-size:0.9rem;"></span>
+                        <button class="btn btn-outline btn-sm" onclick="weekOffset++; loadPlanner();">›</button>
+                        <button class="btn btn-primary btn-sm" onclick="savePlanner()">💾 Save Week</button>
                     </div>
                 </div>
-                <div id="plannerGrid" class="week-grid"></div>
+                <div id="plannerGrid" class="week-grid" style="margin-top:1rem;"></div>
             </div>
 
-            <!-- RECIPES -->
+            <!-- =============================================================
+            VIEW: RECIPES
+            ============================================================= -->
             <div id="view-recipes" class="hidden">
-                <h2>Recipe Library</h2>
+                <h2>📖 Recipe Library</h2>
                 <div class="flex" style="margin-bottom:1rem;">
                     <input id="recipeSearch" placeholder="Search recipes..." oninput="filterRecipes()" style="flex:1;" />
-                    <select id="recipeCategory" onchange="filterRecipes()">
+                    <select id="recipeCategory" onchange="filterRecipes()" style="max-width:200px;">
                         <option value="">All Categories</option>
                     </select>
                 </div>
                 <div id="recipeGrid" class="recipe-grid"></div>
             </div>
 
-            <!-- PROGRESS -->
+            <!-- =============================================================
+            VIEW: PROGRESS
+            ============================================================= -->
             <div id="view-progress" class="hidden">
-                <h2>Progress Tracker</h2>
+                <h2>📈 Progress Tracker</h2>
                 <div class="card">
                     <div class="stat-label">Log New Measurement</div>
                     <div class="grid-3">
@@ -180,107 +989,191 @@
                         <div><label>Waist (cm)</label><input id="progWaist" type="number" step="0.5" /></div>
                         <div><label>Body Fat %</label><input id="progBodyFat" type="number" step="0.5" /></div>
                     </div>
-                    <button onclick="saveProgress()" style="margin-top:1rem;">Save Entry</button>
-                    <p id="progressStatus"></p>
+                    <button class="btn btn-primary mt-1" onclick="saveProgress()">💾 Save Entry</button>
+                    <p id="progressStatus" class="mt-1"></p>
                 </div>
                 <div class="card">
                     <div class="stat-label">Recent Entries</div>
-                    <div id="progressHistory"><p style="color:#94a3b8;">No entries yet.</p></div>
+                    <div id="progressHistory"><p class="text-muted">No entries yet.</p></div>
                 </div>
             </div>
 
-            <!-- SHOPPING -->
+            <!-- =============================================================
+            VIEW: SHOPPING
+            ============================================================= -->
             <div id="view-shopping" class="hidden">
                 <div class="flex-between">
-                    <h2>Shopping List</h2>
-                    <button class="btn-secondary" onclick="generateShoppingList()">⟳ Generate from Planner</button>
+                    <h2>🛒 Shopping List</h2>
+                    <button class="btn btn-secondary btn-sm" onclick="generateShoppingList()">⟳ Generate from Planner</button>
                 </div>
                 <div id="shoppingList" class="card"></div>
             </div>
 
-            <!-- SETTINGS (with inline edit form) -->
+            <!-- =============================================================
+            VIEW: SETTINGS
+            ============================================================= -->
             <div id="view-settings" class="hidden">
-                <h2>Settings</h2>
-                <div class="card">
-                    <div class="stat-label">Profile</div>
-                    <div id="profileInfo">
-                        <p><strong>Name:</strong> <span id="settingsName"></span></p>
-                        <p><strong>Family:</strong> <span id="settingsFamily"></span></p>
-                        <p><strong>Age:</strong> <span id="settingsAge"></span></p>
-                        <p><strong>Sex:</strong> <span id="settingsSex"></span></p>
-                        <p><strong>Goal:</strong> <span id="settingsGoal"></span></p>
-                        <p><strong>Target Calories:</strong> <span id="settingsCalories"></span> kcal</p>
-                        <p><strong>Target Protein:</strong> <span id="settingsProtein"></span> g</p>
-                        <p><strong>Target Water:</strong> <span id="settingsWater"></span> ml</p>
-                    </div>
-                    <button onclick="toggleEditForm()" style="margin-top:1rem;background:#16A34A;color:white;border:none;padding:0.5rem 1rem;border-radius:0.5rem;cursor:pointer;">Edit Profile</button>
-                    
-                    <!-- Inline Edit Form -->
-                    <div id="editForm" class="hidden edit-form">
-                        <div><label>Age</label><input id="editAge" type="number" /></div>
-                        <div><label>Sex</label><select id="editSex"><option>Male</option><option>Female</option></select></div>
-                        <div><label>Height (cm)</label><input id="editHeight" type="number" /></div>
-                        <div><label>Weight (kg)</label><input id="editWeight" type="number" /></div>
-                        <div><label>Activity Level</label><select id="editActivity"><option>Sedentary</option><option>Light</option><option>Moderate</option><option>Active</option><option>Very Active</option></select></div>
-                        <div><label>Goal</label><select id="editGoal"><option>Fat Loss - Slow</option><option>Fat Loss - Standard</option><option>Fat Loss - Aggressive</option><option>Maintain</option><option>Lean Bulk</option><option>Muscle Gain</option><option>Child Growth</option></select></div>
-                        <div class="full-width"><label>Training Days / Week</label><input id="editTraining" type="number" /></div>
-                        <div class="btn-row">
-                            <button class="cancel-btn" onclick="toggleEditForm()">Cancel</button>
-                            <button onclick="submitEditProfile()">Update</button>
+                <h2>⚙️ Settings</h2>
+                <div class="settings-grid">
+                    <div class="card">
+                        <div class="stat-label">👤 Profile</div>
+                        <div id="profileInfo" style="margin-top:0.5rem;">
+                            <p><strong>Name:</strong> <span id="settingsName"></span></p>
+                            <p><strong>Family:</strong> <span id="settingsFamily"></span></p>
+                            <p><strong>Age:</strong> <span id="settingsAge"></span></p>
+                            <p><strong>Sex:</strong> <span id="settingsSex"></span></p>
+                            <p><strong>Goal:</strong> <span id="settingsGoal"></span></p>
+                            <p><strong>Target Calories:</strong> <span id="settingsCalories"></span> kcal</p>
+                            <p><strong>Target Protein:</strong> <span id="settingsProtein"></span> g</p>
+                            <p><strong>Target Water:</strong> <span id="settingsWater"></span> ml</p>
                         </div>
-                        <p id="editProfileStatus" class="full-width"></p>
+                        <button class="btn btn-primary btn-sm mt-1" onclick="toggleEditForm()">✏️ Edit Profile</button>
+
+                        <!-- Inline Edit Form -->
+                        <div id="editForm" class="hidden" style="margin-top:1rem;padding-top:1rem;border-top:1px solid var(--border-color);">
+                            <div class="grid-2">
+                                <div><label>Age</label><input id="editAge" type="number" /></div>
+                                <div><label>Sex</label><select id="editSex"><option>Male</option><option>Female</option></select></div>
+                                <div><label>Height (cm)</label><input id="editHeight" type="number" /></div>
+                                <div><label>Weight (kg)</label><input id="editWeight" type="number" /></div>
+                                <div><label>Activity Level</label><select id="editActivity"><option>Sedentary</option><option>Light</option><option>Moderate</option><option>Active</option><option>Very Active</option></select></div>
+                                <div><label>Goal</label><select id="editGoal"><option>Fat Loss - Slow</option><option>Fat Loss - Standard</option><option>Fat Loss - Aggressive</option><option>Maintain</option><option>Lean Bulk</option><option>Muscle Gain</option><option>Child Growth</option></select></div>
+                            </div>
+                            <div><label>Training Days / Week</label><input id="editTraining" type="number" /></div>
+                            <div class="flex" style="margin-top:0.5rem;">
+                                <button class="btn btn-danger btn-sm" onclick="toggleEditForm()">Cancel</button>
+                                <button class="btn btn-primary btn-sm" onclick="submitEditProfile()">Update</button>
+                            </div>
+                            <p id="editProfileStatus" class="mt-1"></p>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="stat-label">👨‍👩‍👧‍👦 Family Members</div>
+                        <div id="familyMembers" style="margin-top:0.5rem;"><p class="text-muted">Loading...</p></div>
                     </div>
                 </div>
+            </div>
+
+            <!-- =============================================================
+            VIEW: NUTRITION GUIDE
+            ============================================================= -->
+            <div id="view-nutrition" class="hidden">
+                <h2>📚 Nutrition Guide</h2>
                 <div class="card">
-                    <div class="stat-label">Family Members</div>
-                    <div id="familyMembers"><p style="color:#94a3b8;">Loading...</p></div>
+                    <h3>💡 Understanding Your Targets</h3>
+                    <p style="color:var(--text-secondary);">Your calorie and protein targets are calculated using the <strong>Mifflin-St Jeor</strong> equation, adjusted for your goal. Water intake is based on your weight (35ml/kg).</p>
+                </div>
+                <div class="grid-2">
+                    <div class="card">
+                        <h3>🏋️ Protein Guide</h3>
+                        <ul style="list-style:none;padding:0;color:var(--text-secondary);font-size:0.9rem;">
+                            <li style="padding:0.3rem 0;border-bottom:1px solid var(--border-color);">🟢 <strong>General Health:</strong> 0.8–1.0 g/kg</li>
+                            <li style="padding:0.3rem 0;border-bottom:1px solid var(--border-color);">🟡 <strong>Active / Fat Loss:</strong> 1.6–1.8 g/kg</li>
+                            <li style="padding:0.3rem 0;border-bottom:1px solid var(--border-color);">🔴 <strong>Muscle Gain:</strong> 1.8–2.2 g/kg</li>
+                            <li style="padding:0.3rem 0;">💡 <strong>Your target:</strong> <span id="guideProteinTarget" style="font-weight:700;color:var(--primary);">--</span> g/day</li>
+                        </ul>
+                    </div>
+                    <div class="card">
+                        <h3>💧 Water Guide</h3>
+                        <ul style="list-style:none;padding:0;color:var(--text-secondary);font-size:0.9rem;">
+                            <li style="padding:0.3rem 0;border-bottom:1px solid var(--border-color);">🧊 <strong>Minimum:</strong> 30 ml/kg</li>
+                            <li style="padding:0.3rem 0;border-bottom:1px solid var(--border-color);">🏃 <strong>Active / Hot climate:</strong> 35–40 ml/kg</li>
+                            <li style="padding:0.3rem 0;">💡 <strong>Your target:</strong> <span id="guideWaterTarget" style="font-weight:700;color:var(--primary);">--</span> ml/day</li>
+                        </ul>
+                    </div>
+                    <div class="card">
+                        <h3>🧬 Macro Splits</h3>
+                        <ul style="list-style:none;padding:0;color:var(--text-secondary);font-size:0.9rem;">
+                            <li style="padding:0.3rem 0;border-bottom:1px solid var(--border-color);">🥩 <strong>Protein:</strong> 25–40%</li>
+                            <li style="padding:0.3rem 0;border-bottom:1px solid var(--border-color);">🍞 <strong>Carbs:</strong> 30–50%</li>
+                            <li style="padding:0.3rem 0;">🥑 <strong>Fats:</strong> 20–35%</li>
+                        </ul>
+                    </div>
+                    <div class="card">
+                        <h3>📊 BMI Categories</h3>
+                        <ul style="list-style:none;padding:0;color:var(--text-secondary);font-size:0.9rem;">
+                            <li style="padding:0.3rem 0;border-bottom:1px solid var(--border-color);">🟢 <strong>Normal:</strong> 18.5–24.9</li>
+                            <li style="padding:0.3rem 0;border-bottom:1px solid var(--border-color);">🟡 <strong>Overweight:</strong> 25–29.9</li>
+                            <li style="padding:0.3rem 0;">🔴 <strong>Obese:</strong> 30+</li>
+                        </ul>
+                    </div>
                 </div>
             </div>
+
         </div>
 
-        <!-- CREATE PROFILE MODAL -->
-        <div id="createProfileModal" class="modal hidden" style="position:fixed;inset:0;background:rgba(0,0,0,0.5);display:none;align-items:center;justify-content:center;z-index:1000;">
-            <div style="background:white;padding:2rem;border-radius:1.5rem;max-width:500px;width:100%;max-height:90vh;overflow-y:auto;">
+        <!-- =============================================================
+        MODALS
+        ============================================================= -->
+
+        <!-- Create Profile Modal -->
+        <div id="createProfileModal" class="modal-overlay">
+            <div class="modal-box">
+                <button class="close-btn" onclick="closeModal('createProfileModal')">✕</button>
                 <h2>Create Profile</h2>
-                <p style="color:#64748b;">Join an existing family with your Family Code.</p>
-                <label>Name *</label><input id="newProfileName" placeholder="Full name" style="width:100%;margin-bottom:0.5rem;" />
-                <label>Family Code *</label><input id="newProfileFamilyCode" placeholder="e.g. HAGIN" style="width:100%;margin-bottom:0.5rem;" />
-                <label>Age</label><input id="newProfileAge" type="number" placeholder="30" style="width:100%;margin-bottom:0.5rem;" />
-                <label>Sex</label><select id="newProfileSex" style="width:100%;margin-bottom:0.5rem;"><option value="">—</option><option>Male</option><option>Female</option></select>
-                <label>Height (cm)</label><input id="newProfileHeight" type="number" placeholder="175" style="width:100%;margin-bottom:0.5rem;" />
-                <label>Weight (kg)</label><input id="newProfileWeight" type="number" placeholder="75" style="width:100%;margin-bottom:0.5rem;" />
-                <label>Activity Level</label><select id="newProfileActivity" style="width:100%;margin-bottom:0.5rem;"><option value="">—</option><option>Sedentary</option><option>Light</option><option>Moderate</option><option>Active</option><option>Very Active</option></select>
-                <label>Goal</label><select id="newProfileGoal" style="width:100%;margin-bottom:0.5rem;"><option value="">—</option><option>Fat Loss - Slow</option><option>Fat Loss - Standard</option><option>Fat Loss - Aggressive</option><option>Maintain</option><option>Lean Bulk</option><option>Muscle Gain</option><option>Child Growth</option></select>
-                <label>Training Days / Week</label><input id="newProfileTraining" type="number" placeholder="3" style="width:100%;margin-bottom:0.5rem;" />
-                <div style="display:flex;gap:0.5rem;margin-top:1rem;justify-content:flex-end;">
-                    <button onclick="closeModal('createProfileModal')" style="background:#e2e8f0;color:#475569;border:none;padding:0.5rem 1.5rem;border-radius:0.5rem;cursor:pointer;">Cancel</button>
-                    <button onclick="submitCreateProfile()" style="background:#16A34A;color:white;border:none;padding:0.5rem 1.5rem;border-radius:0.5rem;cursor:pointer;">Create</button>
+                <p class="text-muted">Join an existing family with your Family Code.</p>
+                <label>Name *</label><input id="newProfileName" placeholder="Full name" />
+                <label>Family Code *</label><input id="newProfileFamilyCode" placeholder="e.g. HAGIN" />
+                <label>Age</label><input id="newProfileAge" type="number" placeholder="30" />
+                <label>Sex</label><select id="newProfileSex"><option value="">—</option><option>Male</option><option>Female</option></select>
+                <label>Height (cm)</label><input id="newProfileHeight" type="number" placeholder="175" />
+                <label>Weight (kg)</label><input id="newProfileWeight" type="number" placeholder="75" />
+                <label>Activity Level</label><select id="newProfileActivity"><option value="">—</option><option>Sedentary</option><option>Light</option><option>Moderate</option><option>Active</option><option>Very Active</option></select>
+                <label>Goal</label><select id="newProfileGoal"><option value="">—</option><option>Fat Loss - Slow</option><option>Fat Loss - Standard</option><option>Fat Loss - Aggressive</option><option>Maintain</option><option>Lean Bulk</option><option>Muscle Gain</option><option>Child Growth</option></select>
+                <label>Training Days / Week</label><input id="newProfileTraining" type="number" placeholder="3" />
+                <div class="flex" style="margin-top:1rem;justify-content:flex-end;">
+                    <button class="btn btn-danger btn-sm" onclick="closeModal('createProfileModal')">Cancel</button>
+                    <button class="btn btn-primary btn-sm" onclick="submitCreateProfile()">Create</button>
                 </div>
-                <p id="createProfileStatus"></p>
+                <p id="createProfileStatus" class="mt-1"></p>
             </div>
         </div>
 
-        <!-- CREATE FAMILY MODAL -->
-        <div id="createFamilyModal" class="modal hidden" style="position:fixed;inset:0;background:rgba(0,0,0,0.5);display:none;align-items:center;justify-content:center;z-index:1000;">
-            <div style="background:white;padding:2rem;border-radius:1.5rem;max-width:500px;width:100%;max-height:90vh;overflow-y:auto;">
+        <!-- Create Family Modal -->
+        <div id="createFamilyModal" class="modal-overlay">
+            <div class="modal-box">
+                <button class="close-btn" onclick="closeModal('createFamilyModal')">✕</button>
                 <h2>Create New Family</h2>
-                <p style="color:#64748b;">Start your own family nutrition hub.</p>
-                <label>Family Code *</label><input id="newFamilyCode" placeholder="e.g. SMITH" style="width:100%;margin-bottom:0.5rem;" />
-                <label>Family Name</label><input id="newFamilyName" placeholder="The Smiths" style="width:100%;margin-bottom:0.5rem;" />
-                <label>Your Name *</label><input id="newFamilyAdminName" placeholder="Admin name" style="width:100%;margin-bottom:0.5rem;" />
-                <label>Email</label><input id="newFamilyEmail" type="email" placeholder="admin@example.com" style="width:100%;margin-bottom:0.5rem;" />
-                <div style="display:flex;gap:0.5rem;margin-top:1rem;justify-content:flex-end;">
-                    <button onclick="closeModal('createFamilyModal')" style="background:#e2e8f0;color:#475569;border:none;padding:0.5rem 1.5rem;border-radius:0.5rem;cursor:pointer;">Cancel</button>
-                    <button onclick="submitCreateFamily()" style="background:#16A34A;color:white;border:none;padding:0.5rem 1.5rem;border-radius:0.5rem;cursor:pointer;">Create Family</button>
+                <p class="text-muted">Start your own family nutrition hub.</p>
+                <label>Family Code *</label><input id="newFamilyCode" placeholder="e.g. SMITH" />
+                <label>Family Name</label><input id="newFamilyName" placeholder="The Smiths" />
+                <label>Your Name *</label><input id="newFamilyAdminName" placeholder="Admin name" />
+                <label>Email</label><input id="newFamilyEmail" type="email" placeholder="admin@example.com" />
+                <div class="flex" style="margin-top:1rem;justify-content:flex-end;">
+                    <button class="btn btn-danger btn-sm" onclick="closeModal('createFamilyModal')">Cancel</button>
+                    <button class="btn btn-primary btn-sm" onclick="submitCreateFamily()">Create Family</button>
                 </div>
-                <p id="createFamilyStatus"></p>
+                <p id="createFamilyStatus" class="mt-1"></p>
             </div>
         </div>
+
+        <!-- Recipe Detail Modal -->
+        <div id="recipeModal" class="modal-overlay">
+            <div class="modal-box">
+                <button class="close-btn" onclick="closeModal('recipeModal')">✕</button>
+                <h2 id="recipeModalTitle">Recipe Name</h2>
+                <p id="recipeModalMeta" class="text-muted" style="margin-bottom:0.5rem;"></p>
+                <div id="recipeModalContent">
+                    <p>Loading...</p>
+                </div>
+                <div class="flex" style="margin-top:1rem;justify-content:flex-end;">
+                    <button class="btn btn-primary btn-sm" id="recipeModalLogBtn" onclick="logRecipeFromModal()">🍽️ Log this</button>
+                </div>
+            </div>
+        </div>
+
     </div>
 
     <script>
+        // ================================================================
+        //  CONFIGURATION
+        // ================================================================
         const APP_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyqPM0ZWWtd77h6ZDyM40DhEiW4noWjOAwI5mg1lavcce9mzE5Nc-Z7BpPs25AMgTtBJw/exec';
 
+        // ================================================================
+        //  STATE
+        // ================================================================
         let userId = '';
         let userData = {};
         let familyCode = '';
@@ -291,8 +1184,29 @@
         let plannerData = {};
         let shoppingItems = [];
         let progressHistory = [];
+        let weightChart = null;
+        let calorieChart = null;
+        let currentRecipeId = '';
 
-        // ---- HELPERS ----
+        // ================================================================
+        //  THEME ENGINE
+        // ================================================================
+        function setTheme(theme) {
+            document.documentElement.setAttribute('data-theme', theme);
+            localStorage.setItem('nutriflow-theme', theme);
+            document.querySelectorAll('.theme-btn').forEach(b => {
+                b.classList.toggle('active', b.dataset.theme === theme);
+            });
+        }
+
+        function loadTheme() {
+            const saved = localStorage.getItem('nutriflow-theme') || 'light';
+            setTheme(saved);
+        }
+
+        // ================================================================
+        //  API HELPER
+        // ================================================================
         async function apiCall(action, payload = {}) {
             const formData = new URLSearchParams();
             formData.append('action', action);
@@ -315,6 +1229,9 @@
             }
         }
 
+        // ================================================================
+        //  TOAST
+        // ================================================================
         function showToast(msg, type = 'success') {
             const toast = document.getElementById('toast');
             toast.textContent = msg;
@@ -323,15 +1240,20 @@
             setTimeout(() => toast.classList.add('hidden'), 4000);
         }
 
+        // ================================================================
+        //  MODALS
+        // ================================================================
         function closeModal(id) {
-            document.getElementById(id).style.display = 'none';
+            document.getElementById(id).classList.remove('open');
         }
 
-        function showModal(id) {
-            document.getElementById(id).style.display = 'flex';
+        function openModal(id) {
+            document.getElementById(id).classList.add('open');
         }
 
-        // ---- LOGIN ----
+        // ================================================================
+        //  LOGIN
+        // ================================================================
         async function handleSignIn() {
             const familyCodeInput = document.getElementById('loginFamilyCode').value.trim();
             const nameInput = document.getElementById('loginName').value.trim();
@@ -344,6 +1266,7 @@
             }
 
             statusEl.textContent = 'Checking...';
+            statusEl.className = '';
             const result = await apiCall('signIn', { familyCode: familyCodeInput, name: nameInput });
 
             if (result.success) {
@@ -351,7 +1274,7 @@
                 userName = nameInput;
                 userId = result.userId || '';
                 userData = result.userData || {};
-                statusEl.textContent = '✅ Welcome!';
+                statusEl.textContent = '✅ Welcome, ' + userName + '!';
                 statusEl.className = 'success';
                 document.getElementById('loginScreen').classList.add('hidden');
                 document.getElementById('mainApp').classList.remove('hidden');
@@ -363,6 +1286,8 @@
                 loadProgress();
                 loadShopping();
                 loadFamilyMembers();
+                loadNutritionGuide();
+                loadTheme();
             } else {
                 statusEl.textContent = '❌ ' + (result.error || 'Invalid credentials.');
                 statusEl.className = 'error';
@@ -378,7 +1303,9 @@
             userName = '';
         }
 
-        // ---- DASHBOARD ----
+        // ================================================================
+        //  DASHBOARD
+        // ================================================================
         async function loadDashboardData() {
             if (!userId) return;
             const result = await apiCall('getDashboard', { userId, familyCode });
@@ -390,38 +1317,145 @@
                 document.getElementById('dashProtTarget').textContent = userData.Protein_Target_g || 0;
                 document.getElementById('dashWaterTarget').textContent = userData.Water_Target_ml || 0;
 
-                const calPct = userData.Target_Calories ? Math.min((result.dailyCalories / userData.Target_Calories) * 100, 100) : 0;
-                const protPct = userData.Protein_Target_g ? Math.min((result.dailyProtein / userData.Protein_Target_g) * 100, 100) : 0;
-                const waterPct = userData.Water_Target_ml ? Math.min((result.dailyWater / userData.Water_Target_ml) * 100, 100) : 0;
+                const calPct = userData.Target_Calories ? Math.min((result.dailyCalories / userData.Target_Calories) * 100,
+                    100) : 0;
+                const protPct = userData.Protein_Target_g ? Math.min((result.dailyProtein / userData.Protein_Target_g) *
+                    100, 100) : 0;
+                const waterPct = userData.Water_Target_ml ? Math.min((result.dailyWater / userData.Water_Target_ml) *
+                    100, 100) : 0;
                 document.getElementById('calProgress').style.width = calPct + '%';
                 document.getElementById('protProgress').style.width = protPct + '%';
                 document.getElementById('waterProgress').style.width = waterPct + '%';
 
                 const trained = result.trainedToday || false;
-                document.getElementById('trainingBtn').textContent = trained ? '✅ Done' : '⭕ Log';
-                document.getElementById('trainingBtn').style.background = trained ? '#dcfce7' : '#f1f5f9';
-                document.getElementById('trainingBtn').style.color = trained ? '#16A34A' : '#475569';
-                document.getElementById('trainingCount').textContent = (result.trainingDaysThisWeek || 0) + '/' + (userData.Training_Days_Weekly || 3);
+                const btn = document.getElementById('trainingBtn');
+                btn.textContent = trained ? '✅ Done' : '💪 Log Training';
+                btn.classList.toggle('done', trained);
+
+                document.getElementById('trainingCount').textContent = (result.trainingDaysThisWeek || 0) + '/' + (userData
+                    .Training_Days_Weekly || 3);
+
+                // Streak
+                document.getElementById('streakCount').textContent = result.streak || 0;
 
                 const meals = result.todayMeals || [];
-                document.getElementById('todayMeals').innerHTML = meals.length === 0 ? '<p style="color:#94a3b8;">No meals logged yet.</p>' :
-                    meals.map(m => `<div style="border-bottom:1px solid #f1f5f9;padding:0.25rem 0;display:flex;justify-content:space-between;">
-                        <span>${m.Meal_Type || 'Snack'}: ${m.Recipe_Name || '—'}</span>
-                        <span style="font-weight:500;">${m.Calories || 0} kcal</span>
-                    </div>`).join('');
+                const container = document.getElementById('todayMeals');
+                if (meals.length === 0) {
+                    container.innerHTML = '<p class="text-muted">No meals logged yet today.</p>';
+                } else {
+                    container.innerHTML = meals.map(m =>
+                        `<div style="border-bottom:1px solid var(--border-color);padding:0.25rem 0;display:flex;justify-content:space-between;">
+                            <span>${m.Meal_Type || 'Snack'}: ${m.Recipe_Name || '—'}</span>
+                            <span style="font-weight:600;">${m.Calories || 0} kcal</span>
+                        </div>`
+                    ).join('');
+                }
+
+                // Charts
+                renderWeightChart(result.weightHistory || []);
+                renderCalorieChart(result.calorieHistory || []);
             }
         }
 
         async function toggleTraining() {
-            const newVal = document.getElementById('trainingBtn').textContent.includes('Done') ? false : true;
+            const btn = document.getElementById('trainingBtn');
+            const isDone = btn.textContent.includes('Done');
+            const newVal = !isDone;
             const result = await apiCall('toggleTraining', { userId, familyCode, trained: newVal });
             if (result.success) {
                 showToast(newVal ? '✅ Training logged!' : 'Training unlogged.');
                 loadDashboardData();
+            } else {
+                showToast('❌ ' + (result.error || 'Failed to update training.'), 'error');
             }
         }
 
-        // ---- PLANNER ----
+        // ================================================================
+        //  CHARTS
+        // ================================================================
+        function renderWeightChart(history) {
+            const canvas = document.getElementById('weightChart');
+            if (!canvas) return;
+            const ctx = canvas.getContext('2d');
+            if (weightChart) { weightChart.destroy();
+                weightChart = null; }
+
+            const labels = history.map(h => h.Date).slice(-7);
+            const data = history.map(h => parseFloat(h.Weight_kg) || 0).slice(-7);
+
+            weightChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Weight (kg)',
+                        data: data,
+                        borderColor: '#0F766E',
+                        backgroundColor: 'rgba(15, 118, 110, 0.1)',
+                        fill: true,
+                        tension: 0.3,
+                        pointRadius: 4,
+                        pointBackgroundColor: '#0F766E',
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        x: { grid: { display: false }, ticks: { color: '#94a3b8', font: { size: 8 } } },
+                        y: { grid: { color: 'rgba(0,0,0,0.05)' }, ticks: { color: '#94a3b8', font: { size: 8 } } }
+                    }
+                }
+            });
+        }
+
+        function renderCalorieChart(history) {
+            const canvas = document.getElementById('calorieChart');
+            if (!canvas) return;
+            const ctx = canvas.getContext('2d');
+            if (calorieChart) { calorieChart.destroy();
+                calorieChart = null; }
+
+            const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+            const intake = history.slice(-7).map(h => parseInt(h.calories) || 0);
+            const target = new Array(7).fill(parseInt(userData.Target_Calories) || 2000);
+
+            calorieChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: days,
+                    datasets: [{
+                        label: 'Intake',
+                        data: intake,
+                        backgroundColor: '#0F766E',
+                        borderRadius: 4,
+                    }, {
+                        label: 'Target',
+                        data: target,
+                        backgroundColor: 'rgba(245, 158, 11, 0.3)',
+                        borderRadius: 4,
+                        borderColor: '#F59E0B',
+                        borderWidth: 2,
+                        type: 'line',
+                        pointRadius: 0,
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        x: { grid: { display: false }, ticks: { color: '#94a3b8', font: { size: 8 } } },
+                        y: { grid: { color: 'rgba(0,0,0,0.05)' }, ticks: { color: '#94a3b8', font: { size: 8 } } }
+                    }
+                }
+            });
+        }
+
+        // ================================================================
+        //  PLANNER
+        // ================================================================
         function getWeekDays() {
             const now = new Date();
             const start = new Date(now);
@@ -430,7 +1464,8 @@
             for (let i = 0; i < 7; i++) {
                 const d = new Date(start);
                 d.setDate(start.getDate() + i);
-                days.push({ date: d.toISOString().slice(0, 10), label: d.toLocaleDateString('en', { weekday: 'short', month: 'short', day: 'numeric' }) });
+                days.push({ date: d.toISOString().slice(0, 10), label: d.toLocaleDateString('en', { weekday: 'short',
+                        month: 'short', day: 'numeric' }) });
             }
             return days;
         }
@@ -439,13 +1474,15 @@
             if (!userId) return;
             const weekDays = getWeekDays();
             const weekStart = weekDays[0]?.date || '';
-            document.getElementById('weekLabel').textContent = weekDays.length ? weekDays[0].date + ' – ' + weekDays[6].date : '';
+            document.getElementById('weekLabel').textContent = weekDays.length ? weekDays[0].date + ' – ' + weekDays[6].date :
+                '';
 
             const result = await apiCall('getPlanner', { familyCode, weekStart });
             if (result.success) {
                 const data = result.plannerData || {};
                 weekDays.forEach(d => {
-                    plannerData[d.date] = data[d.date] || { Breakfast_ID: '', Snack_1_ID: '', Lunch_ID: '', Snack_2_ID: '', Dinner_ID: '', Dessert_ID: '' };
+                    plannerData[d.date] = data[d.date] || { Breakfast_ID: '', Snack_1_ID: '', Lunch_ID: '',
+                        Snack_2_ID: '', Dinner_ID: '', Dessert_ID: '' };
                 });
                 await loadMealRecipes();
                 renderPlanner(weekDays);
@@ -468,13 +1505,15 @@
                 html += `<div class="day-label">${day.label}</div>`;
                 slots.forEach(slot => {
                     const val = plannerData[day.date]?.[slot.key] || '';
-                    html += `<div><label style="font-size:0.65rem;color:#94a3b8;">${slot.label}</label>`;
-                    html += `<select onchange="plannerData['${day.date}']['${slot.key}']=this.value" style="width:100%;font-size:0.7rem;">`;
+                    html += `<div class="meal-row">`;
+                    html += `<label>${slot.label}</label>`;
+                    html += `<select onchange="plannerData['${day.date}']['${slot.key}']=this.value">`;
                     html += `<option value="">—</option>`;
                     (mealRecipes[slot.key] || []).forEach(r => {
                         html += `<option value="${r.Recipe_ID}" ${r.Recipe_ID === val ? 'selected' : ''}>${r.Recipe_Name}</option>`;
                     });
-                    html += `</select></div>`;
+                    html += `</select>`;
+                    html += `</div>`;
                 });
                 html += `</div>`;
             });
@@ -486,7 +1525,8 @@
             for (const t of types) {
                 const result = await apiCall('getRecipes', { type: 'adult', mealType: t });
                 if (result.success) {
-                    const key = t === 'Breakfast' ? 'Breakfast_ID' : t === 'Snack' ? 'Snack_1_ID' : t === 'Lunch' ? 'Lunch_ID' : t === 'Dinner' ? 'Dinner_ID' : 'Dessert_ID';
+                    const key = t === 'Breakfast' ? 'Breakfast_ID' : t === 'Snack' ? 'Snack_1_ID' : t === 'Lunch' ?
+                        'Lunch_ID' : t === 'Dinner' ? 'Dinner_ID' : 'Dessert_ID';
                     mealRecipes[key] = result.recipes || [];
                     if (t === 'Snack') mealRecipes['Snack_2_ID'] = result.recipes || [];
                 }
@@ -506,17 +1546,22 @@
             if (result.success) {
                 showToast('✅ Week plan saved!');
                 loadShopping();
+            } else {
+                showToast('❌ ' + (result.error || 'Failed to save.'), 'error');
             }
         }
 
-        // ---- RECIPES ----
+        // ================================================================
+        //  RECIPES
+        // ================================================================
         async function loadRecipes() {
             const adult = await apiCall('getRecipes', { type: 'adult' });
             if (adult.success) {
                 allRecipes = adult.recipes || [];
                 const cats = new Set();
                 allRecipes.forEach(r => { if (r.Category) cats.add(r.Category); });
-                document.getElementById('recipeCategory').innerHTML = '<option value="">All Categories</option>' + Array.from(cats).map(c => `<option value="${c}">${c}</option>`).join('');
+                document.getElementById('recipeCategory').innerHTML = '<option value="">All Categories</option>' + Array.from(
+                    cats).map(c => `<option value="${c}">${c}</option>`).join('');
                 filterRecipes();
             }
         }
@@ -530,43 +1575,107 @@
                 return true;
             });
             const grid = document.getElementById('recipeGrid');
-            if (!list.length) { grid.innerHTML = '<p style="color:#94a3b8;">No recipes found.</p>'; return; }
+            if (!list.length) { grid.innerHTML = '<p class="text-muted">No recipes found.</p>'; return; }
             grid.innerHTML = list.map(r => `
-                <div class="recipe-card">
+                <div class="recipe-card" onclick="openRecipeDetail('${r.Recipe_ID}')">
                     <div class="title">${r.Recipe_Name}</div>
-                    <div style="font-size:0.8rem;color:#64748b;">${r.Category || ''} · ${r.Meal_Type || ''}</div>
+                    <div style="font-size:0.8rem;color:var(--text-secondary);">${r.Category || ''} · ${r.Meal_Type || ''}</div>
                     <div style="margin:0.25rem 0;">
-                        <span style="font-weight:700;color:#16A34A;">${r.Calories || 0} kcal</span>
+                        <span class="cal">${r.Calories || 0} kcal</span>
                         <span>P ${r.Protein_g || 0}g</span>
                         <span>C ${r.Carbs_g || 0}g</span>
                         <span>F ${r.Fat_g || 0}g</span>
                     </div>
-                    <div>${(r.Tags || '').split(';').filter(t => t.trim()).map(t => `<span class="tag">${t.trim()}</span>`).join('')}</div>
-                    <button onclick="logRecipe('${r.Recipe_ID}')" style="margin-top:0.5rem;font-size:0.75rem;padding:0.25rem 0.5rem;">Log this</button>
+                    <div class="tags">${(r.Tags || '').split(';').filter(t => t.trim()).map(t => `<span class="tag">${t.trim()}</span>`).join('')}</div>
                 </div>
             `).join('');
         }
 
-        async function logRecipe(recipeId) {
-            const result = await apiCall('logMeal', { userId, familyCode, recipeId, mealType: 'Snack', servings: 1 });
+        // ================================================================
+        //  RECIPE DETAIL MODAL
+        // ================================================================
+        async function openRecipeDetail(recipeId) {
+            currentRecipeId = recipeId;
+            const recipe = allRecipes.find(r => r.Recipe_ID === recipeId);
+            if (!recipe) { showToast('Recipe not found', 'error'); return; }
+
+            document.getElementById('recipeModalTitle').textContent = recipe.Recipe_Name || 'Recipe';
+            document.getElementById('recipeModalMeta').textContent =
+                `${recipe.Category || ''} · ${recipe.Meal_Type || ''} · ${recipe.Calories || 0} kcal · ${recipe.Carb_Level || ''}`;
+
+            const content = document.getElementById('recipeModalContent');
+            content.innerHTML = '<p>Loading ingredients...</p>';
+
+            // Fetch ingredients and methods from the server
+            const ingredientsResult = await apiCall('getRecipeIngredients', { recipeId });
+            const methodsResult = await apiCall('getRecipeMethods', { recipeId });
+
+            let html = '';
+
+            // Nutrition
+            html += `<div style="display:flex;gap:0.5rem;flex-wrap:wrap;margin:0.5rem 0;padding:0.5rem;background:var(--bg-input);border-radius:var(--radius-sm);">
+                <span><strong>🔥</strong> ${recipe.Calories || 0} kcal</span>
+                <span><strong>💪</strong> ${recipe.Protein_g || 0}g</span>
+                <span><strong>🍞</strong> ${recipe.Carbs_g || 0}g</span>
+                <span><strong>🥑</strong> ${recipe.Fat_g || 0}g</span>
+                <span><strong>🌾</strong> ${recipe.Fiber_g || 0}g</span>
+            </div>`;
+
+            // Ingredients
+            if (ingredientsResult.success && ingredientsResult.ingredients.length) {
+                html += `<h3 style="margin-top:0.5rem;">🛒 Ingredients</h3><ul class="ingredient-list">`;
+                ingredientsResult.ingredients.forEach(i => {
+                    html +=
+                        `<li>${i.Ingredient_Name} — <strong>${i.Quantity || ''} ${i.Unit || ''}</strong> ${i.Ingredient_Group ? '· ' + i.Ingredient_Group : ''}</li>`;
+                });
+                html += `</ul>`;
+            } else {
+                html += `<p class="text-muted">No ingredients listed.</p>`;
+            }
+
+            // Methods
+            if (methodsResult.success && methodsResult.methods.length) {
+                html += `<h3 style="margin-top:0.5rem;">📝 Method</h3><ol class="step-list">`;
+                methodsResult.methods.forEach(m => {
+                    html += `<li>${m.Instruction || ''}</li>`;
+                });
+                html += `</ol>`;
+            } else {
+                html += `<p class="text-muted">No instructions available.</p>`;
+            }
+
+            content.innerHTML = html;
+            document.getElementById('recipeModalLogBtn').onclick = () => logRecipeFromModal(recipeId);
+            openModal('recipeModal');
+        }
+
+        async function logRecipeFromModal(recipeId) {
+            const id = recipeId || currentRecipeId;
+            if (!id) { showToast('No recipe selected', 'error'); return; }
+            const result = await apiCall('logMeal', { userId, familyCode, recipeId: id, mealType: 'Snack', servings: 1 });
             if (result.success) {
                 showToast('✅ Meal logged!');
+                closeModal('recipeModal');
                 loadDashboardData();
+            } else {
+                showToast('❌ ' + (result.error || 'Failed to log.'), 'error');
             }
         }
 
-        // ---- PROGRESS ----
+        // ================================================================
+        //  PROGRESS
+        // ================================================================
         async function loadProgress() {
             if (!userId) return;
             const result = await apiCall('getProgress', { userId });
             if (result.success) {
                 progressHistory = result.history || [];
                 const container = document.getElementById('progressHistory');
-                if (!progressHistory.length) { container.innerHTML = '<p style="color:#94a3b8;">No entries yet.</p>'; return; }
+                if (!progressHistory.length) { container.innerHTML = '<p class="text-muted">No entries yet.</p>'; return; }
                 container.innerHTML = `<table style="width:100%;font-size:0.9rem;">
-                    <thead><tr style="text-align:left;border-bottom:1px solid #e2e8f0;"><th>Date</th><th>Weight</th><th>Waist</th><th>BF%</th></tr></thead>
+                    <thead><tr style="text-align:left;border-bottom:1px solid var(--border-color);"><th>Date</th><th>Weight</th><th>Waist</th><th>BF%</th></tr></thead>
                     <tbody>${progressHistory.slice(0,10).map(p => `
-                        <tr style="border-bottom:1px solid #f1f5f9;">
+                        <tr style="border-bottom:1px solid var(--border-color);">
                             <td>${p.Date}</td>
                             <td>${p.Weight_kg || '—'}</td>
                             <td>${p.Waist_cm || '—'}</td>
@@ -586,7 +1695,8 @@
                 document.getElementById('progressStatus').className = 'error';
                 return;
             }
-            const result = await apiCall('saveProgress', { userId, familyCode, weight: weight || null, waist: waist || null, bodyFat: bodyFat || null });
+            const result = await apiCall('saveProgress', { userId, familyCode, weight: weight || null, waist: waist ||
+                    null, bodyFat: bodyFat || null });
             if (result.success) {
                 document.getElementById('progressStatus').textContent = '✅ Saved!';
                 document.getElementById('progressStatus').className = 'success';
@@ -602,7 +1712,9 @@
             }
         }
 
-        // ---- SHOPPING ----
+        // ================================================================
+        //  SHOPPING
+        // ================================================================
         async function loadShopping() {
             if (!userId) return;
             const weekDays = getWeekDays();
@@ -611,7 +1723,7 @@
             if (result.success) {
                 shoppingItems = result.items || [];
                 const container = document.getElementById('shoppingList');
-                if (!shoppingItems.length) { container.innerHTML = '<p style="color:#94a3b8;">No items. Generate from your weekly planner.</p>'; return; }
+                if (!shoppingItems.length) { container.innerHTML = '<p class="text-muted">No items. Generate from your weekly planner.</p>'; return; }
                 container.innerHTML = shoppingItems.map(item => `
                     <div class="shopping-item ${item.Purchased_YesNo === 'Yes' ? 'purchased' : ''}">
                         <input type="checkbox" ${item.Purchased_YesNo === 'Yes' ? 'checked' : ''} onchange="updateShoppingItem('${item.Ingredient_Name}', this.checked)" />
@@ -620,8 +1732,8 @@
                     </div>
                 `).join('') + `
                     <div style="margin-top:1rem;display:flex;gap:0.5rem;">
-                        <button onclick="markAllPurchased()" style="font-size:0.8rem;padding:0.25rem 0.75rem;background:#e2e8f0;color:#475569;">Mark all purchased</button>
-                        <button onclick="clearPurchased()" style="font-size:0.8rem;padding:0.25rem 0.75rem;background:#e2e8f0;color:#475569;">Clear purchased</button>
+                        <button class="btn btn-outline btn-sm" onclick="markAllPurchased()">Mark all purchased</button>
+                        <button class="btn btn-danger btn-sm" onclick="clearPurchased()">Clear purchased</button>
                     </div>
                 `;
             }
@@ -658,10 +1770,11 @@
             showToast('🛒 Shopping list updated!');
         }
 
-        // ---- SETTINGS ----
+        // ================================================================
+        //  SETTINGS
+        // ================================================================
         async function loadFamilyMembers() {
             if (!userId) return;
-            
             document.getElementById('settingsName').textContent = userName || '—';
             document.getElementById('settingsFamily').textContent = familyCode || '—';
             document.getElementById('settingsAge').textContent = userData.Age || '—';
@@ -670,23 +1783,24 @@
             document.getElementById('settingsCalories').textContent = userData.Target_Calories || '—';
             document.getElementById('settingsProtein').textContent = userData.Protein_Target_g || '—';
             document.getElementById('settingsWater').textContent = userData.Water_Target_ml || '—';
-            
+
             const result = await apiCall('getFamilyMembers', { familyCode });
             if (result.success) {
                 const members = result.members || [];
                 const container = document.getElementById('familyMembers');
-                if (!members.length) { container.innerHTML = '<p style="color:#94a3b8;">No other members.</p>'; return; }
-                container.innerHTML = members.map(m => `<div style="display:flex;justify-content:space-between;border-bottom:1px solid #f1f5f9;padding:0.25rem 0;">
-                    <span>${m.Name}</span>
-                    <span style="color:#94a3b8;font-size:0.8rem;">${m.Goal || '—'}</span>
-                </div>`).join('');
+                if (!members.length) { container.innerHTML = '<p class="text-muted">No other members.</p>'; return; }
+                container.innerHTML = members.map(m =>
+                    `<div style="display:flex;justify-content:space-between;border-bottom:1px solid var(--border-color);padding:0.25rem 0;">
+                        <span>${m.Name}</span>
+                        <span style="color:var(--text-muted);font-size:0.8rem;">${m.Goal || '—'}</span>
+                    </div>`
+                ).join('');
             }
         }
 
         function toggleEditForm() {
             const form = document.getElementById('editForm');
             if (form.classList.contains('hidden')) {
-                // Populate form with current data
                 document.getElementById('editAge').value = userData.Age || '';
                 document.getElementById('editSex').value = userData.Sex || 'Male';
                 document.getElementById('editHeight').value = userData.Height_cm || '';
@@ -707,7 +1821,6 @@
                 document.getElementById('editProfileStatus').className = 'error';
                 return;
             }
-
             const payload = {
                 userId: userId,
                 age: parseInt(document.getElementById('editAge').value) || null,
@@ -718,7 +1831,6 @@
                 goal: document.getElementById('editGoal').value,
                 trainingDays: parseInt(document.getElementById('editTraining').value) || 3
             };
-
             const result = await apiCall('updateProfile', payload);
             if (result.success) {
                 document.getElementById('editProfileStatus').textContent = '✅ Updated!';
@@ -728,20 +1840,27 @@
                 showToast('Profile updated successfully!');
                 loadDashboardData();
                 loadFamilyMembers();
+                loadNutritionGuide();
             } else {
                 document.getElementById('editProfileStatus').textContent = '❌ ' + (result.error || 'Update failed.');
                 document.getElementById('editProfileStatus').className = 'error';
             }
         }
 
-        // ---- CREATE PROFILE / FAMILY ----
-        function showCreateProfile() {
-            showModal('createProfileModal');
+        // ================================================================
+        //  NUTRITION GUIDE
+        // ================================================================
+        function loadNutritionGuide() {
+            document.getElementById('guideProteinTarget').textContent = userData.Protein_Target_g || '--';
+            document.getElementById('guideWaterTarget').textContent = userData.Water_Target_ml || '--';
         }
 
-        function showCreateFamily() {
-            showModal('createFamilyModal');
-        }
+        // ================================================================
+        //  CREATE PROFILE / FAMILY
+        // ================================================================
+        function showCreateProfile() { openModal('createProfileModal'); }
+
+        function showCreateFamily() { openModal('createFamilyModal'); }
 
         async function submitCreateProfile() {
             const data = {
@@ -800,27 +1919,33 @@
             }
         }
 
-        // ---- NAVIGATION ----
+        // ================================================================
+        //  NAVIGATION
+        // ================================================================
         function switchView(view) {
             document.querySelectorAll('[id^="view-"]').forEach(el => el.classList.add('hidden'));
             document.getElementById('view-' + view).classList.remove('hidden');
             document.querySelectorAll('.nav button').forEach(b => b.classList.remove('active'));
             document.querySelector(`.nav button[data-view="${view}"]`).classList.add('active');
-            
+
             if (view === 'dashboard') loadDashboardData();
             if (view === 'planner') loadPlanner();
             if (view === 'recipes') loadRecipes();
             if (view === 'progress') loadProgress();
             if (view === 'shopping') loadShopping();
             if (view === 'settings') loadFamilyMembers();
+            if (view === 'nutrition') loadNutritionGuide();
         }
 
-        // ---- INIT ----
-        // Ensure everything starts correctly
-        document.querySelectorAll('.modal').forEach(m => m.style.display = 'none');
-        document.getElementById('loginScreen').classList.remove('hidden');
-        document.getElementById('mainApp').classList.add('hidden');
-        console.log('✅ NutriFlow loaded successfully.');
+        // ================================================================
+        //  INIT
+        // ================================================================
+        document.addEventListener('DOMContentLoaded', function() {
+            document.getElementById('loginScreen').classList.remove('hidden');
+            document.getElementById('mainApp').classList.add('hidden');
+            loadTheme();
+            console.log('✅ NutriFlow v2.0 loaded successfully!');
+        });
     </script>
 </body>
 </html>
