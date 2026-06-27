@@ -364,6 +364,8 @@
                 familyCode = familyCodeInput;
                 userName = nameInput;
                 userId = result.userId || '';
+                userId = result.userId || '';
+console.log('✅ userId set to:', userId);
                 userData = result.userData || {};
                 statusEl.textContent = '✅ Welcome, ' + userName + '!';
                 statusEl.className = 'success';
@@ -796,30 +798,47 @@
 }
 
         async function submitEditProfile() {
-            const result = await apiCall('updateProfile', {
-                userId: userId,
-                age: parseInt(document.getElementById('editAge').value) || null,
-                sex: document.getElementById('editSex').value,
-                height: parseFloat(document.getElementById('editHeight').value) || null,
-                weight: parseFloat(document.getElementById('editWeight').value) || null,
-                activity: document.getElementById('editActivity').value,
-                goal: document.getElementById('editGoal').value,
-                trainingDays: parseInt(document.getElementById('editTraining').value) || 3
-            });
-            if (result.success) {
-                document.getElementById('editProfileStatus').textContent = '✅ Updated!';
-                document.getElementById('editProfileStatus').className = 'success';
-                userData = result.userData || userData;
-                closeModal('editProfileModal');
-                showToast('Profile updated successfully!');
-                loadDashboardData();
-                loadFamilyMembers();
-            } else {
-                document.getElementById('editProfileStatus').textContent = '❌ ' + (result.error || 'Update failed.');
-                document.getElementById('editProfileStatus').className = 'error';
-            }
-        }
-
+    console.log('🔍 submitEditProfile called');
+    console.log('🔍 userId:', userId);
+    console.log('🔍 userData:', userData);
+    
+    // Check if we have a userId
+    if (!userId) {
+        document.getElementById('editProfileStatus').textContent = '❌ Please sign in again.';
+        document.getElementById('editProfileStatus').className = 'error';
+        console.error('❌ userId is empty!');
+        return;
+    }
+    
+    const payload = {
+        userId: userId,
+        age: parseInt(document.getElementById('editAge').value) || null,
+        sex: document.getElementById('editSex').value,
+        height: parseFloat(document.getElementById('editHeight').value) || null,
+        weight: parseFloat(document.getElementById('editWeight').value) || null,
+        activity: document.getElementById('editActivity').value,
+        goal: document.getElementById('editGoal').value,
+        trainingDays: parseInt(document.getElementById('editTraining').value) || 3
+    };
+    
+    console.log('📤 Sending update payload:', payload);
+    
+    const result = await apiCall('updateProfile', payload);
+    console.log('📥 Response:', result);
+    
+    if (result.success) {
+        document.getElementById('editProfileStatus').textContent = '✅ Updated!';
+        document.getElementById('editProfileStatus').className = 'success';
+        userData = result.userData || userData;
+        closeModal('editProfileModal');
+        showToast('Profile updated successfully!');
+        loadDashboardData();
+        loadFamilyMembers();
+    } else {
+        document.getElementById('editProfileStatus').textContent = '❌ ' + (result.error || 'Update failed.');
+        document.getElementById('editProfileStatus').className = 'error';
+    }
+}
         // ================================================================
         //  CREATE PROFILE / FAMILY
         // ================================================================
