@@ -1562,48 +1562,45 @@ LOGIN
         ============================================================= -->
 
         <!-- Create Profile Modal -->
-        <div id="createProfileModal" class="modal-overlay">
-            <div class="modal-box">
-                <button class="close-btn no-print" onclick="closeModal('createProfileModal')">✕</button>
-                <h2>Create Profile</h2>
-                <p class="text-muted">Join an existing family with your Family Code and PIN.</p>
-                <label>Name *</label><input id="newProfileName" placeholder="Full name" />
-                <label>Family Code *</label><input id="newProfileFamilyCode" placeholder="e.g. HAGIN" />
-                <label>Family PIN *</label><input id="newProfileFamilyPin" type="password" placeholder="e.g. 1234" />
-                <label>Age</label><input id="newProfileAge" type="number" placeholder="30" />
-                <label>Sex</label><select id="newProfileSex"><option value="">—</option><option>Male</option><option>Female</option></select>
-                <label>Height (cm)</label><input id="newProfileHeight" type="number" placeholder="175" />
-                <label>Weight (kg)</label><input id="newProfileWeight" type="number" placeholder="75" />
-                <label>Activity Level</label><select id="newProfileActivity"><option value="">—</option><option>Sedentary</option><option>Light</option><option>Moderate</option><option>Active</option><option>Very Active</option></select>
-                <label>Goal</label><select id="newProfileGoal"><option value="">—</option><option>Fat Loss - Slow</option><option>Fat Loss - Standard</option><option>Fat Loss - Aggressive</option><option>Maintain</option><option>Lean Bulk</option><option>Muscle Gain</option><option>Child Growth</option></select>
-                <label>Training Days / Week</label><input id="newProfileTraining" type="number" placeholder="3" />
-                <div class="flex" style="margin-top:1rem;justify-content:flex-end;">
-                    <button class="btn btn-danger btn-sm no-print" onclick="closeModal('createProfileModal')">Cancel</button>
-                    <button class="btn btn-primary btn-sm no-print" onclick="submitCreateProfile()">Create</button>
-                </div>
-                <p id="createProfileStatus" class="mt-1"></p>
-            </div>
+<div id="createProfileModal" class="modal-overlay">
+    <div class="modal-box">
+        <button class="close-btn no-print" onclick="closeModal('createProfileModal')">✕</button>
+        <h2>Create Profile</h2>
+        <p class="text-muted">Join an existing family with your Family Code.</p>
+        <label>Name *</label><input id="newProfileName" placeholder="Full name" />
+        <label>Family Code *</label><input id="newProfileFamilyCode" placeholder="e.g. HAGIN" />
+        <label>Age</label><input id="newProfileAge" type="number" placeholder="30" />
+        <label>Sex</label><select id="newProfileSex"><option value="">—</option><option>Male</option><option>Female</option></select>
+        <label>Height (cm)</label><input id="newProfileHeight" type="number" placeholder="175" />
+        <label>Weight (kg)</label><input id="newProfileWeight" type="number" placeholder="75" />
+        <label>Activity Level</label><select id="newProfileActivity"><option value="">—</option><option>Sedentary</option><option>Light</option><option>Moderate</option><option>Active</option><option>Very Active</option></select>
+        <label>Goal</label><select id="newProfileGoal"><option value="">—</option><option>Fat Loss - Slow</option><option>Fat Loss - Standard</option><option>Fat Loss - Aggressive</option><option>Maintain</option><option>Lean Bulk</option><option>Muscle Gain</option><option>Child Growth</option></select>
+        <label>Training Days / Week</label><input id="newProfileTraining" type="number" placeholder="3" />
+        <div class="flex" style="margin-top:1rem;justify-content:flex-end;">
+            <button class="btn btn-danger btn-sm no-print" onclick="closeModal('createProfileModal')">Cancel</button>
+            <button class="btn btn-primary btn-sm no-print" onclick="submitCreateProfile()">Create</button>
         </div>
+        <p id="createProfileStatus" class="mt-1"></p>
+    </div>
+</div>
 
         <!-- Create Family Modal -->
-        <div id="createFamilyModal" class="modal-overlay">
-            <div class="modal-box">
-                <button class="close-btn no-print" onclick="closeModal('createFamilyModal')">✕</button>
-                <h2>Create New Family</h2>
-                <p class="text-muted">Start your own family nutrition hub.</p>
-                <label>Family Code *</label><input id="newFamilyCode" placeholder="e.g. SMITH" />
-                <label>Family PIN *</label><input id="newFamilyPin" type="password" placeholder="e.g. 1234" />
-                <label>Family Name</label><input id="newFamilyName" placeholder="The Smiths" />
-                <label>Your Name *</label><input id="newFamilyAdminName" placeholder="Admin name" />
-                <label>Email</label><input id="newFamilyEmail" type="email" placeholder="admin@example.com" />
-                <div class="flex" style="margin-top:1rem;justify-content:flex-end;">
-                    <button class="btn btn-danger btn-sm no-print" onclick="closeModal('createFamilyModal')">Cancel</button>
-                    <button class="btn btn-primary btn-sm no-print" onclick="submitCreateFamily()">Create Family</button>
-                </div>
-                <p id="createFamilyStatus" class="mt-1"></p>
-            </div>
+<div id="createFamilyModal" class="modal-overlay">
+    <div class="modal-box">
+        <button class="close-btn no-print" onclick="closeModal('createFamilyModal')">✕</button>
+        <h2>Create New Family</h2>
+        <p class="text-muted">Start your own family nutrition hub.</p>
+        <label>Family Code *</label><input id="newFamilyCode" placeholder="e.g. SMITH" />
+        <label>Family Name</label><input id="newFamilyName" placeholder="The Smiths" />
+        <label>Your Name *</label><input id="newFamilyAdminName" placeholder="Admin name" />
+        <label>Email</label><input id="newFamilyEmail" type="email" placeholder="admin@example.com" />
+        <div class="flex" style="margin-top:1rem;justify-content:flex-end;">
+            <button class="btn btn-danger btn-sm no-print" onclick="closeModal('createFamilyModal')">Cancel</button>
+            <button class="btn btn-primary btn-sm no-print" onclick="submitCreateFamily()">Create Family</button>
         </div>
-
+        <p id="createFamilyStatus" class="mt-1"></p>
+    </div>
+</div>
         <!-- Recipe Detail Modal -->
         <div id="recipeModal" class="modal-overlay">
             <div class="modal-box">
@@ -1771,59 +1768,46 @@ LOGIN
         //  LOGIN
         // ================================================================
         async function handleSignIn() {
-            const familyCodeInput = document.getElementById('loginFamilyCode').value.trim().toUpperCase();
-            const familyPinInput = document.getElementById('loginFamilyPin').value.trim();
-            const nameInput = document.getElementById('loginName').value.trim();
-            const statusEl = document.getElementById('loginStatus');
+    const familyCodeInput = document.getElementById('loginFamilyCode').value.trim();
+    const nameInput = document.getElementById('loginName').value.trim();
+    const statusEl = document.getElementById('loginStatus');
 
-            if (!familyCodeInput || !nameInput) {
-                statusEl.textContent = 'Please enter Family Code, PIN, and Name.';
-                statusEl.className = 'error';
-                return;
-            }
+    if (!familyCodeInput || !nameInput) {
+        statusEl.textContent = 'Please enter Family Code and Name.';
+        statusEl.className = 'error';
+        return;
+    }
 
-            statusEl.textContent = 'Checking...';
-            statusEl.className = '';
-            const result = await apiCall('signIn', { familyCode: familyCodeInput, pin: familyPinInput, name: nameInput });
+    statusEl.textContent = 'Checking...';
+    statusEl.className = '';
+    const result = await apiCall('signIn', { familyCode: familyCodeInput, name: nameInput });
 
-            if (result.success) {
-                familyCode = familyCodeInput;
-                familyPin = familyPinInput;
-                userName = nameInput;
-                userId = result.userId || '';
-                userData = result.userData || {};
-                statusEl.textContent = '✅ Welcome, ' + escapeHtml(userName) + '!';
-                statusEl.className = 'success';
-                document.getElementById('loginScreen').classList.add('hidden');
-                document.getElementById('mainApp').classList.remove('hidden');
-                document.getElementById('userNameDisplay').textContent = escapeHtml(userName);
-                document.getElementById('familyCodeDisplay').textContent = escapeHtml(familyCode);
-                loadDashboardData();
-                loadPlanner();
-                loadRecipes();
-                loadProgress();
-                loadShopping();
-                loadFamilyMembers();
-                loadNutritionGuide();
-                loadTheme();
-                loadTrainingCalendar();
-                loadFamilyCalendar();
-            } else {
-                statusEl.textContent = '❌ ' + (result.error || 'Invalid credentials.');
-                statusEl.className = 'error';
-            }
-        }
-
-        function handleLogout() {
-            document.getElementById('loginScreen').classList.remove('hidden');
-            document.getElementById('mainApp').classList.add('hidden');
-            userId = '';
-            userData = {};
-            familyCode = '';
-            familyPin = '';
-            userName = '';
-        }
-
+    if (result.success) {
+        familyCode = familyCodeInput;
+        userName = nameInput;
+        userId = result.userId || '';
+        userData = result.userData || {};
+        statusEl.textContent = '✅ Welcome, ' + userName + '!';
+        statusEl.className = 'success';
+        document.getElementById('loginScreen').classList.add('hidden');
+        document.getElementById('mainApp').classList.remove('hidden');
+        document.getElementById('userNameDisplay').textContent = userName;
+        document.getElementById('familyCodeDisplay').textContent = familyCode;
+        loadDashboardData();
+        loadPlanner();
+        loadRecipes();
+        loadProgress();
+        loadShopping();
+        loadFamilyMembers();
+        loadNutritionGuide();
+        loadTheme();
+        loadTrainingCalendar();
+        loadFamilyCalendar();
+    } else {
+        statusEl.textContent = '❌ ' + (result.error || 'Invalid credentials.');
+        statusEl.className = 'error';
+    }
+}
         // ================================================================
         //  DASHBOARD
         // ================================================================
@@ -2836,18 +2820,18 @@ LOGIN
         function showCreateFamily() { openModal('createFamilyModal'); }
 
         async function submitCreateProfile() {
-            const data = {
-                name: document.getElementById('newProfileName').value.trim(),
-                familyCode: document.getElementById('newProfileFamilyCode').value.trim().toUpperCase(),
-                pin: document.getElementById('newProfileFamilyPin').value.trim(),
-                age: parseInt(document.getElementById('newProfileAge').value) || null,
-                sex: document.getElementById('newProfileSex').value,
-                height: parseFloat(document.getElementById('newProfileHeight').value) || null,
-                weight: parseFloat(document.getElementById('newProfileWeight').value) || null,
-                activity: document.getElementById('newProfileActivity').value,
-                goal: document.getElementById('newProfileGoal').value,
-                trainingDays: parseInt(document.getElementById('newProfileTraining').value) || 3
-            };
+    const data = {
+        name: document.getElementById('newProfileName').value.trim(),
+        familyCode: document.getElementById('newProfileFamilyCode').value.trim().toUpperCase(),
+        // ❌ REMOVE THIS LINE: pin: document.getElementById('newProfileFamilyPin').value.trim(),
+        age: parseInt(document.getElementById('newProfileAge').value) || null,
+        sex: document.getElementById('newProfileSex').value,
+        height: parseFloat(document.getElementById('newProfileHeight').value) || null,
+        weight: parseFloat(document.getElementById('newProfileWeight').value) || null,
+        activity: document.getElementById('newProfileActivity').value,
+        goal: document.getElementById('newProfileGoal').value,
+        trainingDays: parseInt(document.getElementById('newProfileTraining').value) || 3
+    };
             if (!data.name || !data.familyCode || !data.pin) {
                 document.getElementById('createProfileStatus').textContent = 'Name, Family Code, and PIN are required.';
                 document.getElementById('createProfileStatus').className = 'error';
@@ -2869,13 +2853,13 @@ LOGIN
         }
 
         async function submitCreateFamily() {
-            const data = {
-                code: document.getElementById('newFamilyCode').value.trim().toUpperCase(),
-                pin: document.getElementById('newFamilyPin').value.trim(),
-                name: document.getElementById('newFamilyName').value.trim(),
-                adminName: document.getElementById('newFamilyAdminName').value.trim(),
-                email: document.getElementById('newFamilyEmail').value.trim()
-            };
+    const data = {
+        code: document.getElementById('newFamilyCode').value.trim().toUpperCase(),
+        // ❌ REMOVE THIS LINE: pin: document.getElementById('newFamilyPin').value.trim(),
+        name: document.getElementById('newFamilyName').value.trim(),
+        adminName: document.getElementById('newFamilyAdminName').value.trim(),
+        email: document.getElementById('newFamilyEmail').value.trim()
+    };
             if (!data.code || !data.pin || !data.adminName) {
                 document.getElementById('createFamilyStatus').textContent = 'Family Code, PIN, and Admin Name are required.';
                 document.getElementById('createFamilyStatus').className = 'error';
