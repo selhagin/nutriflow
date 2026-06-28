@@ -1092,33 +1092,30 @@
         <div id="toast" class="toast hidden"></div>
 
         <!-- =============================================================
-        LOGIN
-        ============================================================= -->
-        <div id="loginScreen" class="container">
-            <div class="login-card">
-                <div class="text-center">
-                    <h1 style="font-size:2.5rem;">NutriFlow</h1>
-                    <p class="text-muted" style="margin-bottom:1.5rem;">Family Nutrition OS</p>
-                </div>
-                <div>
-                    <label>Family Code</label>
-                    <input id="loginFamilyCode" placeholder="e.g. HAGIN" />
-                    <label>Family PIN</label>
-                    <input id="loginFamilyPin" type="password" placeholder="Enter family PIN (e.g. 1234)" />
-                    <label>Your Name</label>
-                    <input id="loginName" placeholder="e.g. Salah" />
-                    <button class="btn btn-primary btn-lg" onclick="handleSignIn()" style="width:100%;justify-content:center;margin-top:0.5rem;">
-                        🚀 Sign In
-                    </button>
-                    <p id="loginStatus" class="text-center mt-1" style="font-size:0.9rem;"></p>
-                    <div class="text-center mt-2" style="display:flex;gap:0.5rem;justify-content:center;flex-wrap:wrap;">
-                        <button class="btn btn-outline btn-sm" onclick="showCreateProfile()">Create Profile</button>
-                        <button class="btn btn-secondary btn-sm" onclick="showCreateFamily()">+ New Family</button>
-                    </div>
-                </div>
+LOGIN
+============================================================= -->
+<div id="loginScreen" class="container">
+    <div class="login-card">
+        <div class="text-center">
+            <h1 style="font-size:2.5rem;">NutriFlow</h1>
+            <p class="text-muted" style="margin-bottom:1.5rem;">Family Nutrition OS</p>
+        </div>
+        <div>
+            <label>Family Code</label>
+            <input id="loginFamilyCode" placeholder="e.g. HAGIN" />
+            <label>Your Name</label>
+            <input id="loginName" placeholder="e.g. Salah" />
+            <button class="btn btn-primary btn-lg" onclick="handleSignIn()" style="width:100%;justify-content:center;margin-top:0.5rem;">
+                🚀 Sign In
+            </button>
+            <p id="loginStatus" class="text-center mt-1" style="font-size:0.9rem;"></p>
+            <div class="text-center mt-2" style="display:flex;gap:0.5rem;justify-content:center;flex-wrap:wrap;">
+                <button class="btn btn-outline btn-sm" onclick="showCreateProfile()">Create Profile</button>
+                <button class="btn btn-secondary btn-sm" onclick="showCreateFamily()">+ New Family</button>
             </div>
         </div>
-
+    </div>
+</div>
         <!-- =============================================================
         MAIN APP
         ============================================================= -->
