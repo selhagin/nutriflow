@@ -6,10 +6,9 @@
     <title>NutriFlow · Family Nutrition OS</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js">
     </script>
-
     <style>
         /* ================================================================
-           CSS VARIABLES & THEMES (same as before)
+           1. CSS VARIABLES & THEMES
            ================================================================ */
         :root {
             --bg-primary: #f0fdf4;
@@ -111,7 +110,7 @@
         }
 
         /* ================================================================
-           BASE STYLES (same as before)
+           BASE STYLES
            ================================================================ */
         * {
             box-sizing: border-box;
@@ -155,7 +154,7 @@
         }
         .grid-3 {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
             gap: 1rem;
         }
         .grid-2 {
@@ -201,7 +200,7 @@
             font-weight: 600;
         }
         .stat-value {
-            font-size: 1.8rem;
+            font-size: 1.6rem;
             font-weight: 800;
             color: var(--text-primary);
             line-height: 1.2;
@@ -333,6 +332,9 @@
         }
         .toast.error {
             border-left: 4px solid var(--error);
+        }
+        .toast.info {
+            border-left: 4px solid var(--accent);
         }
         @keyframes slideUp {
             from {
@@ -1014,11 +1016,79 @@
             border-radius: 9999px;
             display: inline-block;
         }
+
+        /* ================================================================
+           PRINT STYLES
+           ================================================================ */
+        @media print {
+            .no-print {
+                display: none !important;
+            }
+            .nav,
+            .theme-dropdown,
+            .btn,
+            button,
+            .toast {
+                display: none !important;
+            }
+            .container {
+                max-width: 100% !important;
+            }
+            .card {
+                box-shadow: none !important;
+                border: 1px solid #ccc !important;
+                break-inside: avoid;
+            }
+            .week-grid {
+                grid-template-columns: repeat(7, 1fr) !important;
+            }
+            .day-card {
+                break-inside: avoid;
+            }
+            body {
+                background: white !important;
+                color: black !important;
+                padding: 0.5in !important;
+            }
+            .stat-value {
+                color: black !important;
+            }
+            .text-muted {
+                color: #666 !important;
+            }
+            h1,
+            h2,
+            h3 {
+                color: black !important;
+            }
+            .calendar-day.trained {
+                background: #4CAF50 !important;
+                color: black !important;
+            }
+            .calendar-day.logged {
+                background: #81C784 !important;
+                color: black !important;
+            }
+            .calendar-day.partial {
+                background: #FFB74D !important;
+                color: black !important;
+            }
+            .calendar-day.multiple {
+                background: #CE93D8 !important;
+                color: black !important;
+            }
+            .calendar-day.empty {
+                background: #e0e0e0 !important;
+                color: black !important;
+            }
+            .calendar-day.today {
+                border-color: #000 !important;
+            }
+        }
     </style>
 </head>
 <body>
-
-    <div id="app">
+        <div id="app">
         <div id="toast" class="toast hidden"></div>
 
         <!-- =============================================================
@@ -1032,9 +1102,11 @@
                 </div>
                 <div>
                     <label>Family Code</label>
-                    <input id="loginFamilyCode" value="Hagin" />
+                    <input id="loginFamilyCode" placeholder="e.g. HAGIN" />
+                    <label>Family PIN</label>
+                    <input id="loginFamilyPin" type="password" placeholder="Enter family PIN (e.g. 1234)" />
                     <label>Your Name</label>
-                    <input id="loginName" value="Salah El Hagin" />
+                    <input id="loginName" placeholder="e.g. Salah" />
                     <button class="btn btn-primary btn-lg" onclick="handleSignIn()" style="width:100%;justify-content:center;margin-top:0.5rem;">
                         🚀 Sign In
                     </button>
@@ -1064,7 +1136,7 @@
                 </div>
             </header>
 
-            <!-- NAVIGATION (with Theme Dropdown) -->
+            <!-- NAVIGATION -->
             <nav class="nav">
                 <button class="active" data-view="dashboard" onclick="switchView('dashboard')">📊 Dashboard</button>
                 <button data-view="planner" onclick="switchView('planner')">📅 Planner</button>
@@ -1078,7 +1150,7 @@
                 <span class="nav-spacer"></span>
 
                 <!-- Theme Dropdown -->
-                <div class="theme-dropdown">
+                <div class="theme-dropdown no-print">
                     <button class="dropdown-btn" onclick="toggleThemeDropdown()">
                         🎨 <span id="currentThemeLabel">Emerald</span> ▾
                     </button>
@@ -1133,23 +1205,29 @@
                         </div>
                     </div>
                 </div>
-<!-- Add this after the stats row -->
-<div class="card" style="text-align:center;">
-  <div style="display:flex; justify-content:center; gap:2rem; flex-wrap:wrap;">
-    <div>
-      <div class="stat-label">BMI</div>
-      <div style="font-size:1.5rem; font-weight:700; color:var(--primary);" id="dashBMI">--</div>
-    </div>
-    <div>
-      <div class="stat-label">BMR</div>
-      <div style="font-size:1.5rem; font-weight:700; color:var(--primary);" id="dashBMR">--</div>
-    </div>
-    <div>
-      <div class="stat-label">TDEE</div>
-      <div style="font-size:1.5rem; font-weight:700; color:var(--primary);" id="dashTDEE">--</div>
-    </div>
-  </div>
-</div>
+
+                <!-- Metrics Row (BMI, BMR, TDEE) -->
+                <div class="card" style="text-align:center;">
+                    <div style="display:flex; justify-content:center; gap:2rem; flex-wrap:wrap;">
+                        <div>
+                            <div class="stat-label">🧮 BMI</div>
+                            <div style="font-size:1.5rem; font-weight:700; color:var(--primary);" id="dashBMI">--</div>
+                        </div>
+                        <div>
+                            <div class="stat-label">🔥 BMR</div>
+                            <div style="font-size:1.5rem; font-weight:700; color:var(--primary);" id="dashBMR">--</div>
+                        </div>
+                        <div>
+                            <div class="stat-label">⚡ TDEE</div>
+                            <div style="font-size:1.5rem; font-weight:700; color:var(--primary);" id="dashTDEE">--</div>
+                        </div>
+                        <div>
+                            <div class="stat-label">📊 Weekly Avg Calories</div>
+                            <div style="font-size:1.5rem; font-weight:700; color:var(--primary);" id="dashWeeklyAvg">--</div>
+                        </div>
+                    </div>
+                </div>
+
                 <!-- Training -->
                 <div class="card">
                     <div class="flex-between" style="margin-bottom:0.75rem;">
@@ -1233,11 +1311,12 @@
                 <div class="flex-between">
                     <h2>📅 Weekly Planner</h2>
                     <div class="flex" style="gap:0.5rem;">
-                        <button class="btn btn-outline btn-sm" onclick="weekOffset--; loadPlanner();">‹</button>
+                        <button class="btn btn-outline btn-sm no-print" onclick="weekOffset--; loadPlanner();">‹</button>
                         <span id="weekLabel" style="font-weight:600;font-size:0.9rem;"></span>
-                        <button class="btn btn-outline btn-sm" onclick="weekOffset++; loadPlanner();">›</button>
-                        <button class="btn btn-primary btn-sm" onclick="savePlanner()">💾 Save Week</button>
-                        <button class="btn btn-secondary btn-sm" onclick="copyLastWeek()">📋 Copy Last Week</button>
+                        <button class="btn btn-outline btn-sm no-print" onclick="weekOffset++; loadPlanner();">›</button>
+                        <button class="btn btn-primary btn-sm no-print" onclick="savePlanner()">💾 Save Week</button>
+                        <button class="btn btn-secondary btn-sm no-print" onclick="copyLastWeek()">📋 Copy Last Week</button>
+                        <button class="btn btn-outline btn-sm no-print" onclick="printPlanner()">🖨️ Print</button>
                     </div>
                 </div>
                 <div id="plannerGrid" class="week-grid" style="margin-top:1rem;"></div>
@@ -1288,14 +1367,24 @@
                 <div id="progressTab-inbody" class="hidden">
                     <div class="card">
                         <div class="stat-label">📄 InBody Report</div>
-                        <p class="text-muted" style="margin-bottom:0.5rem;">Upload your InBody report to Google Drive and paste the shareable link below.</p>
-                        <label>Google Drive Link</label>
-                        <input id="progInBodyLink" type="url" placeholder="https://drive.google.com/file/d/..." />
-                        <button class="btn btn-primary mt-1" onclick="saveInBodyLink()">💾 Save Link</button>
+                        <p class="text-muted" style="margin-bottom:0.75rem;">Enter your InBody scan results manually.</p>
+                        <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 0.75rem;">
+                            <div><label>📅 Test Date</label><input id="inBodyTestDate" type="date" /></div>
+                            <div><label>📏 Height (cm)</label><input id="inBodyHeight" type="number" step="0.1" placeholder="173" /></div>
+                            <div><label>💧 Total Body Water (L)</label><input id="inBodyWater" type="number" step="0.1" placeholder="47.0" /></div>
+                            <div><label>💪 Protein (kg)</label><input id="inBodyProtein" type="number" step="0.1" placeholder="12.5" /></div>
+                            <div><label>🦴 Minerals (kg)</label><input id="inBodyMinerals" type="number" step="0.01" placeholder="4.49" /></div>
+                            <div><label>🔥 Body Fat Mass (kg)</label><input id="inBodyFat" type="number" step="0.1" placeholder="27.2" /></div>
+                            <div><label>⚖️ Weight (kg)</label><input id="inBodyWeight" type="number" step="0.1" placeholder="91.2" /></div>
+                            <div><label>⭐ InBody Score</label><input id="inBodyScore" type="number" placeholder="75" /></div>
+                            <div style="grid-column: 1 / -1;"><label>📝 Notes</label><input id="inBodyNotes" placeholder="e.g., Post-workout, morning fasted..." /></div>
+                            <div style="grid-column: 1 / -1;"><label>🔗 Google Drive Link (optional)</label><input id="progInBodyLink" type="url" placeholder="https://drive.google.com/file/d/..." /></div>
+                        </div>
+                        <button class="btn btn-primary mt-1" onclick="saveInBodyReport()">💾 Save InBody Report</button>
                         <p id="inBodyStatus" class="mt-1"></p>
                     </div>
                     <div class="card">
-                        <div class="stat-label">Previous Reports</div>
+                        <div class="stat-label">📋 Previous InBody Reports</div>
                         <div id="inBodyHistory"><p class="text-muted">No reports yet.</p></div>
                     </div>
                 </div>
@@ -1308,8 +1397,8 @@
                 <div class="flex-between">
                     <h2>🛒 Shopping List</h2>
                     <div class="flex" style="gap:0.5rem;">
-                        <button class="btn btn-secondary btn-sm" onclick="generateShoppingList()">⟳ Generate from Planner</button>
-                        <button class="btn btn-outline btn-sm" onclick="addShoppingItem()">➕ Add Item</button>
+                        <button class="btn btn-secondary btn-sm no-print" onclick="generateShoppingList()">⟳ Generate from Planner</button>
+                        <button class="btn btn-outline btn-sm no-print" onclick="addShoppingItem()">➕ Add Item</button>
                     </div>
                 </div>
                 <div id="shoppingList" class="card"></div>
@@ -1326,10 +1415,10 @@
                     <div class="flex-between" style="margin-bottom:0.5rem;">
                         <span class="stat-label">📅 Family Activity</span>
                         <div style="display:flex;gap:0.3rem;flex-wrap:wrap;">
-                            <button class="btn btn-sm btn-outline" onclick="loadFamilyCalendar('all')" style="padding:0.15rem 0.5rem;">All</button>
-                            <button class="btn btn-sm btn-outline" onclick="loadFamilyCalendar('training')" style="padding:0.15rem 0.5rem;">🏋️ Training</button>
-                            <button class="btn btn-sm btn-outline" onclick="loadFamilyCalendar('meals')" style="padding:0.15rem 0.5rem;">🍽️ Meals</button>
-                            <button class="btn btn-sm btn-outline" onclick="loadFamilyCalendar('progress')" style="padding:0.15rem 0.5rem;">📊 Progress</button>
+                            <button class="btn btn-sm btn-outline no-print" onclick="loadFamilyCalendar('all')" style="padding:0.15rem 0.5rem;">All</button>
+                            <button class="btn btn-sm btn-outline no-print" onclick="loadFamilyCalendar('training')" style="padding:0.15rem 0.5rem;">🏋️ Training</button>
+                            <button class="btn btn-sm btn-outline no-print" onclick="loadFamilyCalendar('meals')" style="padding:0.15rem 0.5rem;">🍽️ Meals</button>
+                            <button class="btn btn-sm btn-outline no-print" onclick="loadFamilyCalendar('progress')" style="padding:0.15rem 0.5rem;">📊 Progress</button>
                         </div>
                     </div>
                     <div class="family-calendar-grid" id="familyCalendarGrid">
@@ -1362,9 +1451,22 @@
             <div id="view-nutrition" class="hidden">
                 <h2>📚 Nutrition Guide</h2>
                 <div class="card">
+                    <h3>🧮 Your Metrics</h3>
+                    <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(140px,1fr)); gap:0.5rem; margin-top:0.5rem;">
+                        <div><strong>BMI:</strong> <span id="displayBMI">--</span></div>
+                        <div><strong>BMR:</strong> <span id="displayBMR">--</span> kcal</div>
+                        <div><strong>TDEE:</strong> <span id="displayTDEE">--</span> kcal</div>
+                        <div><strong>Target Calories:</strong> <span id="displayTargetCal">--</span> kcal</div>
+                        <div><strong>Target Protein:</strong> <span id="displayTargetProtein">--</span> g</div>
+                        <div><strong>Target Water:</strong> <span id="displayTargetWater">--</span> ml</div>
+                    </div>
+                </div>
+
+                <div class="card">
                     <h3>💡 Understanding Your Targets</h3>
                     <p style="color:var(--text-secondary);">Your calorie and protein targets are calculated using the <strong>Mifflin-St Jeor</strong> equation, adjusted for your goal. Water intake is based on your weight (35ml/kg).</p>
                 </div>
+
                 <div class="grid-2">
                     <div class="card">
                         <h3>🏋️ Protein Guide</h3>
@@ -1399,16 +1501,6 @@
                             <li style="padding:0.3rem 0;">🔴 <strong>Obese:</strong> 30+</li>
                         </ul>
                     </div>
-                    <!-- Inside the Nutrition Guide -->
-<div class="card">
-  <h3>🧮 Your Metrics</h3>
-  <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(120px,1fr)); gap:0.5rem; margin-top:0.5rem;">
-    <div><strong>BMI:</strong> <span id="displayBMI">--</span></div>
-    <div><strong>BMR:</strong> <span id="displayBMR">--</span> kcal</div>
-    <div><strong>TDEE:</strong> <span id="displayTDEE">--</span> kcal</div>
-    <div><strong>Target:</strong> <span id="displayTargetCal">--</span> kcal</div>
-    <div><strong>Protein:</strong> <span id="displayTargetProtein">--</span> g</div>
-    <div><strong>Water:</strong> <span id="displayTargetWater">--</span> ml</div>
                 </div>
             </div>
 
@@ -1423,6 +1515,7 @@
                         <div id="profileInfo" style="margin-top:0.5rem;">
                             <p><strong>Name:</strong> <span id="settingsName"></span></p>
                             <p><strong>Family:</strong> <span id="settingsFamily"></span></p>
+                            <p><strong>Family PIN:</strong> <span id="settingsFamilyPin"></span></p>
                             <p><strong>Age:</strong> <span id="settingsAge"></span></p>
                             <p><strong>Sex:</strong> <span id="settingsSex"></span></p>
                             <p><strong>Goal:</strong> <span id="settingsGoal"></span></p>
@@ -1430,7 +1523,7 @@
                             <p><strong>Target Protein:</strong> <span id="settingsProtein"></span> g</p>
                             <p><strong>Target Water:</strong> <span id="settingsWater"></span> ml</p>
                         </div>
-                        <button class="btn btn-primary btn-sm mt-1" onclick="toggleEditForm()">✏️ Edit Profile</button>
+                        <button class="btn btn-primary btn-sm mt-1 no-print" onclick="toggleEditForm()">✏️ Edit Profile</button>
                         <div id="editForm" class="edit-form hidden">
                             <div class="grid-2">
                                 <div><label>Age</label><input id="editAge" type="number" /></div>
@@ -1442,8 +1535,8 @@
                             </div>
                             <div><label>Training Days / Week</label><input id="editTraining" type="number" /></div>
                             <div class="flex" style="margin-top:0.5rem;">
-                                <button class="btn btn-danger btn-sm" onclick="toggleEditForm()">Cancel</button>
-                                <button class="btn btn-primary btn-sm" onclick="submitEditProfile()">Update</button>
+                                <button class="btn btn-danger btn-sm no-print" onclick="toggleEditForm()">Cancel</button>
+                                <button class="btn btn-primary btn-sm no-print" onclick="submitEditProfile()">Update</button>
                             </div>
                             <p id="editProfileStatus" class="mt-1"></p>
                         </div>
@@ -1452,6 +1545,16 @@
                         <div class="stat-label">👨‍👩‍👧‍👦 Family Members</div>
                         <div id="familyMembers" style="margin-top:0.5rem;"><p class="text-muted">Loading...</p></div>
                     </div>
+                </div>
+
+                <!-- Data Management -->
+                <div class="card">
+                    <div class="stat-label">📊 Data Management</div>
+                    <div class="flex" style="margin-top:0.5rem;">
+                        <button class="btn btn-secondary btn-sm no-print" onclick="exportData()">📥 Export My Data (CSV)</button>
+                        <button class="btn btn-danger btn-sm no-print" onclick="deleteMyData()">🗑️ Delete My Data</button>
+                    </div>
+                    <p id="dataStatus" class="mt-1 text-muted" style="font-size:0.8rem;"></p>
                 </div>
             </div>
 
@@ -1464,11 +1567,12 @@
         <!-- Create Profile Modal -->
         <div id="createProfileModal" class="modal-overlay">
             <div class="modal-box">
-                <button class="close-btn" onclick="closeModal('createProfileModal')">✕</button>
+                <button class="close-btn no-print" onclick="closeModal('createProfileModal')">✕</button>
                 <h2>Create Profile</h2>
-                <p class="text-muted">Join an existing family with your Family Code.</p>
+                <p class="text-muted">Join an existing family with your Family Code and PIN.</p>
                 <label>Name *</label><input id="newProfileName" placeholder="Full name" />
                 <label>Family Code *</label><input id="newProfileFamilyCode" placeholder="e.g. HAGIN" />
+                <label>Family PIN *</label><input id="newProfileFamilyPin" type="password" placeholder="e.g. 1234" />
                 <label>Age</label><input id="newProfileAge" type="number" placeholder="30" />
                 <label>Sex</label><select id="newProfileSex"><option value="">—</option><option>Male</option><option>Female</option></select>
                 <label>Height (cm)</label><input id="newProfileHeight" type="number" placeholder="175" />
@@ -1477,8 +1581,8 @@
                 <label>Goal</label><select id="newProfileGoal"><option value="">—</option><option>Fat Loss - Slow</option><option>Fat Loss - Standard</option><option>Fat Loss - Aggressive</option><option>Maintain</option><option>Lean Bulk</option><option>Muscle Gain</option><option>Child Growth</option></select>
                 <label>Training Days / Week</label><input id="newProfileTraining" type="number" placeholder="3" />
                 <div class="flex" style="margin-top:1rem;justify-content:flex-end;">
-                    <button class="btn btn-danger btn-sm" onclick="closeModal('createProfileModal')">Cancel</button>
-                    <button class="btn btn-primary btn-sm" onclick="submitCreateProfile()">Create</button>
+                    <button class="btn btn-danger btn-sm no-print" onclick="closeModal('createProfileModal')">Cancel</button>
+                    <button class="btn btn-primary btn-sm no-print" onclick="submitCreateProfile()">Create</button>
                 </div>
                 <p id="createProfileStatus" class="mt-1"></p>
             </div>
@@ -1487,16 +1591,17 @@
         <!-- Create Family Modal -->
         <div id="createFamilyModal" class="modal-overlay">
             <div class="modal-box">
-                <button class="close-btn" onclick="closeModal('createFamilyModal')">✕</button>
+                <button class="close-btn no-print" onclick="closeModal('createFamilyModal')">✕</button>
                 <h2>Create New Family</h2>
                 <p class="text-muted">Start your own family nutrition hub.</p>
                 <label>Family Code *</label><input id="newFamilyCode" placeholder="e.g. SMITH" />
+                <label>Family PIN *</label><input id="newFamilyPin" type="password" placeholder="e.g. 1234" />
                 <label>Family Name</label><input id="newFamilyName" placeholder="The Smiths" />
                 <label>Your Name *</label><input id="newFamilyAdminName" placeholder="Admin name" />
                 <label>Email</label><input id="newFamilyEmail" type="email" placeholder="admin@example.com" />
                 <div class="flex" style="margin-top:1rem;justify-content:flex-end;">
-                    <button class="btn btn-danger btn-sm" onclick="closeModal('createFamilyModal')">Cancel</button>
-                    <button class="btn btn-primary btn-sm" onclick="submitCreateFamily()">Create Family</button>
+                    <button class="btn btn-danger btn-sm no-print" onclick="closeModal('createFamilyModal')">Cancel</button>
+                    <button class="btn btn-primary btn-sm no-print" onclick="submitCreateFamily()">Create Family</button>
                 </div>
                 <p id="createFamilyStatus" class="mt-1"></p>
             </div>
@@ -1505,21 +1610,20 @@
         <!-- Recipe Detail Modal -->
         <div id="recipeModal" class="modal-overlay">
             <div class="modal-box">
-                <button class="close-btn" onclick="closeModal('recipeModal')">✕</button>
+                <button class="close-btn no-print" onclick="closeModal('recipeModal')">✕</button>
                 <h2 id="recipeModalTitle">Recipe Name</h2>
                 <p id="recipeModalMeta" class="text-muted" style="margin-bottom:0.5rem;"></p>
                 <div id="recipeModalContent">
                     <p>Loading...</p>
                 </div>
                 <div class="flex" style="margin-top:1rem;justify-content:flex-end;">
-                    <button class="btn btn-primary btn-sm" id="recipeModalLogBtn" onclick="logRecipeFromModal()">🍽️ Log this</button>
+                    <button class="btn btn-primary btn-sm no-print" id="recipeModalLogBtn" onclick="logRecipeFromModal()">🍽️ Log this</button>
                 </div>
             </div>
         </div>
 
     </div>
-
-    <script>
+        <script>
         // ================================================================
         //  CONFIGURATION
         // ================================================================
@@ -1531,6 +1635,7 @@
         let userId = '';
         let userData = {};
         let familyCode = '';
+        let familyPin = '';
         let userName = '';
         let weekOffset = 0;
         let allRecipes = [];
@@ -1544,6 +1649,16 @@
         let dailyWaterLog = 0;
         let calendarFilter = 'all';
         let familyMembers = [];
+
+        // ================================================================
+        //  HELPER – Escape HTML to prevent XSS
+        // ================================================================
+        function escapeHtml(text) {
+            if (!text) return '';
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
 
         // ================================================================
         //  THEME ENGINE
@@ -1584,9 +1699,9 @@
         }
 
         // ================================================================
-        //  API HELPER
+        //  API HELPER (with loading state)
         // ================================================================
-        async function apiCall(action, payload = {}) {
+        async function apiCall(action, payload = {}, showLoading = true) {
             const formData = new URLSearchParams();
             formData.append('action', action);
             for (const key in payload) {
@@ -1659,31 +1774,33 @@
         //  LOGIN
         // ================================================================
         async function handleSignIn() {
-            const familyCodeInput = document.getElementById('loginFamilyCode').value.trim();
+            const familyCodeInput = document.getElementById('loginFamilyCode').value.trim().toUpperCase();
+            const familyPinInput = document.getElementById('loginFamilyPin').value.trim();
             const nameInput = document.getElementById('loginName').value.trim();
             const statusEl = document.getElementById('loginStatus');
 
             if (!familyCodeInput || !nameInput) {
-                statusEl.textContent = 'Please enter Family Code and Name.';
+                statusEl.textContent = 'Please enter Family Code, PIN, and Name.';
                 statusEl.className = 'error';
                 return;
             }
 
             statusEl.textContent = 'Checking...';
             statusEl.className = '';
-            const result = await apiCall('signIn', { familyCode: familyCodeInput, name: nameInput });
+            const result = await apiCall('signIn', { familyCode: familyCodeInput, pin: familyPinInput, name: nameInput });
 
             if (result.success) {
                 familyCode = familyCodeInput;
+                familyPin = familyPinInput;
                 userName = nameInput;
                 userId = result.userId || '';
                 userData = result.userData || {};
-                statusEl.textContent = '✅ Welcome, ' + userName + '!';
+                statusEl.textContent = '✅ Welcome, ' + escapeHtml(userName) + '!';
                 statusEl.className = 'success';
                 document.getElementById('loginScreen').classList.add('hidden');
                 document.getElementById('mainApp').classList.remove('hidden');
-                document.getElementById('userNameDisplay').textContent = userName;
-                document.getElementById('familyCodeDisplay').textContent = familyCode;
+                document.getElementById('userNameDisplay').textContent = escapeHtml(userName);
+                document.getElementById('familyCodeDisplay').textContent = escapeHtml(familyCode);
                 loadDashboardData();
                 loadPlanner();
                 loadRecipes();
@@ -1706,6 +1823,7 @@
             userId = '';
             userData = {};
             familyCode = '';
+            familyPin = '';
             userName = '';
         }
 
@@ -1738,16 +1856,43 @@
                     .Training_Days_Weekly || 3);
                 document.getElementById('streakCount').textContent = result.streak || 0;
 
+                // BMI, BMR, TDEE
+                const height = parseFloat(userData.Height_cm) || 0;
+                const weight = parseFloat(userData.Weight_kg) || 0;
+                const age = parseInt(userData.Age) || 0;
+                const sex = userData.Sex || 'Male';
+                const heightM = height / 100;
+                const bmi = (height > 0 && weight > 0) ? (weight / (heightM * heightM)) : 0;
+                let bmr = 0;
+                if (height > 0 && weight > 0 && age > 0) {
+                    if (sex === 'Male') bmr = 10 * weight + 6.25 * height - 5 * age + 5;
+                    else bmr = 10 * weight + 6.25 * height - 5 * age - 161;
+                }
+                const actFactors = { 'Sedentary': 1.2, 'Light': 1.375, 'Moderate': 1.55, 'Active': 1.725, 'Very Active': 1.9 };
+                const factor = actFactors[userData.Activity_Level] || 1.55;
+                const tdee = bmr * factor;
+
+                document.getElementById('dashBMI').textContent = bmi > 0 ? bmi.toFixed(1) : '--';
+                document.getElementById('dashBMR').textContent = bmr > 0 ? Math.round(bmr) : '--';
+                document.getElementById('dashTDEE').textContent = tdee > 0 ? Math.round(tdee) : '--';
+
+                // Weekly average calories
+                const calorieHistory = result.calorieHistory || [];
+                const weekCal = calorieHistory.slice(-7);
+                const avg = weekCal.length ? Math.round(weekCal.reduce((a, b) => a + b, 0) / weekCal.length) : 0;
+                document.getElementById('dashWeeklyAvg').textContent = avg > 0 ? avg : '--';
+
+                // Today's Meals
                 const meals = result.todayMeals || [];
                 const container = document.getElementById('todayMeals');
                 if (meals.length === 0) {
                     container.innerHTML = '<p class="text-muted">No meals logged yet today.</p>';
                 } else {
                     container.innerHTML = meals.map(m =>
-                        `<div style="border-bottom:1px solid var(--border-color);padding:0.25rem 0;display:flex;justify-content:space-between;">
-                            <span>${m.Meal_Type || 'Snack'}: ${m.Recipe_Name || '—'}</span>
+                        `<div style="border-bottom:1px solid var(--border-color);padding:0.25rem 0;display:flex;justify-content:space-between;align-items:center;">
+                            <span>${escapeHtml(m.Meal_Type || 'Snack')}: ${escapeHtml(m.Recipe_Name || '—')}</span>
                             <span style="font-weight:600;">${m.Calories || 0} kcal</span>
-                            <button class="btn btn-danger btn-sm" onclick="deleteMeal('${m.Recipe_ID}')" style="padding:0.1rem 0.3rem;font-size:0.6rem;">🗑️</button>
+                            <button class="btn btn-danger btn-sm no-print" onclick="deleteMeal('${escapeHtml(m.Recipe_ID)}')" style="padding:0.1rem 0.3rem;font-size:0.6rem;">🗑️</button>
                         </div>`
                     ).join('');
                 }
@@ -1756,32 +1901,8 @@
                 const waterTarget = userData.Water_Target_ml || 2000;
                 document.getElementById('dashWaterTarget').textContent = waterTarget;
 
-                // Render charts
                 renderWeightChart(result.weightHistory || []);
                 renderCalorieChart(result.calorieHistory || []);
-                // Calculate and display BMI, BMR, TDEE
-const height = parseFloat(userData.Height_cm) || 0;
-const weight = parseFloat(userData.Weight_kg) || 0;
-const age = parseInt(userData.Age) || 0;
-const sex = userData.Sex || 'Male';
-
-const heightM = height / 100;
-const bmi = (height > 0 && weight > 0) ? (weight / (heightM * heightM)) : 0;
-
-let bmr = 0;
-if (height > 0 && weight > 0 && age > 0) {
-  if (sex === 'Male') {
-    bmr = 10 * weight + 6.25 * height - 5 * age + 5;
-  } else {
-    bmr = 10 * weight + 6.25 * height - 5 * age - 161;
-  }
-}
-const factor = activityFactors[userData.Activity_Level] || 1.55;
-const tdee = bmr * factor;
-
-document.getElementById('dashBMI').textContent = bmi > 0 ? bmi.toFixed(1) : '--';
-document.getElementById('dashBMR').textContent = bmr > 0 ? Math.round(bmr) : '--';
-document.getElementById('dashTDEE').textContent = tdee > 0 ? Math.round(tdee) : '--';
             }
         }
 
@@ -1812,21 +1933,22 @@ document.getElementById('dashTDEE').textContent = tdee > 0 ? Math.round(tdee) : 
             }
         }
 
-       async function undoTraining() {
-  const result = await apiCall('undoTraining', { userId, familyCode });
-  if (result.success) {
-    if (result.message && result.message.includes('No training log')) {
-      showToast('ℹ️ ' + result.message, 'info');
-    } else {
-      showToast('↩️ Training undone');
-      loadDashboardData();
-      loadTrainingCalendar();
-      loadFamilyCalendar();
-    }
-  } else {
-    showToast('❌ ' + (result.error || 'Failed to undo training.'), 'error');
-  }
-}
+        async function undoTraining() {
+            const result = await apiCall('undoTraining', { userId, familyCode });
+            if (result.success) {
+                if (result.message && result.message.includes('No training log')) {
+                    showToast('ℹ️ ' + result.message, 'info');
+                } else {
+                    showToast('↩️ ' + (result.message || 'Training undone'));
+                    loadDashboardData();
+                    loadTrainingCalendar();
+                    loadFamilyCalendar();
+                }
+            } else {
+                showToast('❌ ' + (result.error || 'Failed to undo training.'), 'error');
+            }
+        }
+
         // ================================================================
         //  DELETE MEAL
         // ================================================================
@@ -1855,59 +1977,56 @@ document.getElementById('dashTDEE').textContent = tdee > 0 ? Math.round(tdee) : 
         }
 
         async function loadTrainingCalendar() {
-  if (!userId) return;
-  const result = await apiCall('getCalendarData', { userId, familyCode });
-  if (result.success) {
-    renderTrainingCalendar(result.calendarData || []);
-  } else {
-    console.warn('Calendar data error:', result.error);
-  }
-}
+            if (!userId) return;
+            const result = await apiCall('getCalendarData', { userId, familyCode });
+            if (result.success) {
+                renderTrainingCalendar(result.calendarData || []);
+            }
+        }
 
         function renderTrainingCalendar(calendarData) {
-  const grid = document.getElementById('calendarGrid');
-  const now = new Date();
-  const year = now.getFullYear();
-  const month = now.getMonth();
-  const firstDay = new Date(year, month, 1).getDay();
-  const daysInMonth = new Date(year, month + 1, 0).getDate();
+            const grid = document.getElementById('calendarGrid');
+            const now = new Date();
+            const year = now.getFullYear();
+            const month = now.getMonth();
+            const firstDay = new Date(year, month, 1).getDay();
+            const daysInMonth = new Date(year, month + 1, 0).getDate();
 
-  let html = '';
-  const dayLabels = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-  dayLabels.forEach(d => {
-    html += `<div class="day-label">${d}</div>`;
-  });
+            let html = '';
+            const dayLabels = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+            dayLabels.forEach(d => {
+                html += `<div class="day-label">${d}</div>`;
+            });
 
-  // Empty cells before the first day
-  for (let i = 0; i < firstDay; i++) {
-    html += `<div class="calendar-day empty"></div>`;
-  }
+            for (let i = 0; i < firstDay; i++) {
+                html += `<div class="calendar-day empty"></div>`;
+            }
 
-  // Days of the month
-  for (let day = 1; day <= daysInMonth; day++) {
-    const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
-    const isToday = dateStr === now.toISOString().slice(0, 10);
-    const dayData = calendarData.find(d => d.date === dateStr);
-    let status = 'empty';
-    let label = day;
+            for (let day = 1; day <= daysInMonth; day++) {
+                const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+                const isToday = dateStr === now.toISOString().slice(0, 10);
+                const dayData = calendarData.find(d => d.date === dateStr);
+                let status = 'empty';
+                let label = day;
 
-    if (dayData) {
-      if (calendarFilter === 'training' && dayData.trained) status = 'trained';
-      else if (calendarFilter === 'meals' && dayData.meals) status = 'logged';
-      else if (calendarFilter === 'progress' && dayData.progress) status = 'partial';
-      else if (calendarFilter === 'all') {
-        if (dayData.trained) status = 'trained';
-        else if (dayData.meals) status = 'logged';
-        else if (dayData.progress) status = 'partial';
-      }
-      if (dayData.trained && calendarFilter === 'all') status = 'trained';
-    }
+                if (dayData) {
+                    if (calendarFilter === 'training' && dayData.trained) status = 'trained';
+                    else if (calendarFilter === 'meals' && dayData.meals) status = 'logged';
+                    else if (calendarFilter === 'progress' && dayData.progress) status = 'partial';
+                    else if (calendarFilter === 'all') {
+                        if (dayData.trained) status = 'trained';
+                        else if (dayData.meals) status = 'logged';
+                        else if (dayData.progress) status = 'partial';
+                    }
+                    if (dayData.trained && calendarFilter === 'all') status = 'trained';
+                }
 
-    html += `<div class="calendar-day ${status} ${isToday ? 'today' : ''}">${label}</div>`;
-  }
+                html += `<div class="calendar-day ${status} ${isToday ? 'today' : ''}">${label}</div>`;
+            }
 
-  grid.innerHTML = html;
-}
+            grid.innerHTML = html;
+        }
+
         // ================================================================
         //  FAMILY CALENDAR
         // ================================================================
@@ -1936,16 +2055,14 @@ document.getElementById('dashTDEE').textContent = tdee > 0 ? Math.round(tdee) : 
                 html += `<div class="day-label">${d}</div>`;
             });
 
-            // Fill in empty days before the first day of the month
             for (let i = 0; i < firstDay; i++) {
                 html += `<div class="calendar-day empty"></div>`;
             }
 
             for (let day = 1; day <= daysInMonth; day++) {
-                const dateStr = `${year}-${String(month+1).padStart(2,'0')}-${String(day).padStart(2,'0')}`;
+                const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
                 const isToday = dateStr === now.toISOString().slice(0, 10);
                 const dayData = calendarData.find(d => d.date === dateStr);
-
                 let status = 'empty';
                 let label = day;
                 let tooltip = '';
@@ -1975,20 +2092,19 @@ document.getElementById('dashTDEE').textContent = tdee > 0 ? Math.round(tdee) : 
                     }
                 }
 
-                html += `<div class="calendar-day ${status} ${isToday ? 'today' : ''}" title="${tooltip}">${label}</div>`;
+                html += `<div class="calendar-day ${status} ${isToday ? 'today' : ''}" title="${escapeHtml(tooltip)}">${label}</div>`;
             }
 
             grid.innerHTML = html;
 
-            // Update family members list
             const membersContainer = document.getElementById('familyMembersList');
             if (!members || members.length === 0) {
                 membersContainer.innerHTML = '<p class="text-muted">No other family members yet.</p>';
             } else {
                 membersContainer.innerHTML = members.map(m =>
                     `<div style="display:flex;justify-content:space-between;border-bottom:1px solid var(--border-color);padding:0.25rem 0;">
-                        <span>${m.name}</span>
-                        <span style="color:var(--text-muted);font-size:0.8rem;">${m.goal || '—'}</span>
+                        <span>${escapeHtml(m.name)}</span>
+                        <span style="color:var(--text-muted);font-size:0.8rem;">${escapeHtml(m.goal || '—')}</span>
                     </div>`
                 ).join('');
             }
@@ -2084,8 +2200,12 @@ document.getElementById('dashTDEE').textContent = tdee > 0 ? Math.round(tdee) : 
         }
 
         // ================================================================
-        //  PLANNER
+        //  PLANNER (with Print)
         // ================================================================
+        function printPlanner() {
+            window.print();
+        }
+
         function getWeekDays() {
             const now = new Date();
             const start = new Date(now);
@@ -2140,7 +2260,7 @@ document.getElementById('dashTDEE').textContent = tdee > 0 ? Math.round(tdee) : 
                     html += `<select onchange="plannerData['${day.date}']['${slot.key}']=this.value">`;
                     html += `<option value="">—</option>`;
                     (mealRecipes[slot.key] || []).forEach(r => {
-                        html += `<option value="${r.Recipe_ID}" ${r.Recipe_ID === val ? 'selected' : ''}>${r.Recipe_Name}</option>`;
+                        html += `<option value="${escapeHtml(r.Recipe_ID)}" ${r.Recipe_ID === val ? 'selected' : ''}>${escapeHtml(r.Recipe_Name)}</option>`;
                     });
                     html += `</select>`;
                     html += `</div>`;
@@ -2220,7 +2340,7 @@ document.getElementById('dashTDEE').textContent = tdee > 0 ? Math.round(tdee) : 
                 const cats = new Set();
                 allRecipes.forEach(r => { if (r.Category) cats.add(r.Category); });
                 document.getElementById('recipeCategory').innerHTML = '<option value="">All Categories</option>' + Array.from(
-                    cats).map(c => `<option value="${c}">${c}</option>`).join('');
+                    cats).map(c => `<option value="${escapeHtml(c)}">${escapeHtml(c)}</option>`).join('');
                 filterRecipes();
             }
         }
@@ -2236,16 +2356,16 @@ document.getElementById('dashTDEE').textContent = tdee > 0 ? Math.round(tdee) : 
             const grid = document.getElementById('recipeGrid');
             if (!list.length) { grid.innerHTML = '<p class="text-muted">No recipes found.</p>'; return; }
             grid.innerHTML = list.map(r => `
-                <div class="recipe-card" onclick="openRecipeDetail('${r.Recipe_ID}')">
-                    <div class="title">${r.Recipe_Name}</div>
-                    <div style="font-size:0.8rem;color:var(--text-secondary);">${r.Category || ''} · ${r.Meal_Type || ''}</div>
+                <div class="recipe-card" onclick="openRecipeDetail('${escapeHtml(r.Recipe_ID)}')">
+                    <div class="title">${escapeHtml(r.Recipe_Name)}</div>
+                    <div style="font-size:0.8rem;color:var(--text-secondary);">${escapeHtml(r.Category || '')} · ${escapeHtml(r.Meal_Type || '')}</div>
                     <div style="margin:0.25rem 0;">
                         <span class="cal">${r.Calories || 0} kcal</span>
                         <span>P ${r.Protein_g || 0}g</span>
                         <span>C ${r.Carbs_g || 0}g</span>
                         <span>F ${r.Fat_g || 0}g</span>
                     </div>
-                    <div class="tags">${(r.Tags || '').split(';').filter(t => t.trim()).map(t => `<span class="tag">${t.trim()}</span>`).join('')}</div>
+                    <div class="tags">${(r.Tags || '').split(';').filter(t => t.trim()).map(t => `<span class="tag">${escapeHtml(t.trim())}</span>`).join('')}</div>
                 </div>
             `).join('');
         }
@@ -2258,9 +2378,9 @@ document.getElementById('dashTDEE').textContent = tdee > 0 ? Math.round(tdee) : 
             const recipe = allRecipes.find(r => r.Recipe_ID === recipeId);
             if (!recipe) { showToast('Recipe not found', 'error'); return; }
 
-            document.getElementById('recipeModalTitle').textContent = recipe.Recipe_Name || 'Recipe';
+            document.getElementById('recipeModalTitle').textContent = escapeHtml(recipe.Recipe_Name || 'Recipe');
             document.getElementById('recipeModalMeta').textContent =
-                `${recipe.Category || ''} · ${recipe.Meal_Type || ''} · ${recipe.Calories || 0} kcal · ${recipe.Carb_Level || ''}`;
+                `${escapeHtml(recipe.Category || '')} · ${escapeHtml(recipe.Meal_Type || '')} · ${recipe.Calories || 0} kcal · ${escapeHtml(recipe.Carb_Level || '')}`;
 
             const content = document.getElementById('recipeModalContent');
             content.innerHTML = '<p>Loading ingredients...</p>';
@@ -2278,14 +2398,14 @@ document.getElementById('dashTDEE').textContent = tdee > 0 ? Math.round(tdee) : 
                 <div class="macro-item"><span class="macro-value">🌾 ${recipe.Fiber_g || 0}g</span><span class="macro-label">Fiber</span></div>
                 <div class="macro-item"><span class="macro-value">⏱️ ${recipe.Prep_Min || 0}m</span><span class="macro-label">Prep</span></div>
                 <div class="macro-item"><span class="macro-value">🍳 ${recipe.Cook_Min || 0}m</span><span class="macro-label">Cook</span></div>
-                <div class="macro-item"><span class="macro-value">📊 ${recipe.Difficulty || ''}</span><span class="macro-label">Difficulty</span></div>
+                <div class="macro-item"><span class="macro-value">📊 ${escapeHtml(recipe.Difficulty || '')}</span><span class="macro-label">Difficulty</span></div>
             </div>`;
 
             if (ingredientsResult.success && ingredientsResult.ingredients.length) {
                 html += `<h3>🛒 Ingredients</h3><ul class="ingredient-list">`;
                 ingredientsResult.ingredients.forEach(i => {
                     html +=
-                        `<li><span>${i.Ingredient_Name}</span><span class="ing-qty">${i.Quantity || ''} ${i.Unit || ''}</span></li>`;
+                        `<li><span>${escapeHtml(i.Ingredient_Name)}</span><span class="ing-qty">${escapeHtml(i.Quantity || '')} ${escapeHtml(i.Unit || '')}</span></li>`;
                 });
                 html += `</ul>`;
             } else {
@@ -2295,7 +2415,7 @@ document.getElementById('dashTDEE').textContent = tdee > 0 ? Math.round(tdee) : 
             if (methodsResult.success && methodsResult.methods.length) {
                 html += `<h3>📝 Method</h3><ol class="step-list">`;
                 methodsResult.methods.forEach(m => {
-                    html += `<li>${m.Instruction || ''}</li>`;
+                    html += `<li>${escapeHtml(m.Instruction || '')}</li>`;
                 });
                 html += `</ol>`;
             } else {
@@ -2303,7 +2423,7 @@ document.getElementById('dashTDEE').textContent = tdee > 0 ? Math.round(tdee) : 
             }
 
             if (recipe.Adult_Portion_Notes && (!ingredientsResult.success || !ingredientsResult.ingredients.length)) {
-                html += `<div class="portion-notes"><strong>📋 Portion Notes:</strong> ${recipe.Adult_Portion_Notes}</div>`;
+                html += `<div class="portion-notes"><strong>📋 Portion Notes:</strong> ${escapeHtml(recipe.Adult_Portion_Notes)}</div>`;
             }
 
             content.innerHTML = html;
@@ -2358,7 +2478,7 @@ document.getElementById('dashTDEE').textContent = tdee > 0 ? Math.round(tdee) : 
                 <thead><tr><th>Date</th><th>Weight</th><th>Waist</th><th>BF%</th></tr></thead>
                 <tbody>${progressHistory.slice(0,10).map(p => `
                     <tr>
-                        <td>${p.Date}</td>
+                        <td>${escapeHtml(p.Date)}</td>
                         <td>${p.Weight_kg || '—'}</td>
                         <td>${p.Waist_cm || '—'}</td>
                         <td>${p.Body_Fat_Percent || '—'}</td>
@@ -2369,14 +2489,41 @@ document.getElementById('dashTDEE').textContent = tdee > 0 ? Math.round(tdee) : 
 
         function loadInBodyHistory() {
             const container = document.getElementById('inBodyHistory');
-            const reports = progressHistory.filter(p => p.InBody_Link);
-            if (!reports.length) { container.innerHTML = '<p class="text-muted">No InBody reports uploaded yet.</p>'; return; }
-            container.innerHTML = reports.map(p =>
-                `<div style="display:flex;justify-content:space-between;border-bottom:1px solid var(--border-color);padding:0.25rem 0;">
-                    <span>${p.Date}</span>
-                    <a href="${p.InBody_Link}" target="_blank" class="inbody-link">📎 View Report</a>
-                </div>`
-            ).join('');
+            const reports = progressHistory.filter(p => p.Notes && p.Notes.includes('InBody:'));
+            if (!reports.length) { container.innerHTML = '<p class="text-muted">No InBody reports yet.</p>'; return; }
+
+            container.innerHTML = reports.map(p => {
+                let report = {};
+                try {
+                    const jsonStr = p.Notes.replace('InBody:', '');
+                    report = JSON.parse(jsonStr);
+                } catch (e) {
+                    return `<div style="border-bottom:1px solid var(--border-color);padding:0.5rem 0;">
+                        <div style="display:flex;justify-content:space-between;">
+                            <span><strong>${escapeHtml(p.Date)}</strong></span>
+                            <span class="text-muted">${escapeHtml(p.Notes)}</span>
+                        </div>
+                    </div>`;
+                }
+                return `
+                    <div style="border-bottom:1px solid var(--border-color);padding:0.6rem 0;">
+                        <div style="display:flex;justify-content:space-between;flex-wrap:wrap;">
+                            <span><strong>📅 ${escapeHtml(report.date || p.Date)}</strong></span>
+                            <span>⭐ Score: <strong>${report.inBodyScore || '—'}</strong></span>
+                        </div>
+                        <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(120px,1fr)); gap:0.3rem; margin-top:0.3rem; font-size:0.85rem;">
+                            <span>💧 Water: ${report.totalBodyWater || '—'} L</span>
+                            <span>💪 Protein: ${report.protein || '—'} kg</span>
+                            <span>🦴 Minerals: ${report.minerals || '—'} kg</span>
+                            <span>🔥 Fat: ${report.bodyFatMass || '—'} kg</span>
+                            <span>⚖️ Weight: ${report.weight || '—'} kg</span>
+                            <span>📏 Height: ${report.height || '—'} cm</span>
+                        </div>
+                        ${report.notes ? `<div class="text-muted" style="font-size:0.8rem;margin-top:0.2rem;">📝 ${escapeHtml(report.notes)}</div>` : ''}
+                        ${report.link ? `<a href="${escapeHtml(report.link)}" target="_blank" class="inbody-link">📎 View Report</a>` : ''}
+                    </div>
+                `;
+            }).join('');
         }
 
         async function saveProgress() {
@@ -2415,26 +2562,56 @@ document.getElementById('dashTDEE').textContent = tdee > 0 ? Math.round(tdee) : 
             }
         }
 
-        async function saveInBodyLink() {
+        async function saveInBodyReport() {
+            const testDate = document.getElementById('inBodyTestDate').value;
+            const height = parseFloat(document.getElementById('inBodyHeight').value);
+            const water = parseFloat(document.getElementById('inBodyWater').value);
+            const protein = parseFloat(document.getElementById('inBodyProtein').value);
+            const minerals = parseFloat(document.getElementById('inBodyMinerals').value);
+            const fat = parseFloat(document.getElementById('inBodyFat').value);
+            const weight = parseFloat(document.getElementById('inBodyWeight').value);
+            const score = parseInt(document.getElementById('inBodyScore').value);
+            const notes = document.getElementById('inBodyNotes').value.trim();
             const link = document.getElementById('progInBodyLink').value.trim();
-            if (!link) {
-                document.getElementById('inBodyStatus').textContent = 'Please enter a Google Drive link.';
+
+            if (!testDate && !weight && !water && !protein) {
+                document.getElementById('inBodyStatus').textContent = 'Please fill in at least Test Date and one metric.';
                 document.getElementById('inBodyStatus').className = 'error';
                 return;
             }
 
-            const result = await apiCall('saveInBodyLink', {
-                userId,
-                familyCode,
-                link: link
-            });
+            const payload = {
+                userId: userId,
+                familyCode: familyCode,
+                testDate: testDate || new Date().toISOString().slice(0, 10),
+                height: height || null,
+                totalBodyWater: water || null,
+                protein: protein || null,
+                minerals: minerals || null,
+                bodyFatMass: fat || null,
+                weight: weight || null,
+                inBodyScore: score || null,
+                notes: notes || '',
+                link: link || null
+            };
+
+            const result = await apiCall('saveInBodyReport', payload);
 
             if (result.success) {
-                document.getElementById('inBodyStatus').textContent = '✅ Link saved!';
+                document.getElementById('inBodyStatus').textContent = '✅ InBody report saved!';
                 document.getElementById('inBodyStatus').className = 'success';
+                document.getElementById('inBodyTestDate').value = '';
+                document.getElementById('inBodyHeight').value = '';
+                document.getElementById('inBodyWater').value = '';
+                document.getElementById('inBodyProtein').value = '';
+                document.getElementById('inBodyMinerals').value = '';
+                document.getElementById('inBodyFat').value = '';
+                document.getElementById('inBodyWeight').value = '';
+                document.getElementById('inBodyScore').value = '';
+                document.getElementById('inBodyNotes').value = '';
                 document.getElementById('progInBodyLink').value = '';
-                loadProgress();
-                showToast('📄 InBody report saved!');
+                loadInBodyHistory();
+                showToast('✅ InBody report saved!');
             } else {
                 document.getElementById('inBodyStatus').textContent = '❌ ' + (result.error || 'Failed to save.');
                 document.getElementById('inBodyStatus').className = 'error';
@@ -2461,14 +2638,14 @@ document.getElementById('dashTDEE').textContent = tdee > 0 ? Math.round(tdee) : 
                     '<p class="text-muted">No items. Generate from your weekly planner.</p>'; return; }
             container.innerHTML = shoppingItems.map(item => `
                 <div class="shopping-item ${item.Purchased_YesNo === 'Yes' ? 'purchased' : ''}">
-                    <input type="checkbox" ${item.Purchased_YesNo === 'Yes' ? 'checked' : ''} onchange="updateShoppingItem('${item.Ingredient_Name}', this.checked)" />
-                    <span class="name">${item.Ingredient_Name}</span>
-                    <span class="qty">${item.Quantity_Needed || 1} ${item.Unit || ''}</span>
+                    <input type="checkbox" ${item.Purchased_YesNo === 'Yes' ? 'checked' : ''} onchange="updateShoppingItem('${escapeHtml(item.Ingredient_Name)}', this.checked)" />
+                    <span class="name">${escapeHtml(item.Ingredient_Name)}</span>
+                    <span class="qty">${escapeHtml(item.Quantity_Needed || 1)} ${escapeHtml(item.Unit || '')}</span>
                 </div>
             `).join('') + `
                 <div style="margin-top:1rem;display:flex;gap:0.5rem;">
-                    <button class="btn btn-outline btn-sm" onclick="markAllPurchased()">✅ Mark all purchased</button>
-                    <button class="btn btn-danger btn-sm" onclick="clearPurchased()">🗑️ Clear purchased</button>
+                    <button class="btn btn-outline btn-sm no-print" onclick="markAllPurchased()">✅ Mark all purchased</button>
+                    <button class="btn btn-danger btn-sm no-print" onclick="clearPurchased()">🗑️ Clear purchased</button>
                 </div>
             `;
         }
@@ -2519,8 +2696,9 @@ document.getElementById('dashTDEE').textContent = tdee > 0 ? Math.round(tdee) : 
         // ================================================================
         async function loadFamilyMembers() {
             if (!userId) return;
-            document.getElementById('settingsName').textContent = userName || '—';
-            document.getElementById('settingsFamily').textContent = familyCode || '—';
+            document.getElementById('settingsName').textContent = escapeHtml(userName || '—');
+            document.getElementById('settingsFamily').textContent = escapeHtml(familyCode || '—');
+            document.getElementById('settingsFamilyPin').textContent = familyPin || '—';
             document.getElementById('settingsAge').textContent = userData.Age || '—';
             document.getElementById('settingsSex').textContent = userData.Sex || '—';
             document.getElementById('settingsGoal').textContent = userData.Goal || '—';
@@ -2535,8 +2713,8 @@ document.getElementById('dashTDEE').textContent = tdee > 0 ? Math.round(tdee) : 
                 if (!familyMembers.length) { container.innerHTML = '<p class="text-muted">No other members.</p>'; return; }
                 container.innerHTML = familyMembers.map(m =>
                     `<div style="display:flex;justify-content:space-between;border-bottom:1px solid var(--border-color);padding:0.25rem 0;">
-                        <span>${m.Name}</span>
-                        <span style="color:var(--text-muted);font-size:0.8rem;">${m.Goal || '—'}</span>
+                        <span>${escapeHtml(m.Name)}</span>
+                        <span style="color:var(--text-muted);font-size:0.8rem;">${escapeHtml(m.Goal || '—')}</span>
                     </div>`
                 ).join('');
             }
@@ -2592,49 +2770,65 @@ document.getElementById('dashTDEE').textContent = tdee > 0 ? Math.round(tdee) : 
         }
 
         // ================================================================
+        //  DATA MANAGEMENT
+        // ================================================================
+        function exportData() {
+            if (!userId) return;
+            const data = {
+                user: userData,
+                progress: progressHistory,
+                family: familyCode,
+                exportedAt: new Date().toISOString()
+            };
+            const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `nutriflow_export_${new Date().toISOString().slice(0,10)}.json`;
+            a.click();
+            URL.revokeObjectURL(url);
+            showToast('📥 Data exported!');
+        }
+
+        function deleteMyData() {
+            if (!confirm('⚠️ Are you sure? This will permanently delete ALL your data from the system. This cannot be undone.')) return;
+            const result = apiCall('deleteUserData', { userId, familyCode });
+            if (result.success) {
+                showToast('🗑️ Your data has been deleted.');
+                handleLogout();
+            } else {
+                showToast('❌ ' + (result.error || 'Failed to delete data.'), 'error');
+            }
+        }
+
+        // ================================================================
         //  NUTRITION GUIDE
         // ================================================================
         function loadNutritionGuide() {
             document.getElementById('guideProteinTarget').textContent = userData.Protein_Target_g || '--';
             document.getElementById('guideWaterTarget').textContent = userData.Water_Target_ml || '--';
-            // Calculate BMI, BMR, TDEE
-  const height = parseFloat(userData.Height_cm) || 0;
-  const weight = parseFloat(userData.Weight_kg) || 0;
-  const age = parseInt(userData.Age) || 0;
-  const sex = userData.Sex || 'Male';
-  
-  // BMI
-  const heightM = height / 100;
-  const bmi = (height > 0 && weight > 0) ? (weight / (heightM * heightM)) : 0;
-  
-  // BMR (Mifflin-St Jeor)
-  let bmr = 0;
-  if (height > 0 && weight > 0 && age > 0) {
-    if (sex === 'Male') {
-      bmr = 10 * weight + 6.25 * height - 5 * age + 5;
-    } else {
-      bmr = 10 * weight + 6.25 * height - 5 * age - 161;
-    }
-  }
-  
-  // TDEE
-  const activityFactors = {
-    'Sedentary': 1.2,
-    'Light': 1.375,
-    'Moderate': 1.55,
-    'Active': 1.725,
-    'Very Active': 1.9
-  };
-  const factor = activityFactors[userData.Activity_Level] || 1.55;
-  const tdee = bmr * factor;
-  
-  // Display
-  document.getElementById('displayBMI').textContent = bmi > 0 ? bmi.toFixed(1) : '--';
-  document.getElementById('displayBMR').textContent = bmr > 0 ? Math.round(bmr) : '--';
-  document.getElementById('displayTDEE').textContent = tdee > 0 ? Math.round(tdee) : '--';
-  document.getElementById('displayTargetCal').textContent = userData.Target_Calories || '--';
-  document.getElementById('displayTargetProtein').textContent = userData.Protein_Target_g || '--';
-  document.getElementById('displayTargetWater').textContent = userData.Water_Target_ml || '--';
+
+            const height = parseFloat(userData.Height_cm) || 0;
+            const weight = parseFloat(userData.Weight_kg) || 0;
+            const age = parseInt(userData.Age) || 0;
+            const sex = userData.Sex || 'Male';
+            const heightM = height / 100;
+            const bmi = (height > 0 && weight > 0) ? (weight / (heightM * heightM)) : 0;
+            let bmr = 0;
+            if (height > 0 && weight > 0 && age > 0) {
+                if (sex === 'Male') bmr = 10 * weight + 6.25 * height - 5 * age + 5;
+                else bmr = 10 * weight + 6.25 * height - 5 * age - 161;
+            }
+            const actFactors = { 'Sedentary': 1.2, 'Light': 1.375, 'Moderate': 1.55, 'Active': 1.725, 'Very Active': 1.9 };
+            const factor = actFactors[userData.Activity_Level] || 1.55;
+            const tdee = bmr * factor;
+
+            document.getElementById('displayBMI').textContent = bmi > 0 ? bmi.toFixed(1) : '--';
+            document.getElementById('displayBMR').textContent = bmr > 0 ? Math.round(bmr) : '--';
+            document.getElementById('displayTDEE').textContent = tdee > 0 ? Math.round(tdee) : '--';
+            document.getElementById('displayTargetCal').textContent = userData.Target_Calories || '--';
+            document.getElementById('displayTargetProtein').textContent = userData.Protein_Target_g || '--';
+            document.getElementById('displayTargetWater').textContent = userData.Water_Target_ml || '--';
         }
 
         // ================================================================
@@ -2648,6 +2842,7 @@ document.getElementById('dashTDEE').textContent = tdee > 0 ? Math.round(tdee) : 
             const data = {
                 name: document.getElementById('newProfileName').value.trim(),
                 familyCode: document.getElementById('newProfileFamilyCode').value.trim().toUpperCase(),
+                pin: document.getElementById('newProfileFamilyPin').value.trim(),
                 age: parseInt(document.getElementById('newProfileAge').value) || null,
                 sex: document.getElementById('newProfileSex').value,
                 height: parseFloat(document.getElementById('newProfileHeight').value) || null,
@@ -2656,8 +2851,8 @@ document.getElementById('dashTDEE').textContent = tdee > 0 ? Math.round(tdee) : 
                 goal: document.getElementById('newProfileGoal').value,
                 trainingDays: parseInt(document.getElementById('newProfileTraining').value) || 3
             };
-            if (!data.name || !data.familyCode) {
-                document.getElementById('createProfileStatus').textContent = 'Name and Family Code are required.';
+            if (!data.name || !data.familyCode || !data.pin) {
+                document.getElementById('createProfileStatus').textContent = 'Name, Family Code, and PIN are required.';
                 document.getElementById('createProfileStatus').className = 'error';
                 return;
             }
@@ -2667,6 +2862,7 @@ document.getElementById('dashTDEE').textContent = tdee > 0 ? Math.round(tdee) : 
                 document.getElementById('createProfileStatus').className = 'success';
                 closeModal('createProfileModal');
                 document.getElementById('loginFamilyCode').value = data.familyCode;
+                document.getElementById('loginFamilyPin').value = data.pin;
                 document.getElementById('loginName').value = data.name;
                 showToast('Profile created! Please sign in.');
             } else {
@@ -2678,12 +2874,13 @@ document.getElementById('dashTDEE').textContent = tdee > 0 ? Math.round(tdee) : 
         async function submitCreateFamily() {
             const data = {
                 code: document.getElementById('newFamilyCode').value.trim().toUpperCase(),
+                pin: document.getElementById('newFamilyPin').value.trim(),
                 name: document.getElementById('newFamilyName').value.trim(),
                 adminName: document.getElementById('newFamilyAdminName').value.trim(),
                 email: document.getElementById('newFamilyEmail').value.trim()
             };
-            if (!data.code || !data.adminName) {
-                document.getElementById('createFamilyStatus').textContent = 'Family Code and Admin Name are required.';
+            if (!data.code || !data.pin || !data.adminName) {
+                document.getElementById('createFamilyStatus').textContent = 'Family Code, PIN, and Admin Name are required.';
                 document.getElementById('createFamilyStatus').className = 'error';
                 return;
             }
@@ -2693,6 +2890,7 @@ document.getElementById('dashTDEE').textContent = tdee > 0 ? Math.round(tdee) : 
                 document.getElementById('createFamilyStatus').className = 'success';
                 closeModal('createFamilyModal');
                 document.getElementById('loginFamilyCode').value = data.code;
+                document.getElementById('loginFamilyPin').value = data.pin;
                 document.getElementById('loginName').value = data.adminName;
                 showToast('Family created! Please sign in.');
             } else {
@@ -2727,9 +2925,8 @@ document.getElementById('dashTDEE').textContent = tdee > 0 ? Math.round(tdee) : 
             document.getElementById('loginScreen').classList.remove('hidden');
             document.getElementById('mainApp').classList.add('hidden');
             loadTheme();
-            console.log('✅ NutriFlow v5.0 loaded successfully!');
+            console.log('✅ NutriFlow v6.0 loaded successfully!');
         });
     </script>
-
 </body>
 </html>
