@@ -4165,5 +4165,187 @@ body.guest-mode .guest-only-note{display:block!important;}
 })();
 </script>
 
+
+<style id="nf-small-controlled-css">
+  .nf-top-water{display:inline-flex;align-items:center;gap:.45rem;flex-wrap:wrap;margin-left:.5rem}
+  .nf-top-water input{width:110px;min-height:34px;border-radius:999px;text-align:center;font-weight:700}
+  .nf-top-water .btn{min-height:34px}
+  @media(max-width:720px){.nf-top-water{width:100%;margin-left:0;margin-top:.6rem}.nf-top-water input{width:100%}}
+</style>
+
+<script id="nf-small-controlled-fixes">
+(function(){
+  'use strict';
+  function $(id){ return document.getElementById(id); }
+  function qsa(sel,root){ return Array.from((root||document).querySelectorAll(sel)); }
+  function esc(v){
+    const d=document.createElement('div');
+    d.textContent = v == null ? '' : String(v);
+    return d.innerHTML;
+  }
+  function toast(msg,type){
+    if(typeof showToast === 'function') showToast(msg,type||'success');
+    else console.log(msg);
+  }
+  function getRecipesSafe(){
+    try { if(Array.isArray(allRecipes)) return allRecipes; } catch(e) {}
+    try { const v=JSON.parse(localStorage.getItem('nf_allRecipes')||'[]'); if(Array.isArray(v)) return v; } catch(e) {}
+    try { const v=JSON.parse(localStorage.getItem('allRecipes')||'[]'); if(Array.isArray(v)) return v; } catch(e) {}
+    return [];
+  }
+  function setRecipesSafe(list){
+    try { allRecipes = list; } catch(e) {}
+    try { localStorage.setItem('nf_allRecipes', JSON.stringify(list||[])); } catch(e) {}
+  }
+
+  /* 1) Dashboard cleanup: keep the new Command Center + Calendar Hub only */
+  function cleanDashboardDuplicates(){
+    const dash = $('view-dashboard');
+    if(!dash) return;
+    qsa('.hero-command', dash).forEach(el => el.style.display = 'none');
+    const statsRow = $('dashCalories') && $('dashCalories').closest('.grid-3');
+    if(statsRow) statsRow.style.display = 'none';
+    const oldTraining = $('trainingBtn') && $('trainingBtn').closest('.card');
+    if(oldTraining) oldTraining.style.display = 'none';
+    const smart = $('insightNutritionText') && $('insightNutritionText').closest('.card');
+    if(smart) smart.style.display = 'none';
+  }
+
+  /* 2) Add water controls to the TOP Command Center */
+  function ensureTopWaterControls(){
+    const home = $('nfHomeCommand');
+    if(!home || $('nfTopWaterControls')) return;
+    const actions = home.querySelector('.nf-hero-actions') || home.querySelector('.flex') || home;
+    const box = document.createElement('div');
+    box.id = 'nfTopWaterControls';
+    box.className = 'nf-top-water no-print';
+    box.innerHTML = '<input id="nfWaterCustomAmount" type="number" min="1" step="50" placeholder="Water ml" aria-label="Water amount in ml"><button class="btn btn-primary btn-sm" id="nfAddCustomWaterBtn">💧 Add Water</button><button class="btn btn-outline btn-sm" id="nfAdd250TopBtn">+250</button><button class="btn btn-outline btn-sm" id="nfAdd500TopBtn">+500</button>';
+    actions.appendChild(box);
+    $('nfAddCustomWaterBtn').onclick = function(){
+      const v = Number(($('nfWaterCustomAmount')||{}).value || 0);
+      if(!v || v <= 0) return toast('Enter how many ml you drank.','error');
+      if(typeof addWater === 'function') addWater(v);
+      updateTopWaterKpi();
+      $('nfWaterCustomAmount').value = '';
+    };
+    $('nfAdd250TopBtn').onclick = function(){ if(typeof addWater==='function') addWater(250); updateTopWaterKpi(); };
+    $('nfAdd500TopBtn').onclick = function(){ if(typeof addWater==='function') addWater(500); updateTopWaterKpi(); };
+  }
+  function updateTopWaterKpi(){
+    const dashWater = $('dashWater') ? $('dashWater').textContent : '0';
+    const dashTarget = $('dashWaterTarget') ? $('dashWaterTarget').textContent : '--';
+    if($('nfKpiWater')) $('nfKpiWater').textContent = dashWater + ' / ' + dashTarget;
+  }
+
+  /* 3) Recipe Library: always show usable filter options and filter by category, meal type, tags, or ID prefix */
+  const fallbackFilters = [
+    ['','All Categories'],
+    ['Breakfast','Breakfast'],
+    ['Snack','Snack'],
+    ['Lunch','Lunch'],
+    ['Dinner','Dinner'],
+    ['Dessert','Dessert'],
+    ['Adult Breakfast','Adult Breakfast'],
+    ['Adult Snack','Adult Snack'],
+    ['Adult Lunch/Dinner','Adult Lunch/Dinner'],
+    ['Adult Dessert','Adult Dessert'],
+    ['Kids','Kids'],
+    ['High Protein','High Protein'],
+    ['Quick','Quick & Easy'],
+    ['Family Friendly','Family Friendly'],
+    ['Low Carb','Low Carb']
+  ];
+  function recipeMatchesFilter(r, filter){
+    if(!filter) return true;
+    const f = String(filter).toLowerCase();
+    const fields = [r.Category,r.Meal_Type,r.Tags,r.Carb_Level,r.Protein_Level,r.Recipe_ID,r.ID_Group].map(x=>String(x||'').toLowerCase());
+    if(fields.some(x=>x.includes(f))) return true;
+    const id = String(r.Recipe_ID||'').toUpperCase();
+    if(f === 'breakfast' && id.startsWith('AB')) return true;
+    if(f === 'snack' && id.startsWith('AS')) return true;
+    if((f === 'lunch' || f === 'dinner' || f === 'adult lunch/dinner') && id.startsWith('ALD')) return true;
+    if(f === 'dessert' && id.startsWith('AD')) return true;
+    if(f === 'kids' && id.startsWith('KB')) return true;
+    return false;
+  }
+  function populateRecipeFilters(){
+    const sel = $('recipeCategory');
+    if(!sel) return;
+    const current = sel.value || '';
+    const recipes = getRecipesSafe();
+    const seen = new Map(fallbackFilters);
+    recipes.forEach(r=>{
+      [r.Category, r.Meal_Type].forEach(v=>{
+        if(v && !seen.has(v)) seen.set(v,v);
+      });
+      String(r.Tags||'').split(';').map(s=>s.trim()).filter(Boolean).forEach(tag=>{
+        if(!seen.has(tag)) seen.set(tag,tag);
+      });
+    });
+    sel.innerHTML = Array.from(seen.entries()).map(([val,label]) => '<option value="'+esc(val)+'">'+esc(label)+'</option>').join('');
+    sel.value = Array.from(seen.keys()).includes(current) ? current : '';
+  }
+  window.filterRecipes = function(){
+    const search = (($('recipeSearch')||{}).value || '').toLowerCase().trim();
+    const filter = (($('recipeCategory')||{}).value || '').trim();
+    let list = getRecipesSafe();
+    list = list.filter(r=>{
+      const hay = [r.Recipe_Name,r.Recipe_ID,r.Category,r.Meal_Type,r.Tags,r.Ingredients].join(' ').toLowerCase();
+      if(search && !hay.includes(search)) return false;
+      if(filter && !recipeMatchesFilter(r, filter)) return false;
+      return true;
+    });
+    const grid = $('recipeGrid');
+    if(!grid) return;
+    if(!list.length){ grid.innerHTML = '<p class="text-muted">No recipes found.</p>'; return; }
+    grid.innerHTML = list.map(r =>
+      '<div class="recipe-card" onclick="openRecipeDetail(\''+esc(r.Recipe_ID || '')+'\')">'+
+        '<div class="title">'+esc(r.Recipe_Name || 'Recipe')+'</div>'+
+        '<div style="font-size:0.8rem;color:var(--text-secondary);">'+esc(r.Category || '')+' · '+esc(r.Meal_Type || '')+'</div>'+
+        '<div style="margin:0.25rem 0;"><span class="cal">'+esc(r.Calories || 0)+' kcal</span> <span>P '+esc(r.Protein_g || 0)+'g</span> <span>C '+esc(r.Carbs_g || 0)+'g</span> <span>F '+esc(r.Fat_g || 0)+'g</span></div>'+
+        '<div class="tags">'+String(r.Tags || '').split(';').filter(t=>t.trim()).map(t=>'<span class="tag">'+esc(t.trim())+'</span>').join('')+'</div>'+
+      '</div>'
+    ).join('');
+  };
+  const prevLoadRecipes = window.loadRecipes;
+  window.loadRecipes = async function(){
+    if(prevLoadRecipes) await prevLoadRecipes();
+    try { setRecipesSafe(getRecipesSafe()); } catch(e) {}
+    populateRecipeFilters();
+    window.filterRecipes();
+  };
+
+  function runPolish(){
+    cleanDashboardDuplicates();
+    ensureTopWaterControls();
+    updateTopWaterKpi();
+    populateRecipeFilters();
+    if($('recipeGrid') && !$('view-recipes')?.classList.contains('hidden')) window.filterRecipes();
+  }
+  const prevSwitch = window.switchView;
+  window.switchView = function(view){
+    if(prevSwitch) prevSwitch(view);
+    setTimeout(runPolish, 120);
+  };
+  const prevAddWater = window.addWater;
+  if(prevAddWater){
+    window.addWater = function(amount){
+      const r = prevAddWater(amount);
+      setTimeout(updateTopWaterKpi, 120);
+      return r;
+    };
+  }
+  const prevResetWater = window.resetWater;
+  if(prevResetWater){
+    window.resetWater = function(){
+      const r = prevResetWater();
+      setTimeout(updateTopWaterKpi, 120);
+      return r;
+    };
+  }
+  window.addEventListener('load', function(){ setTimeout(runPolish, 800); setTimeout(runPolish, 1800); });
+})();
+
+</script>
 </body>
 </html>
