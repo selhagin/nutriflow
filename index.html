@@ -4347,5 +4347,169 @@ body.guest-mode .guest-only-note{display:block!important;}
 })();
 
 </script>
+
+
+<!-- ================================================================
+     NUTRIFLOW FINAL MICRO-FIX: RESTORE COMMAND CENTER HERO
+     Keeps the premium top hero visible and removes only the real duplicates.
+     ================================================================ -->
+<style id="nf-restore-command-center-css">
+  #nfHomeCommand{
+    display:block !important;
+    margin-bottom:1.25rem !important;
+  }
+  #nfHomeCommand .nf-hero-actions{
+    align-items:center;
+  }
+  #nfHomeCommand .nf-mini-kpi b{
+    white-space:nowrap;
+  }
+  #nfHomeCommand .nf-top-water{
+    margin-left:0;
+    margin-top:.65rem;
+  }
+  #nfHomeCommand .nf-top-water input{
+    max-width:130px;
+  }
+</style>
+<script id="nf-restore-command-center-js">
+(function(){
+  'use strict';
+  function $(id){ return document.getElementById(id); }
+  function qsa(sel,root){ return Array.from((root||document).querySelectorAll(sel)); }
+  function toast(msg,type){
+    if(typeof showToast === 'function') showToast(msg,type||'success');
+    else console.log(msg);
+  }
+
+  function createCommandCenterIfMissing(){
+    const dash = $('view-dashboard');
+    if(!dash) return null;
+    let home = $('nfHomeCommand');
+    if(home){
+      home.style.display = 'block';
+      return home;
+    }
+    const firstHeading = dash.querySelector('h2');
+    home = document.createElement('div');
+    home.id = 'nfHomeCommand';
+    home.className = 'card no-print';
+    home.innerHTML = ''+
+      '<div class="nf-hero-grid">'+
+        '<div>'+ 
+          '<div class="stat-label">NutriFlow Home</div>'+ 
+          '<div class="nf-hero-title">Today\'s Family Health Control Room</div>'+ 
+          '<p class="text-muted">Log training, plan the week, and see what changed today without scrolling through a messy dashboard.</p>'+ 
+          '<div class="nf-hero-actions no-print">'+
+            '<button class="btn btn-primary" id="nfPlanWeekBtn">📅 Plan This Week</button>'+ 
+            '<button class="btn btn-secondary" id="nfLogTrainingBtn">💪 Log Training</button>'+ 
+            '<button class="btn btn-outline" id="nfPrintCalendarBtn">🖨️ Print Calendar</button>'+ 
+          '</div>'+ 
+        '</div>'+ 
+        '<div class="nf-mini-kpis">'+ 
+          '<div class="nf-mini-kpi"><small>Calories</small><b id="nfKpiCalories">--</b></div>'+ 
+          '<div class="nf-mini-kpi"><small>Protein</small><b id="nfKpiProtein">--</b></div>'+ 
+          '<div class="nf-mini-kpi"><small>Training</small><b id="nfKpiTraining">--</b></div>'+ 
+          '<div class="nf-mini-kpi"><small>Water</small><b id="nfKpiWater">--</b></div>'+ 
+        '</div>'+ 
+      '</div>';
+    if(firstHeading) firstHeading.after(home); else dash.prepend(home);
+    return home;
+  }
+
+  function wireCommandCenter(){
+    const home = createCommandCenterIfMissing();
+    if(!home) return;
+
+    const planBtn = $('nfPlanWeekBtn');
+    if(planBtn) planBtn.onclick = function(){
+      if(typeof switchView === 'function') switchView('planner');
+      if(typeof loadPlannerFinal === 'function') loadPlannerFinal();
+      else if(typeof loadPlanner === 'function') loadPlanner();
+    };
+
+    const trainBtn = $('nfLogTrainingBtn');
+    if(trainBtn) trainBtn.onclick = function(){
+      if(typeof openTrainingModalFinal === 'function') openTrainingModalFinal();
+      else if(typeof openTrainingQuick === 'function') openTrainingQuick();
+      else if(typeof toggleTraining === 'function') toggleTraining();
+      else toast('Training form is not available yet.','error');
+    };
+
+    const printBtn = $('nfPrintCalendarBtn');
+    if(printBtn) printBtn.onclick = function(){
+      if(typeof printCurrentCalendarView === 'function') printCurrentCalendarView();
+      else if(typeof printCalendarFinal === 'function') printCalendarFinal('my');
+      else window.print();
+    };
+  }
+
+  function removeOnlyRealDashboardDuplicates(){
+    const dash = $('view-dashboard');
+    if(!dash) return;
+
+    // Hide old Command Center version only. Keep #nfHomeCommand visible.
+    qsa('section.hero-command', dash).forEach(el => { el.style.display = 'none'; });
+
+    // Hide the old lower stat cards, but never hide the command center KPIs.
+    const oldStats = $('dashCalories') && $('dashCalories').closest('.grid-3');
+    if(oldStats && !oldStats.closest('#nfHomeCommand')) oldStats.style.display = 'none';
+
+    const oldTraining = $('trainingBtn') && $('trainingBtn').closest('.card');
+    if(oldTraining && oldTraining.id !== 'dashboardCalendarHub' && !oldTraining.closest('#nfHomeCommand')) oldTraining.style.display = 'none';
+
+    // Remove old smart/coach blocks if still present.
+    const smart = $('insightNutritionText') && $('insightNutritionText').closest('.card');
+    if(smart) smart.style.display = 'none';
+  }
+
+  function addTopWaterControls(){
+    const home = $('nfHomeCommand');
+    if(!home || $('nfTopWaterControls')) return;
+    const actions = home.querySelector('.nf-hero-actions') || home;
+    const box = document.createElement('div');
+    box.id = 'nfTopWaterControls';
+    box.className = 'nf-top-water no-print';
+    box.innerHTML = '<input id="nfWaterCustomAmount" type="number" min="1" step="50" placeholder="Water ml"><button class="btn btn-primary btn-sm" id="nfAddCustomWaterBtn">💧 Add Water</button><button class="btn btn-outline btn-sm" id="nfAdd250TopBtn">+250</button><button class="btn btn-outline btn-sm" id="nfAdd500TopBtn">+500</button>';
+    actions.appendChild(box);
+
+    function updateWaterKpi(){
+      const cur = $('dashWater') ? $('dashWater').textContent : '0';
+      const tgt = $('dashWaterTarget') ? $('dashWaterTarget').textContent : '--';
+      if($('nfKpiWater')) $('nfKpiWater').textContent = cur + ' / ' + tgt;
+    }
+    $('nfAddCustomWaterBtn').onclick = function(){
+      const amount = Number(($('nfWaterCustomAmount')||{}).value || 0);
+      if(!amount || amount <= 0) return toast('Enter how many ml you drank.','error');
+      if(typeof addWater === 'function') addWater(amount);
+      updateWaterKpi();
+      $('nfWaterCustomAmount').value = '';
+    };
+    $('nfAdd250TopBtn').onclick = function(){ if(typeof addWater==='function') addWater(250); updateWaterKpi(); };
+    $('nfAdd500TopBtn').onclick = function(){ if(typeof addWater==='function') addWater(500); updateWaterKpi(); };
+  }
+
+  function syncTopKpis(){
+    function txt(id){ return $(id) ? $(id).textContent : '0'; }
+    if($('nfKpiCalories')) $('nfKpiCalories').textContent = txt('dashCalories') + ' / ' + txt('dashCalTarget');
+    if($('nfKpiProtein')) $('nfKpiProtein').textContent = txt('dashProtein') + ' / ' + txt('dashProtTarget');
+    if($('nfKpiTraining')) $('nfKpiTraining').textContent = txt('trainingCount') || '--';
+    if($('nfKpiWater')) $('nfKpiWater').textContent = txt('dashWater') + ' / ' + txt('dashWaterTarget');
+  }
+
+  function run(){
+    createCommandCenterIfMissing();
+    wireCommandCenter();
+    removeOnlyRealDashboardDuplicates();
+    addTopWaterControls();
+    syncTopKpis();
+  }
+
+  window.restoreNutriFlowCommandCenter = run;
+  document.addEventListener('DOMContentLoaded', function(){ setTimeout(run, 350); setTimeout(run, 1200); });
+  setTimeout(run, 1800);
+})();
+</script>
+
 </body>
 </html>
