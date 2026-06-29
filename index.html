@@ -4,149 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>NutriFlow · Family Nutrition OS</title>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js">
-    
-
-        // ================================================================
-        //  FINAL CEO POLISH OVERRIDES — working buttons + better UX
-        // ================================================================
-        function isKidsProfile(profile) {
-            const age = Number(profile?.Age || profile?.age || 0);
-            const goal = String(profile?.Goal || profile?.goal || '').toLowerCase();
-            const type = String(profile?.Profile_Type || profile?.User_Type || '').toLowerCase();
-            return (age > 0 && age < 16) || goal.includes('child') || type.includes('kid') || type.includes('child');
-        }
-
-        async function handleSignIn() {
-            const familyCodeInput = document.getElementById('loginFamilyCode').value.trim();
-            const nameInput = document.getElementById('loginName').value.trim();
-            const statusEl = document.getElementById('loginStatus');
-            if (!familyCodeInput || !nameInput) { statusEl.textContent = 'Please enter Family Code and Name.'; statusEl.className = 'error'; return; }
-            statusEl.textContent = 'Opening your command center...'; statusEl.className = '';
-            const result = await apiCall('signIn', { familyCode: familyCodeInput, name: nameInput });
-            if (result.success) {
-                familyCode = familyCodeInput; userName = nameInput; userId = result.userId || ''; userData = result.userData || {};
-                document.getElementById('loginScreen').classList.add('hidden');
-                document.getElementById('mainApp').classList.remove('hidden');
-                safeSetText('userNameDisplay', userName); safeSetText('familyCodeDisplay', familyCode);
-                if (isKidsProfile(userData)) setTheme('kids'); else loadTheme();
-                await Promise.allSettled([loadRecipes(), loadPlanner(), loadProgress(), loadShopping(), loadFamilyMembers(), loadNutritionGuide(), loadTrainingCalendar(), loadFamilyCalendar()]);
-                await loadDashboardData();
-                renderDashboardCalendarHub();
-                showToast('✅ Welcome, ' + userName + '!');
-            } else { statusEl.textContent = '❌ ' + (result.error || 'Invalid credentials.'); statusEl.className = 'error'; }
-        }
-
-        function goToPlanner() { switchView('planner'); setTimeout(() => document.getElementById('plannerGrid')?.scrollIntoView({behavior:'smooth', block:'start'}), 150); }
-        function openTrainingQuick() { const el = document.getElementById('trainingNotes'); if (el) el.value = ''; toggleTraining(); }
-        async function refreshSmartCoach() { showToast('🧠 Refreshing Smart Coach insights...', 'info'); await loadDashboardData(); renderDashboardCalendarHub(); showToast('✅ Insights refreshed'); }
-
-        const originalLoadMealRecipes = loadMealRecipes;
-        async function loadMealRecipes() {
-            if (mealRecipes.__loaded) return;
-            const calls = ['Breakfast','Snack','Lunch','Dinner','Dessert'].map(t => apiCall('getRecipes', { type:'adult', mealType:t }, false).then(result => ({t,result})));
-            const results = await Promise.all(calls);
-            results.forEach(({t,result}) => {
-                if (result.success) {
-                    const key = t === 'Breakfast' ? 'Breakfast_ID' : t === 'Snack' ? 'Snack_1_ID' : t === 'Lunch' ? 'Lunch_ID' : t === 'Dinner' ? 'Dinner_ID' : 'Dessert_ID';
-                    mealRecipes[key] = result.recipes || [];
-                    if (t === 'Snack') mealRecipes['Snack_2_ID'] = result.recipes || [];
-                }
-            });
-            mealRecipes.__loaded = true;
-        }
-
-        function recipeMacroById(id) {
-            const lists = [allRecipes, ...Object.values(mealRecipes || {}).filter(Array.isArray)];
-            for (const list of lists) { const r = (list || []).find(x => x.Recipe_ID === id); if (r) return r; }
-            return null;
-        }
-
-        async function renderPlanner(weekDays) {
-            const grid = document.getElementById('plannerGrid');
-            if (!grid) return;
-            const slots = [
-                { key: 'Breakfast_ID', label: 'Breakfast', icon:'🌅' },{ key: 'Snack_1_ID', label: 'Snack 1', icon:'🍎' },
-                { key: 'Lunch_ID', label: 'Lunch', icon:'🍱' },{ key: 'Snack_2_ID', label: 'Snack 2', icon:'🥕' },
-                { key: 'Dinner_ID', label: 'Dinner', icon:'🌙' },{ key: 'Dessert_ID', label: 'Dessert', icon:'🍮' },
-            ];
-            let html = '';
-            weekDays.forEach(day => {
-                const pretty = new Date(day.date + 'T12:00:00').toLocaleDateString('en', { month:'short', day:'numeric' });
-                let totalCal = 0, totalProtein = 0;
-                html += `<div class="day-card"><div class="day-label"><span>${escapeHtml(day.label.split(',')[0] || day.label)}</span><span class="day-date">${escapeHtml(pretty)}</span></div>`;
-                slots.forEach(slot => {
-                    const val = plannerData[day.date]?.[slot.key] || '';
-                    const rec = recipeMacroById(val); if (rec) { totalCal += Number(rec.Calories || 0); totalProtein += Number(rec.Protein_g || 0); }
-                    html += `<div class="meal-row"><label>${slot.icon} ${escapeHtml(slot.label)}</label><select onchange="plannerData['${day.date}']['${slot.key}']=this.value; renderDashboardCalendarHub(); renderPlanner(getWeekDays());"><option value="">Choose meal</option>`;
-                    (mealRecipes[slot.key] || []).forEach(r => { html += `<option value="${escapeHtml(r.Recipe_ID)}" ${r.Recipe_ID === val ? 'selected' : ''}>${escapeHtml(r.Recipe_Name)}${r.Calories ? ' · ' + r.Calories + ' kcal' : ''}</option>`; });
-                    html += `</select></div>`;
-                });
-                html += `<div class="planner-day-total">${Math.round(totalCal)} kcal · ${Math.round(totalProtein)}g protein</div></div>`;
-            });
-            grid.innerHTML = html;
-        }
-
-        async function submitTrainingLog() {
-            const notes = document.getElementById('trainingModalNotes').value.trim();
-            const type = document.getElementById('trainingType').value;
-            const duration = parseInt(document.getElementById('trainingDuration').value, 10) || 45;
-            const intensity = document.getElementById('trainingIntensity').value;
-            const trainingDate = document.getElementById('trainingDate').value || new Date().toISOString().slice(0, 10);
-            const btn = document.getElementById('trainingSubmitBtn');
-            if (btn) { btn.disabled = true; btn.textContent = 'Saving...'; }
-            const finalNotes = [type, duration + ' min', intensity, notes].filter(Boolean).join(' · ');
-            let result = await apiCall('toggleTraining', { userId, familyCode, trained: true, notes: finalNotes, trainingType:type, duration, intensity, trainingDate });
-            if (!result.success) result = await apiCall('toggleTraining', { userId, familyCode, trained: true, notes: finalNotes });
-            if (btn) { btn.disabled = false; btn.textContent = '✅ Save Training'; }
-            if (result.success) {
-                const existing = (lastUserCalendarData || []).find(x => x.date === trainingDate);
-                if (existing) existing.trained = true; else lastUserCalendarData.push({date: trainingDate, trained:true, meals:false, progress:false});
-                closeModal('trainingLogModal'); showToast('✅ Training logged and added to calendar');
-                const tb = document.getElementById('trainingBtn'); if (tb) { tb.textContent = '✅ Done'; tb.classList.add('done'); }
-                document.getElementById('trainingNotes').value = ''; document.getElementById('trainingModalNotes').value = '';
-                await Promise.allSettled([loadDashboardData(), loadTrainingCalendar(), loadFamilyCalendar()]); renderDashboardCalendarHub();
-            } else showToast('❌ ' + (result.error || 'Failed to update training.'), 'error');
-        }
-
-        const originalOpenRecipeDetailFinal = openRecipeDetail;
-        async function openRecipeDetail(recipeId) {
-            const card = event?.currentTarget; if (card) card.classList.add('loading-fast');
-            await originalOpenRecipeDetailFinal(recipeId);
-            if (card) card.classList.remove('loading-fast');
-            const content = document.getElementById('recipeModalContent');
-            if (content && !document.getElementById('recipeLogMealType')) {
-                content.insertAdjacentHTML('afterbegin', `<div class="recipe-log-panel"><div><label>Log as meal</label><select id="recipeLogMealType"><option>Breakfast</option><option>Snack</option><option>Lunch</option><option>Dinner</option><option>Dessert</option></select></div><div><label>Servings</label><input id="recipeLogServings" type="number" min="0.25" step="0.25" value="1"></div></div>`);
-                const rec = allRecipes.find(r => r.Recipe_ID === recipeId);
-                if (rec?.Meal_Type) document.getElementById('recipeLogMealType').value = rec.Meal_Type;
-            }
-        }
-
-        function chartColor(varName) { return getComputedStyle(document.documentElement).getPropertyValue(varName).trim() || '#0F766E'; }
-        function renderWeightChart(history) {
-            const canvas = document.getElementById('weightChart'); if (!canvas || !window.Chart) return; const ctx = canvas.getContext('2d'); if (weightChart) weightChart.destroy();
-            const range = document.getElementById('chartRange')?.value || '30';
-            let filtered = Array.isArray(history) ? history : []; if (range !== 'all') filtered = filtered.slice(-parseInt(range));
-            const labels = filtered.map(h => h.Date || h.date || ''); const data = filtered.map(h => parseFloat(h.Weight_kg || h.weight || h.Weight) || 0).filter(x=>x>0);
-            const labelData = filtered.map(h => parseFloat(h.Weight_kg || h.weight || h.Weight) || null);
-            weightChart = new Chart(ctx,{type:'line',data:{labels,datasets:[{label:'Weight (kg)',data:labelData,borderColor:chartColor('--primary'),backgroundColor:'rgba(20,184,166,.12)',fill:true,tension:.38,pointRadius:4,pointHoverRadius:6}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{mode:'index',intersect:false}},scales:{x:{grid:{display:false}},y:{beginAtZero:false,grid:{color:'rgba(148,163,184,.18)'}}}});
-            const parent = canvas.closest('.card'); if (parent && !parent.classList.contains('chart-card-premium')) parent.classList.add('chart-card-premium');
-            const summaryId='weightChartSummary'; let sum=document.getElementById(summaryId); if(!sum&&parent){sum=document.createElement('div');sum.id=summaryId;sum.className='chart-summary';parent.appendChild(sum)}
-            if(sum){ const first=data[0], last=data[data.length-1], change=(first&&last)?(last-first):0; sum.innerHTML=data.length?`<span>Latest: ${last.toFixed(1)} kg</span><span>Change: ${change>0?'+':''}${change.toFixed(1)} kg</span>`:'<span>No weight entries yet</span>'; }
-        }
-
-        function renderCalorieChart(history) {
-            const canvas = document.getElementById('calorieChart'); if (!canvas || !window.Chart) return; const ctx = canvas.getContext('2d'); if (calorieChart) calorieChart.destroy();
-            const records = Array.isArray(history) ? history.slice(-7) : []; const labels = records.map((h,i)=>h.Date || h.date || ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'][i] || '');
-            while(labels.length<7) labels.unshift(''); const intake = records.map(h => parseInt(h.calories || h.Calories || h.dailyCalories) || 0); while(intake.length<7) intake.unshift(0);
-            const targetVal = parseInt(userData.Target_Calories) || 2000;
-            calorieChart = new Chart(ctx,{data:{labels,datasets:[{type:'bar',label:'Intake',data:intake,backgroundColor:chartColor('--primary'),borderRadius:10},{type:'line',label:'Target',data:new Array(7).fill(targetVal),borderColor:chartColor('--secondary'),backgroundColor:'rgba(245,158,11,.18)',borderWidth:3,pointRadius:0,tension:.2}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:true,labels:{boxWidth:10}}},scales:{x:{grid:{display:false}},y:{grid:{color:'rgba(148,163,184,.18)'}}}});
-            const parent = canvas.closest('.card'); if (parent && !parent.classList.contains('chart-card-premium')) parent.classList.add('chart-card-premium');
-            const summaryId='calorieChartSummary'; let sum=document.getElementById(summaryId); if(!sum&&parent){sum=document.createElement('div');sum.id=summaryId;sum.className='chart-summary';parent.appendChild(sum)}
-            const avg = intake.length ? Math.round(intake.reduce((a,b)=>a+b,0)/intake.length) : 0; if(sum) sum.innerHTML=`<span>7-day avg: ${avg} kcal</span><span>Target: ${targetVal} kcal</span><span>${avg?Math.round((avg/targetVal)*100):0}% of target</span>`;
-        }
-
-    </script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
     <style>
         /* ================================================================
            1. CSS VARIABLES & THEMES
@@ -1602,7 +1460,7 @@ LOGIN — PREMIUM MAKEOVER
             <label>Your Name</label>
             <input id="loginName" placeholder="e.g. Salah" autocomplete="name" />
             <button class="btn btn-primary btn-lg" onclick="handleSignIn()" style="width:100%;justify-content:center;margin-top:0.5rem;">
-                🚀 Open Command Center
+                🚀 Sign In
             </button>
             <p id="loginStatus" class="text-center mt-1" style="font-size:0.9rem;"></p>
             <div class="text-center mt-2" style="display:flex;gap:0.5rem;justify-content:center;flex-wrap:wrap;">
@@ -3744,5 +3602,171 @@ LOGIN — PREMIUM MAKEOVER
             console.log('✅ NutriFlow v6.0 loaded successfully!');
         });
     </script>
+
+
+<!-- ================================================================
+     NUTRIFLOW PATCH v1.2 — normal login + single training flow
+     ================================================================ -->
+<style>
+    /* Hide the old duplicated dashboard training block. Keep the new top action + Calendar Hub only. */
+    #view-dashboard .card:has(#trainingBtn) {
+        display: none !important;
+    }
+    .hero-command .btn-primary {
+        box-shadow: 0 12px 30px rgba(15,118,110,.22);
+    }
+    #dashboardCalendarHub {
+        margin-top: 1rem;
+    }
+    .dashboard-calendar-grid .calendar-day.just-trained,
+    .family-calendar-grid .calendar-day.just-trained {
+        outline: 3px solid var(--success);
+        outline-offset: 2px;
+        animation: nutriflowPulse 1.1s ease-in-out 2;
+    }
+    @keyframes nutriflowPulse {
+        0%,100% { transform: scale(1); }
+        50% { transform: scale(1.025); }
+    }
+</style>
+<script>
+(function(){
+    function localDateISO(d){
+        const date = d ? new Date(d) : new Date();
+        const y = date.getFullYear();
+        const m = String(date.getMonth()+1).padStart(2,'0');
+        const day = String(date.getDate()).padStart(2,'0');
+        return `${y}-${m}-${day}`;
+    }
+    window.nutriflowLastTrainingDate = '';
+
+    function isKidsProfilePatched(profile) {
+        const age = Number(profile?.Age || profile?.age || 0);
+        const goal = String(profile?.Goal || profile?.goal || '').toLowerCase();
+        const type = String(profile?.Profile_Type || profile?.User_Type || profile?.Profile || '').toLowerCase();
+        return (age > 0 && age < 16) || goal.includes('child') || type.includes('kid') || type.includes('child');
+    }
+
+    window.handleSignIn = async function() {
+        const familyCodeInput = document.getElementById('loginFamilyCode').value.trim();
+        const nameInput = document.getElementById('loginName').value.trim();
+        const statusEl = document.getElementById('loginStatus');
+        if (!familyCodeInput || !nameInput) {
+            statusEl.textContent = 'Please enter Family Code and Name.';
+            statusEl.className = 'error';
+            return;
+        }
+        statusEl.textContent = 'Signing in...';
+        statusEl.className = '';
+        const result = await apiCall('signIn', { familyCode: familyCodeInput, name: nameInput });
+        if (result.success) {
+            familyCode = familyCodeInput;
+            userName = nameInput;
+            userId = result.userId || '';
+            userData = result.userData || {};
+            document.getElementById('loginScreen').classList.add('hidden');
+            document.getElementById('mainApp').classList.remove('hidden');
+            if (typeof safeSetText === 'function') {
+                safeSetText('userNameDisplay', userName);
+                safeSetText('familyCodeDisplay', familyCode);
+            } else {
+                document.getElementById('userNameDisplay').textContent = userName;
+                document.getElementById('familyCodeDisplay').textContent = familyCode;
+            }
+            if (isKidsProfilePatched(userData) && typeof setTheme === 'function') setTheme('kids');
+            else if (typeof loadTheme === 'function') loadTheme();
+            await Promise.allSettled([
+                loadRecipes?.(), loadPlanner?.(), loadProgress?.(), loadShopping?.(),
+                loadFamilyMembers?.(), loadNutritionGuide?.(), loadTrainingCalendar?.(), loadFamilyCalendar?.()
+            ]);
+            await loadDashboardData?.();
+            renderDashboardCalendarHub?.();
+            showToast?.('✅ Signed in successfully.');
+        } else {
+            statusEl.textContent = '❌ ' + (result.error || 'Invalid credentials.');
+            statusEl.className = 'error';
+        }
+    };
+
+    window.openTrainingQuick = function() {
+        const dateEl = document.getElementById('trainingDate');
+        if (dateEl) dateEl.value = localDateISO();
+        const notesEl = document.getElementById('trainingModalNotes');
+        if (notesEl) notesEl.value = '';
+        openModal?.('trainingLogModal');
+    };
+
+    window.toggleTraining = function() {
+        window.openTrainingQuick();
+    };
+
+    function markTrainingInLocalCalendar(trainingDate){
+        if (!Array.isArray(lastUserCalendarData)) lastUserCalendarData = [];
+        const variants = [trainingDate, String(trainingDate || '').slice(0,10)].filter(Boolean);
+        let found = false;
+        lastUserCalendarData = lastUserCalendarData.map(row => {
+            const rowDate = String(row.date || row.Date || '').slice(0,10);
+            if (variants.includes(rowDate)) {
+                found = true;
+                return Object.assign({}, row, { date: rowDate, trained: true, Training: true, activityType: row.activityType || 'training' });
+            }
+            return row;
+        });
+        if (!found) lastUserCalendarData.push({ date: trainingDate, trained: true, Training: true, meals: false, progress: false, activityType:'training' });
+        window.nutriflowLastTrainingDate = trainingDate;
+    }
+
+    const oldBuildDashboardMonthCalendar = window.buildDashboardMonthCalendar;
+    window.buildDashboardMonthCalendar = function(calendarData, isFamily){
+        let html = oldBuildDashboardMonthCalendar ? oldBuildDashboardMonthCalendar(calendarData, isFamily) : '';
+        const d = window.nutriflowLastTrainingDate;
+        if (d) {
+            const day = Number(d.slice(-2));
+            // Add a temporary highlight to the day cell containing the same date number.
+            html = html.replace(new RegExp('(<div class="calendar-day([^"\\]*)"[^>]*>\\s*<span class="num">'+day+'</span>)'), function(m){
+                return m.replace('calendar-day', 'calendar-day just-trained');
+            });
+        }
+        return html;
+    };
+
+    window.submitTrainingLog = async function() {
+        const notes = document.getElementById('trainingModalNotes')?.value.trim() || '';
+        const type = document.getElementById('trainingType')?.value || 'Strength';
+        const duration = parseInt(document.getElementById('trainingDuration')?.value || '45', 10) || 45;
+        const intensity = document.getElementById('trainingIntensity')?.value || 'Moderate';
+        const trainingDate = document.getElementById('trainingDate')?.value || localDateISO();
+        const btn = document.getElementById('trainingSubmitBtn');
+        if (btn) { btn.disabled = true; btn.textContent = 'Saving...'; }
+        const finalNotes = [type, duration + ' min', intensity, notes].filter(Boolean).join(' · ');
+        const result = await apiCall('toggleTraining', { userId, familyCode, trained: true, notes: finalNotes, trainingType:type, duration, intensity, trainingDate });
+        if (btn) { btn.disabled = false; btn.textContent = '✅ Save Training'; }
+        if (!result.success) {
+            showToast?.('❌ ' + (result.error || 'Failed to update training.'), 'error');
+            return;
+        }
+        markTrainingInLocalCalendar(trainingDate);
+        closeModal?.('trainingLogModal');
+        const hiddenBtn = document.getElementById('trainingBtn');
+        if (hiddenBtn) { hiddenBtn.textContent = '✅ Done'; hiddenBtn.classList.add('done'); }
+        const notesInput = document.getElementById('trainingNotes');
+        if (notesInput) notesInput.value = '';
+        const modalNotes = document.getElementById('trainingModalNotes');
+        if (modalNotes) modalNotes.value = '';
+        renderDashboardCalendarHub?.();
+        showToast?.('✅ Training saved and added to Calendar Hub.');
+        await Promise.allSettled([loadDashboardData?.(), loadTrainingCalendar?.(), loadFamilyCalendar?.()]);
+        markTrainingInLocalCalendar(trainingDate);
+        renderDashboardCalendarHub?.();
+    };
+
+    const oldLoadTrainingCalendar = window.loadTrainingCalendar;
+    window.loadTrainingCalendar = async function(){
+        if (oldLoadTrainingCalendar) await oldLoadTrainingCalendar();
+        if (window.nutriflowLastTrainingDate) markTrainingInLocalCalendar(window.nutriflowLastTrainingDate);
+        renderDashboardCalendarHub?.();
+    };
+})();
+</script>
 </body>
 </html>
