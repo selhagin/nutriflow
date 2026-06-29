@@ -5,6 +5,147 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>NutriFlow · Family Nutrition OS</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js">
+    
+
+        // ================================================================
+        //  FINAL CEO POLISH OVERRIDES — working buttons + better UX
+        // ================================================================
+        function isKidsProfile(profile) {
+            const age = Number(profile?.Age || profile?.age || 0);
+            const goal = String(profile?.Goal || profile?.goal || '').toLowerCase();
+            const type = String(profile?.Profile_Type || profile?.User_Type || '').toLowerCase();
+            return (age > 0 && age < 16) || goal.includes('child') || type.includes('kid') || type.includes('child');
+        }
+
+        async function handleSignIn() {
+            const familyCodeInput = document.getElementById('loginFamilyCode').value.trim();
+            const nameInput = document.getElementById('loginName').value.trim();
+            const statusEl = document.getElementById('loginStatus');
+            if (!familyCodeInput || !nameInput) { statusEl.textContent = 'Please enter Family Code and Name.'; statusEl.className = 'error'; return; }
+            statusEl.textContent = 'Opening your command center...'; statusEl.className = '';
+            const result = await apiCall('signIn', { familyCode: familyCodeInput, name: nameInput });
+            if (result.success) {
+                familyCode = familyCodeInput; userName = nameInput; userId = result.userId || ''; userData = result.userData || {};
+                document.getElementById('loginScreen').classList.add('hidden');
+                document.getElementById('mainApp').classList.remove('hidden');
+                safeSetText('userNameDisplay', userName); safeSetText('familyCodeDisplay', familyCode);
+                if (isKidsProfile(userData)) setTheme('kids'); else loadTheme();
+                await Promise.allSettled([loadRecipes(), loadPlanner(), loadProgress(), loadShopping(), loadFamilyMembers(), loadNutritionGuide(), loadTrainingCalendar(), loadFamilyCalendar()]);
+                await loadDashboardData();
+                renderDashboardCalendarHub();
+                showToast('✅ Welcome, ' + userName + '!');
+            } else { statusEl.textContent = '❌ ' + (result.error || 'Invalid credentials.'); statusEl.className = 'error'; }
+        }
+
+        function goToPlanner() { switchView('planner'); setTimeout(() => document.getElementById('plannerGrid')?.scrollIntoView({behavior:'smooth', block:'start'}), 150); }
+        function openTrainingQuick() { const el = document.getElementById('trainingNotes'); if (el) el.value = ''; toggleTraining(); }
+        async function refreshSmartCoach() { showToast('🧠 Refreshing Smart Coach insights...', 'info'); await loadDashboardData(); renderDashboardCalendarHub(); showToast('✅ Insights refreshed'); }
+
+        const originalLoadMealRecipes = loadMealRecipes;
+        async function loadMealRecipes() {
+            if (mealRecipes.__loaded) return;
+            const calls = ['Breakfast','Snack','Lunch','Dinner','Dessert'].map(t => apiCall('getRecipes', { type:'adult', mealType:t }, false).then(result => ({t,result})));
+            const results = await Promise.all(calls);
+            results.forEach(({t,result}) => {
+                if (result.success) {
+                    const key = t === 'Breakfast' ? 'Breakfast_ID' : t === 'Snack' ? 'Snack_1_ID' : t === 'Lunch' ? 'Lunch_ID' : t === 'Dinner' ? 'Dinner_ID' : 'Dessert_ID';
+                    mealRecipes[key] = result.recipes || [];
+                    if (t === 'Snack') mealRecipes['Snack_2_ID'] = result.recipes || [];
+                }
+            });
+            mealRecipes.__loaded = true;
+        }
+
+        function recipeMacroById(id) {
+            const lists = [allRecipes, ...Object.values(mealRecipes || {}).filter(Array.isArray)];
+            for (const list of lists) { const r = (list || []).find(x => x.Recipe_ID === id); if (r) return r; }
+            return null;
+        }
+
+        async function renderPlanner(weekDays) {
+            const grid = document.getElementById('plannerGrid');
+            if (!grid) return;
+            const slots = [
+                { key: 'Breakfast_ID', label: 'Breakfast', icon:'🌅' },{ key: 'Snack_1_ID', label: 'Snack 1', icon:'🍎' },
+                { key: 'Lunch_ID', label: 'Lunch', icon:'🍱' },{ key: 'Snack_2_ID', label: 'Snack 2', icon:'🥕' },
+                { key: 'Dinner_ID', label: 'Dinner', icon:'🌙' },{ key: 'Dessert_ID', label: 'Dessert', icon:'🍮' },
+            ];
+            let html = '';
+            weekDays.forEach(day => {
+                const pretty = new Date(day.date + 'T12:00:00').toLocaleDateString('en', { month:'short', day:'numeric' });
+                let totalCal = 0, totalProtein = 0;
+                html += `<div class="day-card"><div class="day-label"><span>${escapeHtml(day.label.split(',')[0] || day.label)}</span><span class="day-date">${escapeHtml(pretty)}</span></div>`;
+                slots.forEach(slot => {
+                    const val = plannerData[day.date]?.[slot.key] || '';
+                    const rec = recipeMacroById(val); if (rec) { totalCal += Number(rec.Calories || 0); totalProtein += Number(rec.Protein_g || 0); }
+                    html += `<div class="meal-row"><label>${slot.icon} ${escapeHtml(slot.label)}</label><select onchange="plannerData['${day.date}']['${slot.key}']=this.value; renderDashboardCalendarHub(); renderPlanner(getWeekDays());"><option value="">Choose meal</option>`;
+                    (mealRecipes[slot.key] || []).forEach(r => { html += `<option value="${escapeHtml(r.Recipe_ID)}" ${r.Recipe_ID === val ? 'selected' : ''}>${escapeHtml(r.Recipe_Name)}${r.Calories ? ' · ' + r.Calories + ' kcal' : ''}</option>`; });
+                    html += `</select></div>`;
+                });
+                html += `<div class="planner-day-total">${Math.round(totalCal)} kcal · ${Math.round(totalProtein)}g protein</div></div>`;
+            });
+            grid.innerHTML = html;
+        }
+
+        async function submitTrainingLog() {
+            const notes = document.getElementById('trainingModalNotes').value.trim();
+            const type = document.getElementById('trainingType').value;
+            const duration = parseInt(document.getElementById('trainingDuration').value, 10) || 45;
+            const intensity = document.getElementById('trainingIntensity').value;
+            const trainingDate = document.getElementById('trainingDate').value || new Date().toISOString().slice(0, 10);
+            const btn = document.getElementById('trainingSubmitBtn');
+            if (btn) { btn.disabled = true; btn.textContent = 'Saving...'; }
+            const finalNotes = [type, duration + ' min', intensity, notes].filter(Boolean).join(' · ');
+            let result = await apiCall('toggleTraining', { userId, familyCode, trained: true, notes: finalNotes, trainingType:type, duration, intensity, trainingDate });
+            if (!result.success) result = await apiCall('toggleTraining', { userId, familyCode, trained: true, notes: finalNotes });
+            if (btn) { btn.disabled = false; btn.textContent = '✅ Save Training'; }
+            if (result.success) {
+                const existing = (lastUserCalendarData || []).find(x => x.date === trainingDate);
+                if (existing) existing.trained = true; else lastUserCalendarData.push({date: trainingDate, trained:true, meals:false, progress:false});
+                closeModal('trainingLogModal'); showToast('✅ Training logged and added to calendar');
+                const tb = document.getElementById('trainingBtn'); if (tb) { tb.textContent = '✅ Done'; tb.classList.add('done'); }
+                document.getElementById('trainingNotes').value = ''; document.getElementById('trainingModalNotes').value = '';
+                await Promise.allSettled([loadDashboardData(), loadTrainingCalendar(), loadFamilyCalendar()]); renderDashboardCalendarHub();
+            } else showToast('❌ ' + (result.error || 'Failed to update training.'), 'error');
+        }
+
+        const originalOpenRecipeDetailFinal = openRecipeDetail;
+        async function openRecipeDetail(recipeId) {
+            const card = event?.currentTarget; if (card) card.classList.add('loading-fast');
+            await originalOpenRecipeDetailFinal(recipeId);
+            if (card) card.classList.remove('loading-fast');
+            const content = document.getElementById('recipeModalContent');
+            if (content && !document.getElementById('recipeLogMealType')) {
+                content.insertAdjacentHTML('afterbegin', `<div class="recipe-log-panel"><div><label>Log as meal</label><select id="recipeLogMealType"><option>Breakfast</option><option>Snack</option><option>Lunch</option><option>Dinner</option><option>Dessert</option></select></div><div><label>Servings</label><input id="recipeLogServings" type="number" min="0.25" step="0.25" value="1"></div></div>`);
+                const rec = allRecipes.find(r => r.Recipe_ID === recipeId);
+                if (rec?.Meal_Type) document.getElementById('recipeLogMealType').value = rec.Meal_Type;
+            }
+        }
+
+        function chartColor(varName) { return getComputedStyle(document.documentElement).getPropertyValue(varName).trim() || '#0F766E'; }
+        function renderWeightChart(history) {
+            const canvas = document.getElementById('weightChart'); if (!canvas || !window.Chart) return; const ctx = canvas.getContext('2d'); if (weightChart) weightChart.destroy();
+            const range = document.getElementById('chartRange')?.value || '30';
+            let filtered = Array.isArray(history) ? history : []; if (range !== 'all') filtered = filtered.slice(-parseInt(range));
+            const labels = filtered.map(h => h.Date || h.date || ''); const data = filtered.map(h => parseFloat(h.Weight_kg || h.weight || h.Weight) || 0).filter(x=>x>0);
+            const labelData = filtered.map(h => parseFloat(h.Weight_kg || h.weight || h.Weight) || null);
+            weightChart = new Chart(ctx,{type:'line',data:{labels,datasets:[{label:'Weight (kg)',data:labelData,borderColor:chartColor('--primary'),backgroundColor:'rgba(20,184,166,.12)',fill:true,tension:.38,pointRadius:4,pointHoverRadius:6}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{mode:'index',intersect:false}},scales:{x:{grid:{display:false}},y:{beginAtZero:false,grid:{color:'rgba(148,163,184,.18)'}}}});
+            const parent = canvas.closest('.card'); if (parent && !parent.classList.contains('chart-card-premium')) parent.classList.add('chart-card-premium');
+            const summaryId='weightChartSummary'; let sum=document.getElementById(summaryId); if(!sum&&parent){sum=document.createElement('div');sum.id=summaryId;sum.className='chart-summary';parent.appendChild(sum)}
+            if(sum){ const first=data[0], last=data[data.length-1], change=(first&&last)?(last-first):0; sum.innerHTML=data.length?`<span>Latest: ${last.toFixed(1)} kg</span><span>Change: ${change>0?'+':''}${change.toFixed(1)} kg</span>`:'<span>No weight entries yet</span>'; }
+        }
+
+        function renderCalorieChart(history) {
+            const canvas = document.getElementById('calorieChart'); if (!canvas || !window.Chart) return; const ctx = canvas.getContext('2d'); if (calorieChart) calorieChart.destroy();
+            const records = Array.isArray(history) ? history.slice(-7) : []; const labels = records.map((h,i)=>h.Date || h.date || ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'][i] || '');
+            while(labels.length<7) labels.unshift(''); const intake = records.map(h => parseInt(h.calories || h.Calories || h.dailyCalories) || 0); while(intake.length<7) intake.unshift(0);
+            const targetVal = parseInt(userData.Target_Calories) || 2000;
+            calorieChart = new Chart(ctx,{data:{labels,datasets:[{type:'bar',label:'Intake',data:intake,backgroundColor:chartColor('--primary'),borderRadius:10},{type:'line',label:'Target',data:new Array(7).fill(targetVal),borderColor:chartColor('--secondary'),backgroundColor:'rgba(245,158,11,.18)',borderWidth:3,pointRadius:0,tension:.2}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:true,labels:{boxWidth:10}}},scales:{x:{grid:{display:false}},y:{grid:{color:'rgba(148,163,184,.18)'}}}});
+            const parent = canvas.closest('.card'); if (parent && !parent.classList.contains('chart-card-premium')) parent.classList.add('chart-card-premium');
+            const summaryId='calorieChartSummary'; let sum=document.getElementById(summaryId); if(!sum&&parent){sum=document.createElement('div');sum.id=summaryId;sum.className='chart-summary';parent.appendChild(sum)}
+            const avg = intake.length ? Math.round(intake.reduce((a,b)=>a+b,0)/intake.length) : 0; if(sum) sum.innerHTML=`<span>7-day avg: ${avg} kcal</span><span>Target: ${targetVal} kcal</span><span>${avg?Math.round((avg/targetVal)*100):0}% of target</span>`;
+        }
+
     </script>
     <style>
         /* ================================================================
@@ -1407,6 +1548,25 @@
                 border-color: #000 !important;
             }
         }
+    
+
+/* ================================================================
+   FINAL CEO POLISH — login, planner, dashboard, family calendar
+   ================================================================ */
+.login-shell{min-height:100vh;display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden;padding:2rem;background:radial-gradient(circle at top left,rgba(20,184,166,.22),transparent 32%),radial-gradient(circle at bottom right,rgba(245,158,11,.18),transparent 34%),var(--bg-primary);}
+.login-orb{position:absolute;border-radius:999px;filter:blur(6px);opacity:.55;pointer-events:none}.login-orb-one{width:260px;height:260px;background:var(--primary-light);top:8%;left:7%;}.login-orb-two{width:320px;height:320px;background:var(--secondary);right:5%;bottom:5%;opacity:.18}
+.login-panel{width:min(1050px,100%);display:grid;grid-template-columns:1.25fr .85fr;gap:1.25rem;align-items:stretch}.login-brand-side{background:linear-gradient(135deg,rgba(15,118,110,.92),rgba(37,99,235,.72));color:white;border-radius:2rem;padding:2rem;box-shadow:var(--shadow-lg);position:relative;overflow:hidden}.login-brand-side:after{content:"";position:absolute;inset:auto -80px -120px auto;width:360px;height:360px;border-radius:999px;background:rgba(255,255,255,.14)}.login-brand-side h1{color:white;font-size:3.5rem;letter-spacing:-.08em;margin:.4rem 0}.brand-pill{display:inline-flex;background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.25);padding:.35rem .8rem;border-radius:999px;font-weight:800;font-size:.8rem}.login-subtitle{font-size:1.05rem;max-width:620px;color:rgba(255,255,255,.88);line-height:1.65}.login-feature-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:.8rem;margin-top:2rem;position:relative;z-index:1}.login-feature-grid div{background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.18);border-radius:1.1rem;padding:.9rem}.login-feature-grid strong{display:block;margin-bottom:.25rem}.login-feature-grid span{display:block;color:rgba(255,255,255,.78);font-size:.82rem}.premium-login-card{margin:0;max-width:none;border-radius:2rem;padding:2rem;backdrop-filter:blur(14px)}.login-logo-mark{width:64px;height:64px;border-radius:1.25rem;margin:0 auto .75rem;background:linear-gradient(135deg,var(--primary),var(--secondary));color:#fff;display:grid;place-items:center;font-weight:900;font-size:1.25rem;box-shadow:0 16px 35px rgba(15,118,110,.24)}
+@media(max-width:850px){.login-panel{grid-template-columns:1fr}.login-brand-side h1{font-size:2.6rem}.login-feature-grid{grid-template-columns:1fr}.login-shell{padding:1rem}}
+.hero-command{background:linear-gradient(135deg,var(--bg-card),var(--primary-bg));border:1px solid var(--border-color);border-radius:1.6rem;padding:1.25rem;box-shadow:var(--shadow-lg);margin-bottom:1rem}.hero-kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:.75rem;margin-top:1rem}.hero-kpi{background:var(--bg-card);border:1px solid var(--border-color);border-radius:1rem;padding:.9rem;box-shadow:var(--shadow)}.hero-kpi .label{font-size:.68rem;text-transform:uppercase;letter-spacing:.07em;color:var(--text-muted);font-weight:800}.hero-kpi .value{font-size:1.25rem;font-weight:900;margin-top:.25rem;color:var(--text-primary)}@media(max-width:850px){.hero-kpis{grid-template-columns:repeat(2,1fr)}}@media(max-width:520px){.hero-kpis{grid-template-columns:1fr}}
+/* remove duplicate old compact calendar below training */
+#view-dashboard .calendar-compact{display:none!important}.training-action-card{border:2px solid rgba(20,184,166,.18);background:linear-gradient(135deg,var(--bg-card),rgba(20,184,166,.07))}.training-action-card input{min-height:42px}
+.chart-container{height:240px}.chart-card-premium{position:relative;overflow:hidden}.chart-card-premium:before{content:"";position:absolute;right:-60px;top:-60px;width:160px;height:160px;border-radius:999px;background:var(--primary-bg);opacity:.7}.chart-summary{display:flex;gap:.5rem;flex-wrap:wrap;margin-top:.65rem}.chart-summary span{background:var(--bg-input);border:1px solid var(--border-color);border-radius:999px;padding:.25rem .65rem;font-size:.75rem;color:var(--text-secondary)}
+.week-grid{grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:1rem}.day-card{border-radius:1.25rem;padding:1rem;background:linear-gradient(180deg,var(--bg-card),var(--bg-input));box-shadow:var(--shadow);position:relative;overflow:hidden}.day-card:before{content:"";position:absolute;inset:0 0 auto 0;height:5px;background:linear-gradient(90deg,var(--primary),var(--secondary))}.day-card .day-label{display:flex;justify-content:space-between;align-items:center;font-size:.9rem;margin-bottom:.65rem}.day-card .day-label .day-date{color:var(--text-muted);font-size:.72rem}.meal-row{background:var(--bg-card);border:1px solid var(--border-color);border-radius:.85rem;padding:.45rem;margin-bottom:.45rem}.meal-row label{font-size:.65rem}.meal-row select{font-size:.78rem;padding:.35rem;border-radius:.65rem}.planner-day-total{margin-top:.55rem;padding:.45rem .55rem;border-radius:.8rem;background:var(--primary-bg);color:var(--primary);font-size:.75rem;font-weight:800;text-align:center}
+.recipe-card{border-radius:1.25rem}.recipe-card.loading-fast{opacity:.7}.recipe-log-panel{display:grid;grid-template-columns:1fr 110px;gap:.6rem;background:var(--bg-input);border:1px solid var(--border-color);border-radius:1rem;padding:.75rem;margin:.75rem 0}.recipe-log-panel label{font-size:.65rem}.quality-badge{display:inline-flex;margin:.15rem .2rem .15rem 0;background:var(--primary-bg);color:var(--primary);border-radius:999px;padding:.2rem .55rem;font-size:.72rem;font-weight:800}
+.dashboard-calendar-card{border-radius:1.6rem}.dashboard-calendar-grid .calendar-day{min-height:96px}.calendar-pill{display:block;margin-top:.18rem;border-radius:999px;padding:.12rem .35rem;font-size:.62rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.pill-training{background:rgba(22,163,74,.12);color:var(--success)}.pill-meal{background:rgba(37,99,235,.12);color:var(--accent)}.pill-progress{background:rgba(245,158,11,.16);color:var(--warning)}
+.family-calendar-grid{max-width:100%;background:var(--bg-input);border-radius:1.25rem;padding:.75rem;border:1px solid var(--border-color)}.family-calendar-grid .calendar-day{min-height:78px;aspect-ratio:auto;align-items:flex-start;justify-content:flex-start;padding:.35rem;flex-direction:column}.family-calendar-grid .day-label{font-size:.7rem;background:transparent}.family-member-chip{display:inline-flex;align-items:center;gap:.3rem;background:var(--primary-bg);color:var(--primary);border-radius:999px;padding:.22rem .55rem;margin:.12rem;font-size:.75rem;font-weight:800}
+@media print{.print-calendar-only body,.print-planner-only body{background:#fff!important}.print-calendar-only #mainApp>*:not(#view-dashboard),.print-calendar-only header,.print-calendar-only nav,.print-calendar-only .hero-command,.print-calendar-only #view-dashboard>.grid-3,.print-calendar-only #view-dashboard>.card:not(#dashboardCalendarHub),.print-calendar-only .no-print{display:none!important}.print-calendar-only #dashboardCalendarHub{display:block!important;box-shadow:none!important;border:1px solid #999!important}.print-calendar-only .dashboard-calendar-grid .calendar-day{min-height:115px!important;color:#111!important}.print-planner-only header,.print-planner-only nav,.print-planner-only #view-dashboard,.print-planner-only #view-recipes,.print-planner-only #view-progress,.print-planner-only #view-shopping,.print-planner-only #view-family,.print-planner-only #view-nutrition,.print-planner-only #view-settings,.print-planner-only .no-print{display:none!important}.print-planner-only #view-planner{display:block!important}.print-planner-only .week-grid{grid-template-columns:repeat(7,1fr)!important;gap:.35rem!important}.print-planner-only .day-card{box-shadow:none!important;border:1px solid #aaa!important;padding:.45rem!important}.print-planner-only select{border:0!important;appearance:none!important;background:white!important;padding:0!important;font-size:.65rem!important}.print-planner-only .meal-row{padding:.25rem!important}.print-planner-only body{padding:.35in!important}}
+
     </style>
 </head>
 <body>
@@ -1414,21 +1574,35 @@
         <div id="toast" class="toast hidden"></div>
 
         <!-- =============================================================
-LOGIN
+LOGIN — PREMIUM MAKEOVER
 ============================================================= -->
-<div id="loginScreen" class="container">
-    <div class="login-card">
-        <div class="text-center">
-            <h1 style="font-size:2.5rem;">NutriFlow</h1>
-            <p class="text-muted" style="margin-bottom:1.5rem;">Family Nutrition OS</p>
+<div id="loginScreen" class="login-shell">
+    <div class="login-orb login-orb-one"></div>
+    <div class="login-orb login-orb-two"></div>
+    <div class="login-panel">
+        <div class="login-brand-side">
+            <div class="brand-pill">Family Nutrition OS</div>
+            <h1>NutriFlow</h1>
+            <p class="login-subtitle">Plan meals, log training, track progress, and keep the whole family aligned from one clean command center.</p>
+            <div class="login-feature-grid">
+                <div><strong>📅 Weekly Planner</strong><span>Family-ready meal schedule</span></div>
+                <div><strong>💪 Fitness Logs</strong><span>Training, streaks, and progress</span></div>
+                <div><strong>🧠 Smart Coach</strong><span>Simple daily recommendations</span></div>
+                <div><strong>👨‍👩‍👧 Family View</strong><span>One consolidated calendar</span></div>
+            </div>
         </div>
-        <div>
+        <div class="login-card premium-login-card">
+            <div class="text-center">
+                <div class="login-logo-mark">NF</div>
+                <h2 style="margin-bottom:0.25rem;">Welcome back</h2>
+                <p class="text-muted" style="margin-bottom:1.25rem;">Use your Family Code and Name to continue.</p>
+            </div>
             <label>Family Code</label>
-            <input id="loginFamilyCode" placeholder="e.g. HAGIN" />
+            <input id="loginFamilyCode" placeholder="e.g. HAGIN" autocomplete="organization" />
             <label>Your Name</label>
-            <input id="loginName" placeholder="e.g. Salah" />
+            <input id="loginName" placeholder="e.g. Salah" autocomplete="name" />
             <button class="btn btn-primary btn-lg" onclick="handleSignIn()" style="width:100%;justify-content:center;margin-top:0.5rem;">
-                🚀 Sign In
+                🚀 Open Command Center
             </button>
             <p id="loginStatus" class="text-center mt-1" style="font-size:0.9rem;"></p>
             <div class="text-center mt-2" style="display:flex;gap:0.5rem;justify-content:center;flex-wrap:wrap;">
@@ -1497,7 +1671,7 @@ LOGIN
                             <h2 style="margin-bottom:0.25rem;">NutriFlow Command Center</h2>
                             <p class="text-muted">A family nutrition OS built for daily decisions, progress visibility, and long-term health habits.</p>
                         </div>
-                        <button class="btn btn-secondary btn-sm" onclick="switchView('planner')">Plan This Week →</button>
+                        <div class="flex" style="gap:0.5rem;"><button class="btn btn-secondary btn-sm" onclick="goToPlanner()">Plan This Week →</button><button class="btn btn-primary btn-sm" onclick="openTrainingQuick()">💪 Log Training</button></div>
                     </div>
                     <div class="hero-kpis">
                         <div class="hero-kpi"><div class="label">Today Score</div><div class="value" id="heroTodayScore">--</div></div>
@@ -1587,7 +1761,7 @@ LOGIN
                             <div class="stat-label">🧠 Smart Coach Snapshot</div>
                             <h3 style="margin-top:0.2rem;">What the system should tell you today</h3>
                         </div>
-                        <button class="btn btn-outline btn-sm" onclick="loadDashboardData()">Refresh Insights</button>
+                        <button class="btn btn-outline btn-sm" onclick="refreshSmartCoach()">Refresh Insights</button>
                     </div>
                     <div class="insight-panel">
                         <div class="insight-card"><strong id="insightNutritionTitle">Nutrition</strong><p id="insightNutritionText">Waiting for today’s data.</p></div>
