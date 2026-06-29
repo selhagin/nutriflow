@@ -1466,6 +1466,7 @@ LOGIN — PREMIUM MAKEOVER
             <div class="text-center mt-2" style="display:flex;gap:0.5rem;justify-content:center;flex-wrap:wrap;">
                 <button class="btn btn-outline btn-sm" onclick="showCreateProfile()">Create Profile</button>
                 <button class="btn btn-secondary btn-sm" onclick="showCreateFamily()">+ New Family</button>
+                <button class="btn btn-outline btn-sm guest-recipes-btn" onclick="continueAsGuestRecipes()">👀 Guest Recipes Only</button>
             </div>
         </div>
     </div>
@@ -3768,5 +3769,105 @@ LOGIN — PREMIUM MAKEOVER
     };
 })();
 </script>
+
+
+<!-- ================================================================
+     NUTRIFLOW PATCH v1.3 — guest recipe-only mode
+     ================================================================ -->
+<style>
+    .guest-recipes-btn {
+        width: 100%;
+        justify-content: center;
+        margin-top: .25rem;
+        border-color: var(--primary-light);
+        background: rgba(20,184,166,.08);
+    }
+    body.guest-mode .nav button:not([data-view="recipes"]),
+    body.guest-mode .hero-command,
+    body.guest-mode #mainApp header .flex:last-child span,
+    body.guest-mode #mainApp header .flex:first-child span {
+        display: none !important;
+    }
+    body.guest-mode #view-recipes::before {
+        content: "Guest Mode · Recipe Library Only";
+        display: inline-flex;
+        margin: 0 0 1rem 0;
+        padding: .45rem .8rem;
+        border-radius: 999px;
+        background: var(--primary-bg);
+        color: var(--primary);
+        font-weight: 800;
+        font-size: .78rem;
+        letter-spacing: .02em;
+    }
+    body.guest-mode #recipeModalLogBtn,
+    body.guest-mode [onclick="logRecipeFromModal()"] {
+        display: none !important;
+    }
+</style>
+<script>
+(function(){
+    window.isGuestMode = false;
+
+    function setGuestRecipeOnlyUI(){
+        document.body.classList.add('guest-mode');
+        document.querySelectorAll('[id^="view-"]').forEach(el => el.classList.add('hidden'));
+        const recipesView = document.getElementById('view-recipes');
+        if (recipesView) recipesView.classList.remove('hidden');
+        document.querySelectorAll('.nav button').forEach(btn => {
+            btn.classList.toggle('active', btn.dataset.view === 'recipes');
+        });
+        const nameEl = document.getElementById('userNameDisplay');
+        if (nameEl) nameEl.textContent = 'Guest';
+        const familyEl = document.getElementById('familyCodeDisplay');
+        if (familyEl) familyEl.textContent = 'Recipes Only';
+    }
+
+    window.continueAsGuestRecipes = async function(){
+        window.isGuestMode = true;
+        userId = 'guest';
+        userName = 'Guest';
+        familyCode = 'GUEST';
+        userData = { Name: 'Guest', Profile_Type: 'Guest' };
+        const statusEl = document.getElementById('loginStatus');
+        if (statusEl) {
+            statusEl.textContent = 'Opening recipe library...';
+            statusEl.className = '';
+        }
+        document.getElementById('loginScreen')?.classList.add('hidden');
+        document.getElementById('mainApp')?.classList.remove('hidden');
+        if (typeof loadTheme === 'function') loadTheme();
+        setGuestRecipeOnlyUI();
+        try {
+            await loadRecipes?.();
+            filterRecipes?.();
+            showToast?.('👀 Guest mode: recipes only.');
+        } catch (err) {
+            console.error(err);
+            showToast?.('Recipes could not load. Please try signing in.', 'error');
+        }
+    };
+
+    const previousSwitchView = window.switchView;
+    window.switchView = function(view){
+        if (window.isGuestMode && view !== 'recipes') {
+            showToast?.('Guest mode can view recipes only.', 'info');
+            view = 'recipes';
+        }
+        if (previousSwitchView) previousSwitchView(view);
+        if (window.isGuestMode) setGuestRecipeOnlyUI();
+    };
+
+    const previousLogout = window.handleLogout;
+    window.handleLogout = function(){
+        window.isGuestMode = false;
+        document.body.classList.remove('guest-mode');
+        if (previousLogout) return previousLogout();
+        document.getElementById('loginScreen')?.classList.remove('hidden');
+        document.getElementById('mainApp')?.classList.add('hidden');
+    };
+})();
+</script>
+
 </body>
 </html>
