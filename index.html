@@ -4165,6 +4165,147 @@ body.guest-mode .guest-only-note{display:block!important;}
 })();
 </script>
 
+
+
+<!-- =====================================================================
+     NUTRIFLOW V3.1 FINAL STABILITY LOCK
+     Fixes: single calendar tab row, reliable training recording, cleaner
+     calendar view, and safer print without touching recipe/planner data.
+     ===================================================================== -->
+<style id="nf-v31-final-style">
+/* Keep one calendar control row only: the original toolbar row */
+#dashboardCalendarHub .nf-cal-tabs{display:none!important;}
+#dashboardCalendarHub .calendar-toolbar{display:flex!important;justify-content:space-between!important;align-items:flex-start!important;gap:1rem!important;flex-wrap:wrap!important;}
+#dashboardCalendarHub .calendar-mode-tabs{display:flex!important;gap:.45rem!important;flex-wrap:wrap!important;}
+#dashboardCalendarHub .calendar-mode-tabs button{border-radius:999px!important;padding:.55rem 1rem!important;font-weight:900!important;border:1px solid var(--border-color)!important;background:var(--bg-input)!important;color:var(--text-secondary)!important;box-shadow:none!important;}
+#dashboardCalendarHub .calendar-mode-tabs button.active{background:var(--primary)!important;color:#fff!important;border-color:var(--primary)!important;}
+#dashboardCalendarHub .btn-outline{border-radius:999px!important;}
+#dashboardCalendarHub{padding:1.35rem!important;border-radius:1.5rem!important;}
+#dashboardCalendarTitle{margin:.35rem 0 1rem!important;color:var(--text-secondary)!important;}
+.dashboard-calendar-grid.nf-month-grid{display:grid!important;grid-template-columns:repeat(7,minmax(0,1fr))!important;gap:.42rem!important;}
+.dashboard-calendar-grid .nf-day-name,.dashboard-calendar-grid .day-label{font-size:.66rem!important;font-weight:1000!important;text-align:center!important;color:var(--text-muted)!important;letter-spacing:.05em!important;text-transform:uppercase!important;}
+.dashboard-calendar-grid .nf-cal-day{min-height:96px!important;border-radius:1rem!important;border:1px solid var(--border-color)!important;background:var(--bg-input)!important;padding:.55rem!important;}
+.dashboard-calendar-grid .nf-cal-day.today{outline:2px solid var(--primary)!important;background:var(--primary-bg)!important;}
+.nf-pill{display:inline-block!important;margin-top:.2rem!important;}
+.nf-training-recent-table{width:100%;border-collapse:collapse;margin-top:.75rem}.nf-training-recent-table th,.nf-training-recent-table td{border-bottom:1px solid var(--border-color);padding:.45rem;text-align:left;font-size:.85rem}.nf-training-recent-table th{color:var(--text-muted);font-size:.68rem;text-transform:uppercase;letter-spacing:.05em}.nf-training-actions{display:flex;gap:.5rem;justify-content:space-between;align-items:center;flex-wrap:wrap;margin-top:1rem}
+@media print{body.nf-printing #dashboardCalendarHub .calendar-mode-tabs,body.nf-printing #dashboardCalendarHub .btn,body.nf-printing .no-print{display:none!important}}
+</style>
+<script id="nf-v31-final-training-calendar-fix">
+(function(){
+  'use strict';
+  const $ = (id)=>document.getElementById(id);
+  const qsa = (s,root=document)=>Array.from(root.querySelectorAll(s));
+  const esc = (v)=>String(v==null?'':v).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+  const todayISO = ()=>new Date().toISOString().slice(0,10);
+  const dateOnly = (v)=>{ if(!v) return ''; try{return new Date(v).toISOString().slice(0,10)}catch(e){return String(v).slice(0,10)} };
+  const readLS = (k,d)=>{try{const v=localStorage.getItem(k);return v?JSON.parse(v):d}catch(e){return d}};
+  const writeLS = (k,v)=>{try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}};
+  const getRaw = (k)=>{try{return localStorage.getItem(k)||''}catch(e){return ''}};
+  const familyCode = ()=> getRaw('familyCode') || window.familyCode || window.__familyCode || 'family';
+  const userId = ()=> getRaw('userId') || window.userId || window.__userId || 'user';
+  const userName = ()=> getRaw('userName') || window.userName || window.__userName || 'User';
+  const trainKey = ()=> 'nf_v3_training_' + (familyCode()||'family') + '_' + (userId()||'user');
+  const getTrain = ()=> readLS(trainKey(),[]);
+  const setTrain = (arr)=> writeLS(trainKey(),arr||[]);
+  function toast(msg,type){ if(typeof showToast==='function') showToast(msg,type||'success'); else console.log(msg); }
+  function callApi(action,payload){
+    if(typeof apiCall==='function') return apiCall(action,payload||{},false).catch(e=>({success:false,error:e.message}));
+    return Promise.resolve({success:false,error:'apiCall missing'});
+  }
+  function removeExtraCalendarTabs(){ qsa('#dashboardCalendarHub .nf-cal-tabs').forEach(el=>el.remove()); }
+  window.ensureCalendarTabs = removeExtraCalendarTabs;
+  function refreshCalendar(mode){
+    removeExtraCalendarTabs();
+    if(typeof window.renderCalendarHubV3==='function') window.renderCalendarHubV3(mode||window.nfCalendarMode||'my');
+    else if(typeof window.renderDashboardCalendarHub==='function') window.renderDashboardCalendarHub();
+    removeExtraCalendarTabs();
+    qsa('#dashboardCalendarHub [data-dash-cal]').forEach(btn=>{
+      const m=btn.getAttribute('data-dash-cal');
+      btn.onclick=function(){ window.nfCalendarMode=m; refreshCalendar(m); };
+    });
+  }
+  function upsertCalendarMarker(entry){
+    const key='lastUserCalendarData';
+    const existing=readLS(key,[]);
+    const filtered=Array.isArray(existing)?existing.filter(x=>dateOnly(x.date||x.Date)!==entry.date):[];
+    filtered.push({date:entry.date,trained:true,training:true,meals:false,progress:false,notes:entry.notes||entry.type||'Training'});
+    writeLS(key,filtered);
+    window.lastUserCalendarData=filtered;
+  }
+  function removeCalendarMarker(date){
+    const key='lastUserCalendarData';
+    const existing=readLS(key,[]);
+    const filtered=Array.isArray(existing)?existing.filter(x=>dateOnly(x.date||x.Date)!==date):[];
+    writeLS(key,filtered);
+    window.lastUserCalendarData=filtered;
+  }
+  function trainingRows(){
+    const rows=getTrain().slice().sort((a,b)=>String(b.date).localeCompare(String(a.date))).slice(0,7);
+    if(!rows.length) return '<tr><td colspan="5" class="text-muted">No training logged yet.</td></tr>';
+    return rows.map(t=>'<tr><td>'+esc(dateOnly(t.date))+'</td><td>'+esc(t.type||'Training')+'</td><td>'+esc(t.duration||'')+' min</td><td>'+esc(t.intensity||'')+'</td><td><button class="btn btn-danger btn-sm" onclick="deleteTrainingV31(\''+esc(t.id)+'\')">Delete</button></td></tr>').join('');
+  }
+  window.openTrainingModalV31 = function(){
+    let m=$('nfTrainingModal');
+    if(!m){ m=document.createElement('div'); m.id='nfTrainingModal'; m.className='modal-overlay'; document.body.appendChild(m); }
+    m.innerHTML='<div class="modal-box"><button class="close-btn no-print" onclick="closeModal(\'nfTrainingModal\')">✕</button><h2>💪 Log Training</h2><p class="text-muted">Save training here and it will appear immediately in the Calendar Hub. It also sends the update to Google Sheets.</p><div class="nf-form-grid"><div><label>Date</label><input id="nfTrainDate" type="date" value="'+todayISO()+'"></div><div><label>Training Type</label><select id="nfTrainType"><option>Strength Training</option><option>Upper Body</option><option>Lower Body</option><option>Full Body</option><option>Cardio</option><option>Walk</option><option>Mobility</option><option>Sport</option></select></div><div><label>Duration (minutes)</label><input id="nfTrainDuration" type="number" min="1" value="45"></div><div><label>Intensity</label><select id="nfTrainIntensity"><option>Easy</option><option selected>Moderate</option><option>Hard</option></select></div><div class="full"><label>Notes</label><input id="nfTrainNotes" placeholder="Chest & back, treadmill, legs, etc."></div></div><div class="nf-training-actions"><button class="btn btn-outline" onclick="undoTrainingTodayV31()">↩️ Undo Today</button><div class="flex"><button class="btn btn-outline" onclick="closeModal(\'nfTrainingModal\')">Cancel</button><button class="btn btn-primary" onclick="saveTrainingV31()">✅ Save Training</button></div></div><h3>Recent Training</h3><table class="nf-training-recent-table"><thead><tr><th>Date</th><th>Type</th><th>Duration</th><th>Intensity</th><th></th></tr></thead><tbody>'+trainingRows()+'</tbody></table></div>';
+    m.classList.add('open');
+  };
+  async function syncTraining(entry, trained){
+    const payload={userId:userId(),familyCode:familyCode(),userName:userName(),name:userName(),trained:!!trained,date:entry.date,trainingDate:entry.date,trainingType:entry.type||'',type:entry.type||'',duration:entry.duration||'',intensity:entry.intensity||'',notes:[entry.type,entry.duration?entry.duration+' min':'',entry.intensity,entry.notes].filter(Boolean).join(' · ')};
+    const r1=await callApi('toggleTraining',payload);
+    // Some backends use a separate log action. This is harmless if not implemented.
+    callApi('logTraining',payload);
+    return r1;
+  }
+  window.saveTrainingV31 = async function(){
+    const entry={id:'TR'+Date.now(),date:($('nfTrainDate')?.value||todayISO()),type:($('nfTrainType')?.value||'Training'),duration:($('nfTrainDuration')?.value||45),intensity:($('nfTrainIntensity')?.value||''),notes:($('nfTrainNotes')?.value||'')};
+    const list=getTrain().filter(x=>!(dateOnly(x.date)===entry.date && (x.type||'')===entry.type));
+    list.push(entry); setTrain(list); upsertCalendarMarker(entry);
+    if(typeof closeModal==='function') closeModal('nfTrainingModal');
+    refreshCalendar('my');
+    toast('✅ Training saved and shown in Calendar Hub');
+    const result=await syncTraining(entry,true);
+    if(result && result.success===false) toast('Training shown locally, but Google Sheets did not confirm: '+(result.error||'check backend action'), 'error');
+    if(typeof loadDashboardData==='function') setTimeout(()=>loadDashboardData(),300);
+  };
+  window.deleteTrainingV31 = async function(id){
+    const list=getTrain(); const entry=list.find(x=>x.id===id); setTrain(list.filter(x=>x.id!==id));
+    if(entry) removeCalendarMarker(dateOnly(entry.date));
+    refreshCalendar('my');
+    window.openTrainingModalV31();
+    if(entry) await syncTraining({...entry,date:dateOnly(entry.date)},false);
+    toast('Training deleted');
+  };
+  window.undoTrainingTodayV31 = async function(){
+    const d=todayISO(); const removed=getTrain().filter(x=>dateOnly(x.date)===d); setTrain(getTrain().filter(x=>dateOnly(x.date)!==d)); removeCalendarMarker(d);
+    if(typeof closeModal==='function') closeModal('nfTrainingModal');
+    refreshCalendar('my');
+    await syncTraining({date:d,type:'Training'},false);
+    toast('↩️ Today training removed');
+  };
+  window.openTrainingQuick=window.openTrainingModalV31;
+  window.toggleTraining=window.openTrainingModalV31;
+  window.openTrainingModalV3=window.openTrainingModalV31;
+  window.saveTrainingV3=window.saveTrainingV31;
+  window.undoTrainingTodayV3=window.undoTrainingTodayV31;
+  function wire(){
+    removeExtraCalendarTabs();
+    qsa('button').forEach(b=>{
+      const t=(b.textContent||'').toLowerCase();
+      if(t.includes('log training')) b.onclick=window.openTrainingModalV31;
+    });
+    qsa('#dashboardCalendarHub [data-dash-cal]').forEach(btn=>{
+      const mode=btn.getAttribute('data-dash-cal');
+      btn.onclick=function(){ window.nfCalendarMode=mode; refreshCalendar(mode); };
+    });
+    refreshCalendar(window.nfCalendarMode||'my');
+  }
+  document.addEventListener('DOMContentLoaded',()=>setTimeout(wire,700));
+  setTimeout(wire,1200);
+  setTimeout(wire,2500);
+})();
+</script>
+
 </body>
 </html>
 
