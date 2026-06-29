@@ -1017,6 +1017,328 @@
             display: inline-block;
         }
 
+
+
+        /* ================================================================
+           CEO / PRODUCT POLISH LAYER
+           ================================================================ */
+        .hero-command {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+            border-radius: 1.5rem;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: var(--shadow-lg);
+            position: relative;
+            overflow: hidden;
+        }
+        .hero-command::after {
+            content: "";
+            position: absolute;
+            width: 220px;
+            height: 220px;
+            right: -70px;
+            top: -80px;
+            background: rgba(255,255,255,0.12);
+            border-radius: 9999px;
+        }
+        .hero-command h2,
+        .hero-command .text-muted {
+            color: white;
+        }
+        .hero-kpis {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 0.75rem;
+            margin-top: 1rem;
+            position: relative;
+            z-index: 1;
+        }
+        .hero-kpi {
+            background: rgba(255,255,255,0.14);
+            border: 1px solid rgba(255,255,255,0.18);
+            border-radius: 1rem;
+            padding: 0.85rem;
+            backdrop-filter: blur(8px);
+        }
+        .hero-kpi .label {
+            font-size: 0.65rem;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            opacity: 0.85;
+            font-weight: 700;
+        }
+        .hero-kpi .value {
+            font-size: 1.35rem;
+            font-weight: 900;
+            margin-top: 0.25rem;
+        }
+        .insight-panel {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 1rem;
+        }
+        .insight-card {
+            border-radius: 1rem;
+            padding: 1rem;
+            background: var(--bg-input);
+            border: 1px solid var(--border-color);
+        }
+        .insight-card strong {
+            display: block;
+            color: var(--text-primary);
+            margin-bottom: 0.35rem;
+        }
+        .insight-card p {
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+            line-height: 1.45;
+        }
+        .recipe-log-box {
+            margin-top: 1rem;
+            padding: 1rem;
+            border-radius: 1rem;
+            border: 1px solid var(--border-color);
+            background: var(--bg-input);
+        }
+        .mini-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+            gap: 0.75rem;
+        }
+        .quality-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.3rem;
+            border-radius: 9999px;
+            background: var(--primary-bg);
+            color: var(--primary);
+            padding: 0.2rem 0.55rem;
+            font-size: 0.7rem;
+            font-weight: 800;
+            margin: 0.15rem;
+        }
+        .danger-zone {
+            border-color: rgba(220, 38, 38, 0.25);
+        }
+
+
+
+        /* ================================================================
+           3-THEME PRODUCT SYSTEM: Light / Dark / Kids
+           ================================================================ */
+        [data-theme="kids"] {
+            --bg-primary: #fff7ed;
+            --bg-secondary: #ffffff;
+            --bg-card: rgba(255,255,255,0.92);
+            --bg-nav: #ffffff;
+            --bg-input: #fff1f2;
+            --text-primary: #3b0764;
+            --text-secondary: #7e22ce;
+            --text-muted: #a855f7;
+            --border-color: #fbcfe8;
+            --shadow: 0 8px 24px rgba(236, 72, 153, 0.10);
+            --shadow-lg: 0 24px 70px rgba(236, 72, 153, 0.18);
+            --primary: #06b6d4;
+            --primary-light: #67e8f9;
+            --primary-dark: #0891b2;
+            --primary-bg: #cffafe;
+            --secondary: #f59e0b;
+            --accent: #ec4899;
+            --success: #22c55e;
+            --warning: #f97316;
+        }
+        [data-theme="kids"] body {
+            background:
+                radial-gradient(circle at 12% 10%, rgba(103,232,249,0.28), transparent 28%),
+                radial-gradient(circle at 85% 18%, rgba(244,114,182,0.24), transparent 26%),
+                radial-gradient(circle at 78% 80%, rgba(251,191,36,0.24), transparent 24%),
+                var(--bg-primary);
+        }
+        [data-theme="kids"] .card,
+        [data-theme="kids"] .login-card {
+            border-radius: 1.35rem;
+        }
+        [data-theme="kids"] .nav button.active,
+        [data-theme="kids"] .btn-primary {
+            box-shadow: 0 10px 24px rgba(6,182,212,0.25);
+        }
+
+        .dashboard-calendar-card .calendar-toolbar {
+            display:flex;
+            justify-content:space-between;
+            gap:0.75rem;
+            align-items:center;
+            flex-wrap:wrap;
+            margin-bottom:0.75rem;
+        }
+        .calendar-mode-tabs {
+            display:flex;
+            gap:0.3rem;
+            flex-wrap:wrap;
+        }
+        .calendar-mode-tabs button {
+            border:1px solid var(--border-color);
+            background:var(--bg-input);
+            color:var(--text-secondary);
+            border-radius:9999px;
+            padding:0.35rem 0.75rem;
+            font-size:0.75rem;
+            font-weight:700;
+            cursor:pointer;
+        }
+        .calendar-mode-tabs button.active {
+            background:var(--primary);
+            color:#fff;
+            border-color:var(--primary);
+        }
+        .dashboard-calendar-grid,
+        .print-calendar-grid {
+            display:grid;
+            grid-template-columns:repeat(7,1fr);
+            gap:0.25rem;
+        }
+        .dashboard-calendar-grid .day-label,
+        .print-calendar-grid .day-label {
+            font-size:0.65rem;
+            font-weight:800;
+            color:var(--text-muted);
+            text-align:center;
+            padding:0.35rem 0.15rem;
+            text-transform:uppercase;
+        }
+        .dashboard-calendar-grid .calendar-day,
+        .print-calendar-grid .calendar-day {
+            min-height:4.6rem;
+            border:1px solid var(--border-color);
+            background:var(--bg-input);
+            border-radius:0.75rem;
+            padding:0.35rem;
+            font-size:0.72rem;
+            position:relative;
+            overflow:hidden;
+        }
+        .dashboard-calendar-grid .calendar-day .num,
+        .print-calendar-grid .calendar-day .num {
+            font-weight:800;
+            color:var(--text-primary);
+        }
+        .dashboard-calendar-grid .calendar-day.today {
+            outline:2px solid var(--primary);
+            background:var(--primary-bg);
+        }
+        .calendar-pill {
+            display:block;
+            margin-top:0.22rem;
+            border-radius:9999px;
+            padding:0.1rem 0.38rem;
+            font-size:0.62rem;
+            font-weight:700;
+            white-space:nowrap;
+            overflow:hidden;
+            text-overflow:ellipsis;
+        }
+        .pill-training { background:rgba(22,163,74,0.14); color:var(--success); }
+        .pill-meal { background:rgba(37,99,235,0.12); color:var(--accent); }
+        .pill-progress { background:rgba(245,158,11,0.16); color:var(--warning); }
+        .weekly-plan-table {
+            width:100%;
+            border-collapse:separate;
+            border-spacing:0;
+            overflow:hidden;
+            border:1px solid var(--border-color);
+            border-radius:1rem;
+            font-size:0.76rem;
+        }
+        .weekly-plan-table th,
+        .weekly-plan-table td {
+            border-bottom:1px solid var(--border-color);
+            border-right:1px solid var(--border-color);
+            padding:0.55rem 0.4rem;
+            text-align:center;
+            vertical-align:top;
+        }
+        .weekly-plan-table th {
+            background:var(--primary-bg);
+            color:var(--primary);
+            font-weight:800;
+        }
+        .weekly-plan-table td:first-child,
+        .weekly-plan-table th:first-child {
+            font-weight:800;
+            color:var(--text-secondary);
+        }
+        .weekly-plan-table tr:last-child td { border-bottom:none; }
+        .weekly-plan-table td:last-child,
+        .weekly-plan-table th:last-child { border-right:none; }
+        .meal-mini-name { font-weight:650; color:var(--text-primary); line-height:1.2; }
+        .meal-mini-empty { color:var(--text-muted); }
+        .theme-quick-switch {
+            display:flex;
+            gap:0.4rem;
+            flex-wrap:wrap;
+            padding:0.45rem;
+            border:1px solid var(--border-color);
+            border-radius:1rem;
+            background:var(--bg-card);
+        }
+        .theme-chip {
+            border:1px solid var(--border-color);
+            background:var(--bg-input);
+            color:var(--text-secondary);
+            border-radius:9999px;
+            padding:0.4rem 0.75rem;
+            font-size:0.75rem;
+            font-weight:800;
+            cursor:pointer;
+        }
+        .theme-chip.active { background:var(--primary); color:#fff; border-color:var(--primary); }
+
+        @media print {
+            .print-only { display:block !important; }
+
+            body.print-calendar-only #mainApp > header,
+            body.print-calendar-only .nav,
+            body.print-calendar-only #view-dashboard > *:not(#dashboardCalendarHub),
+            body.print-calendar-only #view-planner,
+            body.print-calendar-only #view-recipes,
+            body.print-calendar-only #view-progress,
+            body.print-calendar-only #view-shopping,
+            body.print-calendar-only #view-family,
+            body.print-calendar-only #view-nutrition,
+            body.print-calendar-only #view-settings {
+                display:none !important;
+            }
+            body.print-calendar-only #view-dashboard,
+            body.print-calendar-only #dashboardCalendarHub {
+                display:block !important;
+            }
+            body.print-planner-only #mainApp > header,
+            body.print-planner-only .nav,
+            body.print-planner-only #view-dashboard,
+            body.print-planner-only #view-recipes,
+            body.print-planner-only #view-progress,
+            body.print-planner-only #view-shopping,
+            body.print-planner-only #view-family,
+            body.print-planner-only #view-nutrition,
+            body.print-planner-only #view-settings {
+                display:none !important;
+            }
+            body.print-planner-only #view-planner,
+            body.print-planner-only #plannerGrid {
+                display:block !important;
+            }
+
+            .dashboard-calendar-card,
+            .calendar-compact,
+            .family-calendar-grid,
+            #plannerGrid { break-inside: avoid; }
+            .weekly-plan-table { font-size:9px; }
+            .weekly-plan-table th, .weekly-plan-table td { padding:6px 4px; }
+            .dashboard-calendar-grid .calendar-day, .print-calendar-grid .calendar-day { min-height:64px; border-radius:6px; }
+            .calendar-pill { border:1px solid #ddd; color:#000 !important; background:#fff !important; }
+        }
+
         /* ================================================================
            PRINT STYLES
            ================================================================ */
@@ -1152,20 +1474,14 @@ LOGIN
                         🎨 <span id="currentThemeLabel">Emerald</span> ▾
                     </button>
                     <div class="dropdown-content" id="themeDropdownContent">
-                        <div class="dropdown-item active" data-theme="emerald" onclick="setTheme('emerald')">
-                            <span class="swatch" style="background:linear-gradient(135deg,#0F766E,#14b8a6);"></span> Emerald
+                        <div class="dropdown-item active" data-theme="light" onclick="setTheme('light')">
+                            <span class="swatch" style="background:linear-gradient(135deg,#ffffff,#0F766E);"></span> Light
                         </div>
-                        <div class="dropdown-item" data-theme="midnight" onclick="setTheme('midnight')">
-                            <span class="swatch" style="background:linear-gradient(135deg,#6366f1,#818cf8);"></span> Midnight
+                        <div class="dropdown-item" data-theme="dark" onclick="setTheme('dark')">
+                            <span class="swatch" style="background:linear-gradient(135deg,#0f172a,#14b8a6);"></span> Dark
                         </div>
-                        <div class="dropdown-item" data-theme="sunrise" onclick="setTheme('sunrise')">
-                            <span class="swatch" style="background:linear-gradient(135deg,#e85d04,#f48c06);"></span> Sunrise
-                        </div>
-                        <div class="dropdown-item" data-theme="rose" onclick="setTheme('rose')">
-                            <span class="swatch" style="background:linear-gradient(135deg,#e11d48,#fb7185);"></span> Rose
-                        </div>
-                        <div class="dropdown-item" data-theme="steel" onclick="setTheme('steel')">
-                            <span class="swatch" style="background:linear-gradient(135deg,#475569,#94a3b8);"></span> Steel
+                        <div class="dropdown-item" data-theme="kids" onclick="setTheme('kids')">
+                            <span class="swatch" style="background:linear-gradient(135deg,#06b6d4,#ec4899,#f59e0b);"></span> Kids
                         </div>
                     </div>
                 </div>
@@ -1175,7 +1491,47 @@ LOGIN
             VIEW: DASHBOARD
             ============================================================= -->
             <div id="view-dashboard">
-                <h2>📊 Dashboard</h2>
+                <section class="hero-command no-print">
+                    <div class="flex-between">
+                        <div>
+                            <h2 style="margin-bottom:0.25rem;">NutriFlow Command Center</h2>
+                            <p class="text-muted">A family nutrition OS built for daily decisions, progress visibility, and long-term health habits.</p>
+                        </div>
+                        <button class="btn btn-secondary btn-sm" onclick="switchView('planner')">Plan This Week →</button>
+                    </div>
+                    <div class="hero-kpis">
+                        <div class="hero-kpi"><div class="label">Today Score</div><div class="value" id="heroTodayScore">--</div></div>
+                        <div class="hero-kpi"><div class="label">Protein Status</div><div class="value" id="heroProteinStatus">--</div></div>
+                        <div class="hero-kpi"><div class="label">Training Pace</div><div class="value" id="heroTrainingPace">--</div></div>
+                        <div class="hero-kpi"><div class="label">Next Best Action</div><div class="value" id="heroNextAction" style="font-size:1rem;line-height:1.25;">--</div></div>
+                    </div>
+                </section>
+
+                <!-- Dashboard Calendar Hub -->
+                <div class="card dashboard-calendar-card" id="dashboardCalendarHub">
+                    <div class="calendar-toolbar">
+                        <div>
+                            <div class="stat-label">📅 Calendar Hub</div>
+                            <h3 style="margin:0.2rem 0 0;">Today, Weekly Plan & Family View</h3>
+                        </div>
+                        <div class="flex" style="gap:0.5rem;">
+                            <div class="calendar-mode-tabs no-print">
+                                <button class="active" data-dash-cal="my" onclick="switchDashboardCalendar('my')">My Activity</button>
+                                <button data-dash-cal="week" onclick="switchDashboardCalendar('week')">Weekly Meal Plan</button>
+                                <button data-dash-cal="family" onclick="switchDashboardCalendar('family')">Family Calendar</button>
+                            </div>
+                            <button class="btn btn-outline btn-sm no-print" onclick="printCurrentCalendarView()">🖨️ Print View</button>
+                        </div>
+                    </div>
+                    <div id="dashboardCalendarTitle" class="text-muted" style="margin-bottom:0.5rem;">Loading calendar...</div>
+                    <div id="dashboardCalendarGrid" class="dashboard-calendar-grid"></div>
+                    <div id="dashboardWeeklyPlanWrap" class="hidden"></div>
+                    <div class="calendar-legend" style="margin-top:0.75rem;">
+                        <span><span class="dot" style="background:var(--success);"></span> Training</span>
+                        <span><span class="dot" style="background:var(--accent);"></span> Meals</span>
+                        <span><span class="dot" style="background:var(--warning);"></span> Progress</span>
+                    </div>
+                </div>
 
                 <!-- Stats Row -->
                 <div class="grid-3" style="margin-bottom:1.5rem;">
@@ -1222,6 +1578,21 @@ LOGIN
                             <div class="stat-label">📊 Weekly Avg Calories</div>
                             <div style="font-size:1.5rem; font-weight:700; color:var(--primary);" id="dashWeeklyAvg">--</div>
                         </div>
+                    </div>
+                </div>
+
+                <div class="card no-print">
+                    <div class="flex-between" style="margin-bottom:0.75rem;">
+                        <div>
+                            <div class="stat-label">🧠 Smart Coach Snapshot</div>
+                            <h3 style="margin-top:0.2rem;">What the system should tell you today</h3>
+                        </div>
+                        <button class="btn btn-outline btn-sm" onclick="loadDashboardData()">Refresh Insights</button>
+                    </div>
+                    <div class="insight-panel">
+                        <div class="insight-card"><strong id="insightNutritionTitle">Nutrition</strong><p id="insightNutritionText">Waiting for today’s data.</p></div>
+                        <div class="insight-card"><strong id="insightTrainingTitle">Training</strong><p id="insightTrainingText">Waiting for training data.</p></div>
+                        <div class="insight-card"><strong id="insightBusinessTitle">System Quality</strong><p id="insightBusinessText">Tracking readiness will improve as you log more data.</p></div>
                     </div>
                 </div>
 
@@ -1512,7 +1883,6 @@ LOGIN
                         <div id="profileInfo" style="margin-top:0.5rem;">
                             <p><strong>Name:</strong> <span id="settingsName"></span></p>
                             <p><strong>Family:</strong> <span id="settingsFamily"></span></p>
-                            <p><strong>Family PIN:</strong> <span id="settingsFamilyPin"></span></p>
                             <p><strong>Age:</strong> <span id="settingsAge"></span></p>
                             <p><strong>Sex:</strong> <span id="settingsSex"></span></p>
                             <p><strong>Goal:</strong> <span id="settingsGoal"></span></p>
@@ -1610,8 +1980,79 @@ LOGIN
                 <div id="recipeModalContent">
                     <p>Loading...</p>
                 </div>
+                <div class="recipe-log-box no-print">
+                    <div class="stat-label">🍽️ Log Meal</div>
+                    <div class="mini-grid" style="margin-top:0.5rem;">
+                        <div>
+                            <label>Meal Type</label>
+                            <select id="recipeLogMealType">
+                                <option>Breakfast</option>
+                                <option>Snack 1</option>
+                                <option>Lunch</option>
+                                <option>Snack 2</option>
+                                <option>Dinner</option>
+                                <option>Dessert</option>
+                                <option>Snack</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label>Serving Size</label>
+                            <select id="recipeLogServings">
+                                <option value="0.5">0.5 serving</option>
+                                <option value="1" selected>1 serving</option>
+                                <option value="1.5">1.5 servings</option>
+                                <option value="2">2 servings</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="flex" style="margin-top:1rem;justify-content:flex-end;">
+                        <button class="btn btn-primary btn-sm" id="recipeModalLogBtn" onclick="logRecipeFromModal()">🍽️ Log this meal</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Training Log Modal -->
+        <div id="trainingLogModal" class="modal-overlay">
+            <div class="modal-box">
+                <button class="close-btn no-print" onclick="closeModal('trainingLogModal')">✕</button>
+                <h2>💪 Log Training</h2>
+                <p class="text-muted" style="margin-bottom:0.75rem;">Record today's workout so it appears in your dashboard, calendar, streak, and family view.</p>
+                <div class="mini-grid">
+                    <div>
+                        <label>Training Type</label>
+                        <select id="trainingType">
+                            <option>Strength Training</option>
+                            <option>Cardio</option>
+                            <option>HIIT</option>
+                            <option>Walking</option>
+                            <option>Mobility / Stretching</option>
+                            <option>Sports</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label>Duration</label>
+                        <input id="trainingDuration" type="number" min="5" step="5" value="45" />
+                    </div>
+                    <div>
+                        <label>Intensity</label>
+                        <select id="trainingIntensity">
+                            <option>Light</option>
+                            <option selected>Moderate</option>
+                            <option>Hard</option>
+                            <option>Very Hard</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label>Date</label>
+                        <input id="trainingDate" type="date" />
+                    </div>
+                </div>
+                <label style="margin-top:0.75rem;">Notes</label>
+                <textarea id="trainingModalNotes" rows="3" placeholder="e.g., Upper body — chest and back, felt strong today..."></textarea>
                 <div class="flex" style="margin-top:1rem;justify-content:flex-end;">
-                    <button class="btn btn-primary btn-sm no-print" id="recipeModalLogBtn" onclick="logRecipeFromModal()">🍽️ Log this</button>
+                    <button class="btn btn-danger btn-sm no-print" onclick="closeModal('trainingLogModal')">Cancel</button>
+                    <button class="btn btn-primary btn-sm no-print" id="trainingSubmitBtn" onclick="submitTrainingLog()">✅ Save Training</button>
                 </div>
             </div>
         </div>
@@ -1629,7 +2070,6 @@ LOGIN
         let userId = '';
         let userData = {};
         let familyCode = '';
-        let familyPin = '';
         let userName = '';
         let weekOffset = 0;
         let allRecipes = [];
@@ -1643,6 +2083,11 @@ LOGIN
         let dailyWaterLog = 0;
         let calendarFilter = 'all';
         let familyMembers = [];
+        let lastUserCalendarData = [];
+        let lastFamilyCalendarData = [];
+        let lastFamilyCalendarMembers = [];
+        let dashboardCalendarMode = 'my';
+        let recipeDetailsCache = {};
 
         // ================================================================
         //  HELPER – Escape HTML to prevent XSS
@@ -1662,33 +2107,25 @@ LOGIN
         }
 
         function setTheme(theme) {
-            const themeMap = {
-                emerald: 'light',
-                midnight: 'midnight',
-                sunrise: 'sunrise',
-                rose: 'rose',
-                steel: 'steel'
-            };
+            const aliases = { emerald: 'light', midnight: 'dark', sunrise: 'kids', rose: 'kids', steel: 'light' };
+            theme = aliases[theme] || theme || 'light';
+            const themeMap = { light: 'light', dark: 'midnight', kids: 'kids' };
             document.documentElement.setAttribute('data-theme', themeMap[theme] || 'light');
             localStorage.setItem('nutriflow-theme', theme);
 
-            document.querySelectorAll('.dropdown-item').forEach(item => {
+            document.querySelectorAll('.dropdown-item, .theme-chip').forEach(item => {
                 item.classList.toggle('active', item.dataset.theme === theme);
             });
 
-            const labels = {
-                emerald: 'Emerald',
-                midnight: 'Midnight',
-                sunrise: 'Sunrise',
-                rose: 'Rose',
-                steel: 'Steel'
-            };
-            document.getElementById('currentThemeLabel').textContent = labels[theme] || 'Emerald';
-            document.getElementById('themeDropdownContent').classList.remove('show');
+            const labels = { light: 'Light', dark: 'Dark', kids: 'Kids' };
+            const labelEl = document.getElementById('currentThemeLabel');
+            if (labelEl) labelEl.textContent = labels[theme] || 'Light';
+            const dd = document.getElementById('themeDropdownContent');
+            if (dd) dd.classList.remove('show');
         }
 
         function loadTheme() {
-            const saved = localStorage.getItem('nutriflow-theme') || 'emerald';
+            const saved = localStorage.getItem('nutriflow-theme') || 'light';
             setTheme(saved);
         }
 
@@ -1808,6 +2245,58 @@ LOGIN
         statusEl.className = 'error';
     }
 }
+
+        // ================================================================
+        //  EXECUTIVE INSIGHTS ENGINE
+        // ================================================================
+        function safeSetText(id, value) {
+            const el = document.getElementById(id);
+            if (el) el.textContent = value;
+        }
+
+        function pct(actual, target) {
+            actual = Number(actual || 0);
+            target = Number(target || 0);
+            if (!target) return 0;
+            return Math.max(0, Math.min(100, Math.round((actual / target) * 100)));
+        }
+
+        function updateExecutiveInsights(data) {
+            const calTarget = Number(userData.Target_Calories || 0);
+            const proteinTarget = Number(userData.Protein_Target_g || 0);
+            const waterTarget = Number(userData.Water_Target_ml || 2000);
+            const trainingTarget = Number(userData.Training_Days_Weekly || 3);
+
+            const calScore = pct(data.calories, calTarget);
+            const protScore = pct(data.protein, proteinTarget);
+            const waterScore = pct(data.water, waterTarget);
+            const trainScore = trainingTarget ? Math.min(100, Math.round((data.trainingDaysThisWeek / trainingTarget) * 100)) : 0;
+            const todayScore = Math.round((calScore * 0.30) + (protScore * 0.35) + (waterScore * 0.15) + (trainScore * 0.20));
+
+            safeSetText('heroTodayScore', todayScore ? todayScore + '%' : '--');
+            safeSetText('heroProteinStatus', protScore >= 90 ? 'On Track' : protScore >= 60 ? 'Needs Push' : 'Low');
+            safeSetText('heroTrainingPace', `${data.trainingDaysThisWeek}/${trainingTarget}`);
+
+            let nextAction = 'Log your next meal';
+            if (protScore < 70) nextAction = 'Add protein meal';
+            else if (calScore > 105) nextAction = 'Keep dinner lighter';
+            else if (waterScore < 60) nextAction = 'Drink water now';
+            else if (trainScore < 70) nextAction = 'Plan next workout';
+            else nextAction = 'Stay consistent';
+            safeSetText('heroNextAction', nextAction);
+
+            safeSetText('insightNutritionTitle', protScore >= 90 ? 'Nutrition: strong' : 'Nutrition: action needed');
+            safeSetText('insightNutritionText', proteinTarget
+                ? `You reached ${protScore}% of protein and ${calScore}% of calories today. ${protScore < 80 ? 'Prioritize a lean protein option in the next meal.' : 'Keep meals controlled and avoid unnecessary snacks.'}`
+                : 'Set calorie and protein targets in your profile to unlock stronger recommendations.');
+
+            safeSetText('insightTrainingTitle', data.trainedToday ? 'Training: completed today' : 'Training: pending today');
+            safeSetText('insightTrainingText', `You are at ${data.trainingDaysThisWeek}/${trainingTarget} training days this week with a ${data.streak || 0}-day streak. ${data.trainedToday ? 'Recovery and protein are the priority now.' : 'A short focused session still protects the weekly habit.'}`);
+
+            safeSetText('insightBusinessTitle', 'System Quality: investor-ready direction');
+            safeSetText('insightBusinessText', 'The product is moving beyond tracking into decision support: score, recommendation, habit signal, and family visibility. This is the right direction for a premium OS.');
+        }
+
         // ================================================================
         //  DASHBOARD
         // ================================================================
@@ -1890,22 +2379,46 @@ LOGIN
         // ================================================================
         //  TRAINING
         // ================================================================
-        async function toggleTraining() {
+        function toggleTraining() {
             const btn = document.getElementById('trainingBtn');
-            const isDone = btn.textContent.includes('Done');
-            const newVal = !isDone;
+            const isDone = btn && btn.textContent.includes('Done');
+            if (isDone) {
+                if (confirm('Training is already logged for today. Do you want to undo it?')) undoTraining();
+                return;
+            }
             const notes = document.getElementById('trainingNotes').value.trim();
+            document.getElementById('trainingModalNotes').value = notes;
+            document.getElementById('trainingDate').value = new Date().toISOString().slice(0, 10);
+            openModal('trainingLogModal');
+        }
 
+        async function submitTrainingLog() {
+            const notes = document.getElementById('trainingModalNotes').value.trim();
+            const type = document.getElementById('trainingType').value;
+            const duration = parseInt(document.getElementById('trainingDuration').value, 10) || 45;
+            const intensity = document.getElementById('trainingIntensity').value;
+            const trainingDate = document.getElementById('trainingDate').value || new Date().toISOString().slice(0, 10);
+            const btn = document.getElementById('trainingSubmitBtn');
+            if (btn) { btn.disabled = true; btn.textContent = 'Saving...'; }
+
+            const finalNotes = [type, duration + ' min', intensity, notes].filter(Boolean).join(' · ');
             const result = await apiCall('toggleTraining', {
                 userId,
                 familyCode,
-                trained: newVal,
-                notes: notes
+                trained: true,
+                notes: finalNotes,
+                trainingType: type,
+                duration,
+                intensity,
+                trainingDate
             });
 
+            if (btn) { btn.disabled = false; btn.textContent = '✅ Save Training'; }
             if (result.success) {
-                showToast(newVal ? '✅ Training logged!' : 'Training unlogged.');
+                closeModal('trainingLogModal');
+                showToast('✅ Training logged and calendar updated!');
                 document.getElementById('trainingNotes').value = '';
+                document.getElementById('trainingModalNotes').value = '';
                 loadDashboardData();
                 loadTrainingCalendar();
                 loadFamilyCalendar();
@@ -1961,7 +2474,9 @@ LOGIN
             if (!userId) return;
             const result = await apiCall('getCalendarData', { userId, familyCode });
             if (result.success) {
-                renderTrainingCalendar(result.calendarData || []);
+                lastUserCalendarData = result.calendarData || [];
+                renderTrainingCalendar(lastUserCalendarData);
+                renderDashboardCalendarHub();
             }
         }
 
@@ -2018,7 +2533,10 @@ LOGIN
             if (!userId) return;
             const result = await apiCall('getFamilyCalendar', { familyCode });
             if (result.success) {
-                renderFamilyCalendar(result.calendarData || [], result.members || []);
+                lastFamilyCalendarData = result.calendarData || [];
+                lastFamilyCalendarMembers = result.members || [];
+                renderFamilyCalendar(lastFamilyCalendarData, lastFamilyCalendarMembers);
+                renderDashboardCalendarHub();
             }
         }
 
@@ -2089,6 +2607,119 @@ LOGIN
                     </div>`
                 ).join('');
             }
+        }
+
+
+        // ================================================================
+        //  DASHBOARD CALENDAR HUB
+        // ================================================================
+        function switchDashboardCalendar(mode) {
+            dashboardCalendarMode = mode || 'my';
+            document.querySelectorAll('[data-dash-cal]').forEach(btn => {
+                btn.classList.toggle('active', btn.dataset.dashCal === dashboardCalendarMode);
+            });
+            renderDashboardCalendarHub();
+        }
+
+        function renderDashboardCalendarHub() {
+            const grid = document.getElementById('dashboardCalendarGrid');
+            const weeklyWrap = document.getElementById('dashboardWeeklyPlanWrap');
+            const title = document.getElementById('dashboardCalendarTitle');
+            if (!grid || !weeklyWrap || !title) return;
+
+            if (dashboardCalendarMode === 'week') {
+                grid.classList.add('hidden');
+                weeklyWrap.classList.remove('hidden');
+                title.textContent = 'Weekly meal plan preview — print-ready for the fridge or family WhatsApp.';
+                weeklyWrap.innerHTML = buildWeeklyPlanTable();
+                return;
+            }
+
+            weeklyWrap.classList.add('hidden');
+            grid.classList.remove('hidden');
+            const isFamily = dashboardCalendarMode === 'family';
+            title.textContent = isFamily ? 'Consolidated family activity calendar for this month.' : 'Your personal monthly activity calendar.';
+            grid.innerHTML = buildDashboardMonthCalendar(isFamily ? lastFamilyCalendarData : lastUserCalendarData, isFamily);
+        }
+
+        function buildDashboardMonthCalendar(calendarData, isFamily) {
+            const now = new Date();
+            const year = now.getFullYear();
+            const month = now.getMonth();
+            const firstDay = new Date(year, month, 1).getDay();
+            const daysInMonth = new Date(year, month + 1, 0).getDate();
+            const dayLabels = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+            let html = dayLabels.map(d => `<div class="day-label">${d}</div>`).join('');
+            for (let i = 0; i < firstDay; i++) html += '<div class="calendar-day empty"></div>';
+            for (let day = 1; day <= daysInMonth; day++) {
+                const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+                const isToday = dateStr === now.toISOString().slice(0, 10);
+                const d = (calendarData || []).find(x => x.date === dateStr) || {};
+                let pills = '';
+                if (isFamily) {
+                    const trained = d.trained || [];
+                    const meals = d.meals || [];
+                    const progress = d.progress || [];
+                    if (trained.length) pills += `<span class="calendar-pill pill-training">🏋️ ${escapeHtml(trained.slice(0,2).join(', '))}${trained.length>2?'…':''}</span>`;
+                    if (meals.length) pills += `<span class="calendar-pill pill-meal">🍽️ ${escapeHtml(meals.slice(0,2).join(', '))}${meals.length>2?'…':''}</span>`;
+                    if (progress.length) pills += `<span class="calendar-pill pill-progress">📊 ${escapeHtml(progress.slice(0,2).join(', '))}${progress.length>2?'…':''}</span>`;
+                } else {
+                    if (d.trained) pills += '<span class="calendar-pill pill-training">🏋️ Training</span>';
+                    if (d.meals) pills += '<span class="calendar-pill pill-meal">🍽️ Meals</span>';
+                    if (d.progress) pills += '<span class="calendar-pill pill-progress">📊 Progress</span>';
+                }
+                html += `<div class="calendar-day ${isToday ? 'today' : ''}"><span class="num">${day}</span>${pills || '<span class="calendar-pill" style="color:var(--text-muted);">—</span>'}</div>`;
+            }
+            return html;
+        }
+
+        function getRecipeNameById(recipeId) {
+            if (!recipeId) return '';
+            const sources = [allRecipes, ...Object.values(mealRecipes || {})];
+            for (const list of sources) {
+                const found = (list || []).find(r => r.Recipe_ID === recipeId);
+                if (found) return found.Recipe_Name || recipeId;
+            }
+            return recipeId;
+        }
+
+        function buildWeeklyPlanTable() {
+            const weekDays = getWeekDays();
+            const slots = [
+                { key: 'Breakfast_ID', label: 'Breakfast' },
+                { key: 'Snack_1_ID', label: 'Snack 1' },
+                { key: 'Lunch_ID', label: 'Lunch' },
+                { key: 'Snack_2_ID', label: 'Snack 2' },
+                { key: 'Dinner_ID', label: 'Dinner' },
+                { key: 'Dessert_ID', label: 'Dessert' },
+                { key: '_training', label: 'Training' }
+            ];
+            let html = '<table class="weekly-plan-table"><thead><tr><th>Meal</th>';
+            weekDays.forEach(d => html += `<th>${escapeHtml(d.label)}</th>`);
+            html += '</tr></thead><tbody>';
+            slots.forEach(slot => {
+                html += `<tr><td>${escapeHtml(slot.label)}</td>`;
+                weekDays.forEach(day => {
+                    if (slot.key === '_training') {
+                        const trained = (lastUserCalendarData || []).find(x => x.date === day.date && x.trained);
+                        html += `<td>${trained ? '<span class="meal-mini-name">✅ Completed</span>' : '<span class="meal-mini-empty">○ Planned</span>'}</td>`;
+                    } else {
+                        const id = plannerData[day.date]?.[slot.key] || '';
+                        const name = getRecipeNameById(id);
+                        html += `<td>${name ? `<span class="meal-mini-name">${escapeHtml(name)}</span>` : '<span class="meal-mini-empty">—</span>'}</td>`;
+                    }
+                });
+                html += '</tr>';
+            });
+            html += '</tbody></table>';
+            return html;
+        }
+
+        function printCurrentCalendarView() {
+            document.body.classList.add('print-calendar-only');
+            const cleanup = () => document.body.classList.remove('print-calendar-only');
+            window.addEventListener('afterprint', cleanup, { once: true });
+            setTimeout(() => { window.print(); setTimeout(cleanup, 500); }, 50);
         }
 
         // ================================================================
@@ -2184,7 +2815,10 @@ LOGIN
         //  PLANNER (with Print)
         // ================================================================
         function printPlanner() {
-            window.print();
+            document.body.classList.add('print-planner-only');
+            const cleanup = () => document.body.classList.remove('print-planner-only');
+            window.addEventListener('afterprint', cleanup, { once: true });
+            setTimeout(() => { window.print(); setTimeout(cleanup, 500); }, 50);
         }
 
         function getWeekDays() {
@@ -2217,6 +2851,7 @@ LOGIN
                 });
                 await loadMealRecipes();
                 renderPlanner(weekDays);
+                renderDashboardCalendarHub();
             }
         }
 
@@ -2276,6 +2911,7 @@ LOGIN
             const result = await apiCall('savePlanner', { familyCode, weekStart, entries: JSON.stringify(entries) });
             if (result.success) {
                 showToast('✅ Week plan saved!');
+                renderDashboardCalendarHub();
                 loadShopping();
             } else {
                 showToast('❌ ' + (result.error || 'Failed to save.'), 'error');
@@ -2305,6 +2941,7 @@ LOGIN
                     }
                 });
                 renderPlanner(weekDays);
+                renderDashboardCalendarHub();
                 showToast('📋 Copied from last week!');
             } else {
                 showToast('❌ Failed to copy last week.', 'error');
@@ -2315,6 +2952,8 @@ LOGIN
         //  RECIPES
         // ================================================================
         async function loadRecipes() {
+            const grid = document.getElementById('recipeGrid');
+            if (grid && !allRecipes.length) grid.innerHTML = '<p class="text-muted">Loading recipes...</p>';
             const adult = await apiCall('getRecipes', { type: 'adult' });
             if (adult.success) {
                 allRecipes = adult.recipes || [];
@@ -2359,15 +2998,23 @@ LOGIN
             const recipe = allRecipes.find(r => r.Recipe_ID === recipeId);
             if (!recipe) { showToast('Recipe not found', 'error'); return; }
 
-            document.getElementById('recipeModalTitle').textContent = escapeHtml(recipe.Recipe_Name || 'Recipe');
+            openModal('recipeModal');
+
+            document.getElementById('recipeModalTitle').textContent = recipe.Recipe_Name || 'Recipe';
             document.getElementById('recipeModalMeta').textContent =
-                `${escapeHtml(recipe.Category || '')} · ${escapeHtml(recipe.Meal_Type || '')} · ${recipe.Calories || 0} kcal · ${escapeHtml(recipe.Carb_Level || '')}`;
+                `${recipe.Category || ''} · ${recipe.Meal_Type || ''} · ${recipe.Calories || 0} kcal · ${recipe.Carb_Level || ''}`;
 
             const content = document.getElementById('recipeModalContent');
-            content.innerHTML = '<p>Loading ingredients...</p>';
+            content.innerHTML = '<p class="text-muted">Loading ingredients and method...</p>';
 
-            const ingredientsResult = await apiCall('getRecipeIngredients', { recipeId });
-            const methodsResult = await apiCall('getRecipeMethods', { recipeId });
+            if (!recipeDetailsCache[recipeId]) {
+                const [ingredientsResult, methodsResult] = await Promise.all([
+                    apiCall('getRecipeIngredients', { recipeId }, false),
+                    apiCall('getRecipeMethods', { recipeId }, false)
+                ]);
+                recipeDetailsCache[recipeId] = { ingredientsResult, methodsResult };
+            }
+            const { ingredientsResult, methodsResult } = recipeDetailsCache[recipeId];
 
             let html = '';
 
@@ -2381,6 +3028,14 @@ LOGIN
                 <div class="macro-item"><span class="macro-value">🍳 ${recipe.Cook_Min || 0}m</span><span class="macro-label">Cook</span></div>
                 <div class="macro-item"><span class="macro-value">📊 ${escapeHtml(recipe.Difficulty || '')}</span><span class="macro-label">Difficulty</span></div>
             </div>`;
+
+            const proteinPerCalorie = Number(recipe.Calories || 0) ? (Number(recipe.Protein_g || 0) / Number(recipe.Calories || 1)) * 100 : 0;
+            const badges = [];
+            if (Number(recipe.Protein_g || 0) >= 25 || proteinPerCalorie >= 4) badges.push('💪 High Protein');
+            if (Number(recipe.Fiber_g || 0) >= 5) badges.push('🌾 Fiber Boost');
+            if ((recipe.Tags || '').toLowerCase().includes('kid')) badges.push('👧 Kid Friendly');
+            if (Number(recipe.Prep_Min || 0) + Number(recipe.Cook_Min || 0) <= 20) badges.push('⚡ Fast Meal');
+            if (badges.length) html += `<div style="margin:0.5rem 0;">${badges.map(b => `<span class="quality-badge">${escapeHtml(b)}</span>`).join('')}</div>`;
 
             if (ingredientsResult.success && ingredientsResult.ingredients.length) {
                 html += `<h3>🛒 Ingredients</h3><ul class="ingredient-list">`;
@@ -2409,15 +3064,25 @@ LOGIN
 
             content.innerHTML = html;
             document.getElementById('recipeModalLogBtn').onclick = () => logRecipeFromModal(recipeId);
-            openModal('recipeModal');
         }
 
         async function logRecipeFromModal(recipeId) {
             const id = recipeId || currentRecipeId;
             if (!id) { showToast('No recipe selected', 'error'); return; }
-            const result = await apiCall('logMeal', { userId, familyCode, recipeId: id, mealType: 'Snack', servings: 1 });
+            const mealTypeEl = document.getElementById('recipeLogMealType');
+            const servingsEl = document.getElementById('recipeLogServings');
+            const mealType = mealTypeEl ? mealTypeEl.value : 'Snack';
+            const servings = servingsEl ? parseFloat(servingsEl.value) || 1 : 1;
+
+            const btn = document.getElementById('recipeModalLogBtn');
+            if (btn) { btn.disabled = true; btn.textContent = 'Saving...'; }
+
+            const result = await apiCall('logMeal', { userId, familyCode, recipeId: id, mealType, servings });
+
+            if (btn) { btn.disabled = false; btn.textContent = '🍽️ Log this meal'; }
+
             if (result.success) {
-                showToast('✅ Meal logged!');
+                showToast(`✅ ${mealType} logged (${servings} serving${servings === 1 ? '' : 's'})!`);
                 closeModal('recipeModal');
                 loadDashboardData();
                 loadTrainingCalendar();
@@ -2679,7 +3344,6 @@ LOGIN
             if (!userId) return;
             document.getElementById('settingsName').textContent = escapeHtml(userName || '—');
             document.getElementById('settingsFamily').textContent = escapeHtml(familyCode || '—');
-            document.getElementById('settingsFamilyPin').textContent = familyPin || '—';
             document.getElementById('settingsAge').textContent = userData.Age || '—';
             document.getElementById('settingsSex').textContent = userData.Sex || '—';
             document.getElementById('settingsGoal').textContent = userData.Goal || '—';
@@ -2823,7 +3487,6 @@ LOGIN
     const data = {
         name: document.getElementById('newProfileName').value.trim(),
         familyCode: document.getElementById('newProfileFamilyCode').value.trim().toUpperCase(),
-        // ❌ REMOVE THIS LINE: pin: document.getElementById('newProfileFamilyPin').value.trim(),
         age: parseInt(document.getElementById('newProfileAge').value) || null,
         sex: document.getElementById('newProfileSex').value,
         height: parseFloat(document.getElementById('newProfileHeight').value) || null,
@@ -2832,8 +3495,8 @@ LOGIN
         goal: document.getElementById('newProfileGoal').value,
         trainingDays: parseInt(document.getElementById('newProfileTraining').value) || 3
     };
-            if (!data.name || !data.familyCode || !data.pin) {
-                document.getElementById('createProfileStatus').textContent = 'Name, Family Code, and PIN are required.';
+            if (!data.name || !data.familyCode) {
+                document.getElementById('createProfileStatus').textContent = 'Name and Family Code are required.';
                 document.getElementById('createProfileStatus').className = 'error';
                 return;
             }
@@ -2843,7 +3506,6 @@ LOGIN
                 document.getElementById('createProfileStatus').className = 'success';
                 closeModal('createProfileModal');
                 document.getElementById('loginFamilyCode').value = data.familyCode;
-                document.getElementById('loginFamilyPin').value = data.pin;
                 document.getElementById('loginName').value = data.name;
                 showToast('Profile created! Please sign in.');
             } else {
@@ -2855,13 +3517,12 @@ LOGIN
         async function submitCreateFamily() {
     const data = {
         code: document.getElementById('newFamilyCode').value.trim().toUpperCase(),
-        // ❌ REMOVE THIS LINE: pin: document.getElementById('newFamilyPin').value.trim(),
         name: document.getElementById('newFamilyName').value.trim(),
         adminName: document.getElementById('newFamilyAdminName').value.trim(),
         email: document.getElementById('newFamilyEmail').value.trim()
     };
-            if (!data.code || !data.pin || !data.adminName) {
-                document.getElementById('createFamilyStatus').textContent = 'Family Code, PIN, and Admin Name are required.';
+            if (!data.code || !data.adminName) {
+                document.getElementById('createFamilyStatus').textContent = 'Family Code and Admin Name are required.';
                 document.getElementById('createFamilyStatus').className = 'error';
                 return;
             }
@@ -2871,7 +3532,6 @@ LOGIN
                 document.getElementById('createFamilyStatus').className = 'success';
                 closeModal('createFamilyModal');
                 document.getElementById('loginFamilyCode').value = data.code;
-                document.getElementById('loginFamilyPin').value = data.pin;
                 document.getElementById('loginName').value = data.adminName;
                 showToast('Family created! Please sign in.');
             } else {
@@ -2890,6 +3550,7 @@ LOGIN
             document.querySelector(`.nav button[data-view="${view}"]`).classList.add('active');
 
             if (view === 'dashboard') loadDashboardData();
+            if (view === 'dashboard') renderDashboardCalendarHub();
             if (view === 'planner') loadPlanner();
             if (view === 'recipes') loadRecipes();
             if (view === 'progress') loadProgress();
