@@ -3869,5 +3869,258 @@ LOGIN — PREMIUM MAKEOVER
 })();
 </script>
 
+
+
+<!-- ================================================================
+     NUTRIFLOW V2 WOW CEO PATCH — FULL SYSTEM EXPERIENCE
+     Purpose: final UX/product layer: premium design, working buttons,
+     normal login/logout, themes, guest recipes, planner, coach,
+     progress edit/delete, shopping workflow, printable family calendar.
+     ================================================================ -->
+<style id="nutriflow-v2-wow-styles">
+:root{
+  --nf-radius-xl:28px; --nf-radius-lg:22px; --nf-radius-md:16px;
+  --nf-glass:rgba(255,255,255,.78); --nf-glass-border:rgba(15,118,110,.14);
+  --nf-gradient:linear-gradient(135deg,#0f766e 0%,#14b8a6 45%,#22c55e 100%);
+  --nf-gradient-soft:linear-gradient(135deg,rgba(20,184,166,.16),rgba(34,197,94,.10));
+  --nf-danger-soft:rgba(220,38,38,.10); --nf-warning-soft:rgba(245,158,11,.14);
+  --nf-success-soft:rgba(22,163,74,.12); --nf-info-soft:rgba(37,99,235,.10);
+}
+[data-theme="dark"]{
+  --bg-primary:#07111f; --bg-secondary:#101c2e; --bg-card:#101c2e; --bg-nav:#0b1626; --bg-input:#0b1626;
+  --text-primary:#f8fafc; --text-secondary:#cbd5e1; --text-muted:#94a3b8; --border-color:rgba(148,163,184,.22);
+  --primary:#2dd4bf; --primary-light:#5eead4; --primary-dark:#14b8a6; --primary-bg:rgba(45,212,191,.12);
+  --secondary:#fbbf24; --accent:#60a5fa; --success:#22c55e; --warning:#f59e0b; --error:#f87171;
+  --shadow:0 16px 40px rgba(0,0,0,.28); --shadow-lg:0 28px 80px rgba(0,0,0,.45);
+  --nf-glass:rgba(15,23,42,.70); --nf-glass-border:rgba(94,234,212,.18);
+  --nf-gradient:linear-gradient(135deg,#0f172a 0%,#0f766e 50%,#22c55e 100%);
+  --nf-gradient-soft:linear-gradient(135deg,rgba(45,212,191,.14),rgba(96,165,250,.10));
+}
+[data-theme="kids"]{
+  --bg-primary:#fff7ed; --bg-secondary:#ffffff; --bg-card:#ffffff; --bg-nav:#ffffff; --bg-input:#fffbeb;
+  --text-primary:#3b2446; --text-secondary:#6b3f52; --text-muted:#9a6b7a; --border-color:#fed7aa;
+  --primary:#06b6d4; --primary-light:#67e8f9; --primary-dark:#0891b2; --primary-bg:#cffafe;
+  --secondary:#ec4899; --accent:#8b5cf6; --success:#22c55e; --warning:#f59e0b; --error:#ef4444;
+  --nf-gradient:linear-gradient(135deg,#06b6d4 0%,#8b5cf6 45%,#ec4899 100%);
+  --nf-gradient-soft:linear-gradient(135deg,rgba(103,232,249,.25),rgba(236,72,153,.14),rgba(245,158,11,.12));
+}
+body.nf-v2{padding:0;background:radial-gradient(circle at top left,rgba(20,184,166,.18),transparent 34%),var(--bg-primary);}
+body.nf-v2 .container{max-width:1280px;padding:1rem;margin:auto;}
+body.nf-v2 #mainApp{display:grid;grid-template-columns:245px 1fr;gap:1rem;align-items:start;}
+body.nf-v2 #mainApp.hidden{display:none!important;}
+body.nf-v2 #mainApp>header{grid-column:2;background:var(--nf-glass)!important;backdrop-filter:blur(16px);border:1px solid var(--nf-glass-border)!important;border-radius:var(--nf-radius-lg)!important;box-shadow:var(--shadow)!important;position:sticky;top:.75rem;z-index:20;}
+body.nf-v2 .nav{grid-column:1;grid-row:1 / span 20;position:sticky;top:1rem;display:flex;flex-direction:column;align-items:stretch;gap:.45rem;min-height:calc(100vh - 2rem);padding:1rem!important;border-radius:var(--nf-radius-xl)!important;background:linear-gradient(180deg,var(--bg-card),rgba(255,255,255,.72))!important;border:1px solid var(--nf-glass-border)!important;box-shadow:var(--shadow-lg)!important;}
+[data-theme="dark"] body.nf-v2 .nav, body.nf-v2[data-theme="dark"] .nav{background:linear-gradient(180deg,#0b1626,#08111f)!important;}
+body.nf-v2 .nav:before{content:"NutriFlow OS";font-weight:900;font-size:1.25rem;color:var(--primary);padding:.75rem .7rem .2rem;}
+body.nf-v2 .nav button{width:100%;justify-content:flex-start;text-align:left;border-radius:16px!important;padding:.78rem .9rem!important;font-weight:800;background:transparent;}
+body.nf-v2 .nav button.active{background:var(--nf-gradient)!important;color:#fff!important;box-shadow:0 14px 34px rgba(15,118,110,.25);}
+body.nf-v2 .nav .nav-spacer{flex:1;}
+body.nf-v2 .theme-dropdown{width:100%;}.theme-dropdown .dropdown-btn{width:100%;justify-content:center;border-radius:16px!important;}
+body.nf-v2 #mainApp>[id^="view-"]{grid-column:2;min-width:0;}
+body.nf-v2 .card{border-radius:var(--nf-radius-lg)!important;border:1px solid var(--nf-glass-border)!important;background:var(--nf-glass)!important;box-shadow:var(--shadow)!important;backdrop-filter:blur(14px);}
+body.nf-v2 .login-card{max-width:980px;display:grid;grid-template-columns:1.1fr .9fr;gap:1rem;padding:0!important;overflow:hidden;border:1px solid var(--nf-glass-border)!important;border-radius:32px!important;background:var(--bg-card)!important;box-shadow:var(--shadow-lg)!important;}
+body.nf-v2 .login-card .text-center{background:var(--nf-gradient);color:white;text-align:left;padding:3rem;display:flex;flex-direction:column;justify-content:center;min-height:440px;}
+body.nf-v2 .login-card .text-center h1{color:white!important;font-size:3.1rem!important;line-height:1;}
+body.nf-v2 .login-card .text-center p{color:rgba(255,255,255,.86)!important;font-size:1.1rem!important;}
+body.nf-v2 .login-card .text-center:after{content:"Family meals · training · progress · shopping · recipes";display:block;margin-top:1.5rem;padding:1rem;border:1px solid rgba(255,255,255,.26);border-radius:20px;background:rgba(255,255,255,.12);font-weight:800;}
+body.nf-v2 .login-card>div:last-child{padding:3rem 2.2rem;display:flex;flex-direction:column;justify-content:center;}
+body.nf-v2 .login-card input{height:50px;border-radius:16px;font-weight:700;}
+body.nf-v2 .btn{border-radius:14px;font-weight:900;box-shadow:none;}
+body.nf-v2 .btn-primary{background:var(--nf-gradient)!important;}
+body.nf-v2 .hero-command{background:var(--nf-gradient)!important;color:white;border-radius:30px;padding:1.6rem;margin-bottom:1rem;box-shadow:var(--shadow-lg);position:relative;overflow:hidden;}
+body.nf-v2 .hero-command h2, body.nf-v2 .hero-command .text-muted{color:white!important;}
+body.nf-v2 .hero-kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:1rem;margin-top:1rem;}
+body.nf-v2 .hero-kpi{background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.22);border-radius:20px;padding:1rem;color:white;}
+body.nf-v2 .hero-kpi .label{font-size:.72rem;text-transform:uppercase;letter-spacing:.08em;opacity:.78;font-weight:900;}
+body.nf-v2 .hero-kpi .value{font-size:1.55rem;font-weight:950;margin-top:.25rem;}
+.nf-section-head{display:flex;align-items:center;justify-content:space-between;gap:.75rem;margin-bottom:.8rem;}.nf-section-head h3{margin:0;font-size:1.2rem;}
+.nf-calendar-grid-v2{display:grid;grid-template-columns:repeat(7,1fr);gap:.55rem;}.nf-day-name{text-align:center;font-size:.7rem;font-weight:950;color:var(--text-muted);text-transform:uppercase;letter-spacing:.08em;}.nf-cal-day{min-height:92px;border:1px solid var(--border-color);border-radius:18px;padding:.55rem;background:var(--bg-card);position:relative;overflow:hidden;}.nf-cal-day.today{outline:3px solid var(--primary);}.nf-cal-day .num{font-weight:950;color:var(--text-primary);}.nf-dot-row{display:flex;gap:.2rem;flex-wrap:wrap;margin-top:.45rem}.nf-dot{width:.55rem;height:.55rem;border-radius:999px;display:inline-block}.nf-dot.train{background:var(--success)}.nf-dot.meal{background:var(--accent)}.nf-dot.progress{background:var(--warning)}.nf-dot.family{background:var(--secondary)}.nf-cal-note{font-size:.65rem;color:var(--text-secondary);margin-top:.35rem;line-height:1.15}.nf-empty-day{opacity:.35}.nf-week-board{display:grid;grid-template-columns:110px repeat(7,1fr);gap:.45rem;align-items:stretch;}.nf-week-cell{min-height:82px;border:1px solid var(--border-color);border-radius:16px;background:var(--bg-card);padding:.55rem;font-size:.78rem;}.nf-week-head{background:var(--nf-gradient)!important;color:white!important;font-weight:950;text-align:center;display:flex;align-items:center;justify-content:center;}.nf-meal-label{font-weight:950;color:var(--primary);display:flex;align-items:center;}.nf-week-cell select{font-size:.75rem;border-radius:12px;padding:.35rem;}.nf-toolbar{display:flex;gap:.5rem;align-items:center;flex-wrap:wrap}.nf-progress-list,.nf-shopping-list{display:grid;gap:.65rem}.nf-row-card{display:flex;justify-content:space-between;gap:.75rem;align-items:center;border:1px solid var(--border-color);background:var(--bg-card);border-radius:18px;padding:.8rem}.nf-row-card small{color:var(--text-muted)}.nf-action-row{display:flex;gap:.35rem;flex-wrap:wrap}.nf-pill{display:inline-flex;align-items:center;gap:.25rem;border-radius:999px;padding:.22rem .55rem;background:var(--primary-bg);color:var(--primary);font-size:.72rem;font-weight:900}.insight-panel{display:grid;grid-template-columns:repeat(3,1fr);gap:1rem}.insight-card{background:var(--bg-card);border:1px solid var(--border-color);border-radius:20px;padding:1rem}.insight-card strong{color:var(--primary)}
+body.nf-v2 #view-planner .week-grid{display:grid;grid-template-columns:repeat(7,minmax(145px,1fr));gap:.8rem;overflow-x:auto;padding-bottom:.5rem}.day-card{border-radius:22px!important;padding:1rem!important;background:var(--bg-card)!important;box-shadow:var(--shadow)!important}.day-card .day-label{font-size:1rem!important;margin-bottom:.6rem!important}.day-card .meal-row{padding:.45rem;border:1px solid var(--border-color);border-radius:14px;margin-bottom:.45rem!important;background:var(--bg-input)}.day-card .meal-row label{font-size:.65rem!important}.day-card select{min-height:34px!important;border-radius:12px!important;}
+body.nf-v2 #view-family .family-calendar-grid{max-width:none!important;gap:.55rem!important}.family-calendar-grid .calendar-day{border-radius:18px!important;min-height:76px!important;aspect-ratio:auto!important;font-size:.8rem!important;}
+body.nf-v2 #view-shopping #shoppingList{padding:1rem}.shopping-item{border:1px solid var(--border-color);border-radius:16px;padding:.7rem!important;margin-bottom:.5rem;background:var(--bg-card)}
+body.nf-v2 #view-recipes .recipe-card{border-radius:22px!important;padding:1rem!important}.recipe-card:before{content:"🍽️";display:flex;width:42px;height:42px;align-items:center;justify-content:center;border-radius:14px;background:var(--primary-bg);margin-bottom:.6rem;font-size:1.4rem}
+.nf-modal-grid{display:grid;grid-template-columns:1fr 1fr;gap:.75rem}.nf-modal-grid .full{grid-column:1 / -1}.nf-form-actions{display:flex;justify-content:flex-end;gap:.5rem;margin-top:1rem}.nf-hidden-old-training{display:none!important;}
+@media(max-width:900px){body.nf-v2 #mainApp{display:block}body.nf-v2 .nav{position:static;min-height:auto;flex-direction:row;overflow-x:auto;border-radius:0!important;margin:0 -1rem 1rem!important}body.nf-v2 .nav:before{display:none}body.nf-v2 .nav button{width:auto;white-space:nowrap}body.nf-v2 #mainApp>header{position:static}.hero-kpis,.insight-panel{grid-template-columns:1fr 1fr}.nf-calendar-grid-v2{gap:.25rem}.nf-cal-day{min-height:70px;border-radius:14px}.nf-week-board{grid-template-columns:90px repeat(7,155px);overflow-x:auto}.login-card{display:block!important}.login-card .text-center{min-height:auto!important;padding:2rem!important}}
+@media print{body.nf-v2{background:white!important}.nav,header,.no-print,.theme-dropdown,.btn,button{display:none!important}.card{box-shadow:none!important;border:1px solid #bbb!important;background:white!important}.nf-calendar-grid-v2{gap:.25rem}.nf-cal-day{min-height:78px;border:1px solid #999!important}.nf-week-board{grid-template-columns:90px repeat(7,1fr)!important;gap:.25rem}.nf-week-cell{font-size:.62rem;min-height:64px;border:1px solid #999!important}.nf-week-head{background:#eee!important;color:#000!important}#mainApp,#view-dashboard,#view-planner,#view-family{display:block!important}.hidden{display:none!important}}
+</style>
+
+<script id="nutriflow-v2-wow-script">
+(function(){
+'use strict';
+const $ = (id)=>document.getElementById(id);
+const todayISO = ()=>{const d=new Date(); d.setMinutes(d.getMinutes()-d.getTimezoneOffset()); return d.toISOString().slice(0,10)};
+const fmtDate = (v)=>String(v||'').slice(0,10) || todayISO();
+const esc = (v)=> (typeof escapeHtml==='function'? escapeHtml(String(v??'')) : String(v??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])));
+const toast = (m,t='success')=> typeof showToast==='function'? showToast(m,t): alert(m);
+window.nfV2 = window.nfV2 || {trainingDates:new Set(), progressEdits:[], shoppingLocal:[], activeCalendar:'my'};
+
+document.addEventListener('DOMContentLoaded',()=>{document.body.classList.add('nf-v2'); nfV2Boot();});
+function nfV2Boot(){
+  polishLogin(); ensureV2Modals(); removeDuplicateTrainingArea(); hydrateLocalState(); setTimeout(()=>{renderSmartCoach(); renderDashboardCalendarHubV2();},300);
+}
+function polishLogin(){
+  const btn = document.querySelector('#loginScreen .btn-primary'); if(btn){btn.innerHTML='🚀 Sign In'; btn.onclick=handleSignIn;}
+  const loginCard=document.querySelector('.login-card'); if(loginCard && !document.getElementById('nfLoginHint')){
+    const hint=document.createElement('div'); hint.id='nfLoginHint'; hint.className='text-muted'; hint.style.marginTop='.75rem'; hint.style.fontSize='.8rem'; hint.textContent='Guest access is recipes-only. Family access opens your full OS.'; loginCard.querySelector('div:last-child')?.appendChild(hint);
+  }
+}
+function hydrateLocalState(){
+  try{ const key='nf_training_'+(window.userId||'guest'); (JSON.parse(localStorage.getItem(key)||'[]')).forEach(d=>nfV2.trainingDates.add(d)); }catch(e){}
+  try{ nfV2.shoppingLocal = JSON.parse(localStorage.getItem('nf_shopping_'+(window.familyCode||'guest'))||'[]'); }catch(e){nfV2.shoppingLocal=[]}
+}
+function saveLocalTraining(){try{localStorage.setItem('nf_training_'+(window.userId||'guest'),JSON.stringify([...nfV2.trainingDates]));}catch(e){}}
+function isKidProfile(data){ const age=Number(data?.Age||data?.age||0); const goal=String(data?.Goal||data?.Profile_Type||'').toLowerCase(); return age>0&&age<14 || goal.includes('child') || goal.includes('kid'); }
+const oldSetTheme = window.setTheme;
+window.setTheme=function(theme){
+  const normalized = ({emerald:'light',midnight:'dark',rose:'kids',sunrise:'kids',steel:'light'}[theme]||theme||'light');
+  document.documentElement.setAttribute('data-theme', normalized);
+  localStorage.setItem('nutriflow-theme', normalized);
+  document.querySelectorAll('.dropdown-item').forEach(i=>i.classList.toggle('active', i.dataset.theme===normalized));
+  const label=$('currentThemeLabel'); if(label) label.textContent = normalized==='kids'?'Kids':normalized==='dark'?'Dark':'Light';
+  $('themeDropdownContent')?.classList.remove('show');
+};
+window.loadTheme=function(){ const saved=localStorage.getItem('nutriflow-theme') || 'light'; window.setTheme(saved); };
+
+window.handleSignIn = async function(){
+  const fc=$('loginFamilyCode')?.value.trim(); const nm=$('loginName')?.value.trim(); const st=$('loginStatus');
+  if(!fc||!nm){ if(st){st.textContent='Please enter Family Code and Name.'; st.className='error'} return; }
+  if(st){st.textContent='Signing in...'; st.className=''}
+  const result = await apiCall('signIn',{familyCode:fc,name:nm});
+  if(!result.success){ if(st){st.textContent='❌ '+(result.error||'Invalid credentials.'); st.className='error'} return; }
+  window.isGuestMode=false; document.body.classList.remove('guest-mode');
+  window.familyCode=fc; window.userName=nm; window.userId=result.userId||''; window.userData=result.userData||{};
+  $('loginScreen')?.classList.add('hidden'); $('mainApp')?.classList.remove('hidden');
+  if($('userNameDisplay')) $('userNameDisplay').textContent=nm; if($('familyCodeDisplay')) $('familyCodeDisplay').textContent=fc;
+  if(isKidProfile(window.userData)) setTheme('kids'); else loadTheme();
+  hydrateLocalState(); switchView('dashboard');
+  await Promise.allSettled([loadRecipes?.(),loadPlanner?.(),loadProgress?.(),loadShopping?.(),loadFamilyMembers?.(),loadNutritionGuide?.(),loadTrainingCalendar?.(),loadFamilyCalendar?.(),loadDashboardData?.()]);
+  removeDuplicateTrainingArea(); renderSmartCoach(); renderDashboardCalendarHubV2();
+  toast('✅ Signed in successfully.');
+};
+window.handleLogout=function(){
+  window.isGuestMode=false; document.body.classList.remove('guest-mode');
+  ['userId','userName','familyCode'].forEach(k=>window[k]=''); window.userData={}; nfV2.trainingDates=new Set();
+  $('mainApp')?.classList.add('hidden'); $('loginScreen')?.classList.remove('hidden');
+  if($('loginName')) $('loginName').value=''; const st=$('loginStatus'); if(st){st.textContent=''; st.className=''}
+  toast('Signed out. You can login as another user.','info');
+};
+
+function ensureV2Modals(){
+ if(!$('nfTrainingModal')) document.body.insertAdjacentHTML('beforeend',`<div id="nfTrainingModal" class="modal-overlay"><div class="modal-box"><button class="close-btn no-print" onclick="closeModal('nfTrainingModal')">✕</button><h2>💪 Log Training</h2><p class="text-muted">Save once and it appears immediately in the Calendar Hub.</p><div class="nf-modal-grid"><div><label>Date</label><input id="nfTrainingDate" type="date"></div><div><label>Type</label><select id="nfTrainingType"><option>Strength</option><option>Cardio</option><option>Walk</option><option>Mobility</option><option>Sport</option></select></div><div><label>Duration (minutes)</label><input id="nfTrainingDuration" type="number" value="45"></div><div><label>Intensity</label><select id="nfTrainingIntensity"><option>Light</option><option selected>Moderate</option><option>Hard</option></select></div><div class="full"><label>Notes</label><input id="nfTrainingNotes" placeholder="Chest and back, treadmill, legs..."></div></div><div class="nf-form-actions"><button class="btn btn-outline no-print" onclick="closeModal('nfTrainingModal')">Cancel</button><button class="btn btn-primary no-print" onclick="submitTrainingLog()">✅ Save Training</button></div></div></div>`);
+ if(!$('nfShoppingModal')) document.body.insertAdjacentHTML('beforeend',`<div id="nfShoppingModal" class="modal-overlay"><div class="modal-box"><button class="close-btn no-print" onclick="closeModal('nfShoppingModal')">✕</button><h2 id="nfShoppingTitle">🛒 Add Shopping Item</h2><div class="nf-modal-grid"><div class="full"><label>Item</label><input id="nfShopName" placeholder="Chicken breast, Greek yogurt..."></div><div><label>Quantity</label><input id="nfShopQty" placeholder="1 kg, 2 packs..."></div><div><label>Category</label><select id="nfShopCat"><option>Protein</option><option>Vegetables</option><option>Carbs</option><option>Dairy</option><option>Fruit</option><option>Other</option></select></div></div><div class="nf-form-actions"><button class="btn btn-outline no-print" onclick="closeModal('nfShoppingModal')">Cancel</button><button class="btn btn-primary no-print" onclick="saveShoppingItemV2()">Save Item</button></div></div></div>`);
+ if(!$('nfProgressModal')) document.body.insertAdjacentHTML('beforeend',`<div id="nfProgressModal" class="modal-overlay"><div class="modal-box"><button class="close-btn no-print" onclick="closeModal('nfProgressModal')">✕</button><h2 id="nfProgressTitle">📈 Progress Entry</h2><input id="nfProgressIndex" type="hidden"><div class="nf-modal-grid"><div><label>Date</label><input id="nfProgDate" type="date"></div><div><label>Weight (kg)</label><input id="nfProgWeight" type="number" step="0.1"></div><div><label>Waist (cm)</label><input id="nfProgWaist" type="number" step="0.5"></div><div><label>Body Fat %</label><input id="nfProgBodyFat" type="number" step="0.1" placeholder="Optional"></div><div class="full"><p class="text-muted">Body fat can come from InBody, a smart scale, caliper, or manual estimate. Best option: use InBody monthly and track trend, not single-day accuracy.</p></div></div><div class="nf-form-actions"><button class="btn btn-outline no-print" onclick="closeModal('nfProgressModal')">Cancel</button><button class="btn btn-primary no-print" onclick="saveProgressV2()">Save Entry</button></div></div></div>`);
+}
+function removeDuplicateTrainingArea(){
+  const old=$('trainingBtn'); if(old){ const card=old.closest('.card'); if(card) card.classList.add('nf-hidden-old-training'); }
+  const oldCal=$('calendarGrid'); if(oldCal){ const wrap=oldCal.closest('.calendar-compact'); if(wrap) wrap.classList.add('nf-hidden-old-training'); }
+}
+window.goToPlanner=function(){ switchView('planner'); setTimeout(()=>loadPlanner?.(),50); };
+window.openTrainingQuick=function(){ ensureV2Modals(); if($('nfTrainingDate')) $('nfTrainingDate').value=todayISO(); if($('nfTrainingNotes')) $('nfTrainingNotes').value=''; openModal('nfTrainingModal'); };
+window.toggleTraining=window.openTrainingQuick;
+window.submitTrainingLog=async function(){
+  const d=$('nfTrainingDate')?.value||todayISO(); const type=$('nfTrainingType')?.value||'Training'; const dur=$('nfTrainingDuration')?.value||'45'; const int=$('nfTrainingIntensity')?.value||'Moderate'; const notes=$('nfTrainingNotes')?.value.trim()||'';
+  nfV2.trainingDates.add(d); saveLocalTraining(); markCalendarTraining(d,type,notes); closeModal('nfTrainingModal'); renderDashboardCalendarHubV2(); renderSmartCoach();
+  const payload={userId,familyCode,trained:true,trainingDate:d,date:d,notes:[type,dur+' min',int,notes].filter(Boolean).join(' · '),trainingType:type,duration:dur,intensity:int};
+  apiCall('toggleTraining',payload,false).then(r=>{ if(!r?.success) return apiCall('logTraining',payload,false); }).catch(()=>{});
+  toast('✅ Training added to Calendar Hub.'); setTimeout(()=>{loadDashboardData?.();loadFamilyCalendar?.();},300);
+};
+function markCalendarTraining(date,type='Training',notes=''){
+  window.lastUserCalendarData = Array.isArray(window.lastUserCalendarData)?window.lastUserCalendarData:[];
+  const key=fmtDate(date); let found=false;
+  window.lastUserCalendarData = window.lastUserCalendarData.map(x=>{ if(fmtDate(x.date||x.Date)===key){found=true; return {...x,date:key,trained:true,Training:true,trainingType:type,trainingNotes:notes};} return x;});
+  if(!found) window.lastUserCalendarData.push({date:key,trained:true,Training:true,trainingType:type,trainingNotes:notes});
+}
+
+window.refreshSmartCoach=function(){ renderSmartCoach(true); toast('🧠 Insights refreshed.','info'); };
+function renderSmartCoach(refreshed=false){
+  const cal=Number($('dashCalories')?.textContent||0), calT=Number(userData?.Target_Calories||$('dashCalTarget')?.textContent||0);
+  const prot=Number($('dashProtein')?.textContent||0), protT=Number(userData?.Protein_Target_g||$('dashProtTarget')?.textContent||0);
+  const water=Number($('dashWater')?.textContent||0), waterT=Number(userData?.Water_Target_ml||$('dashWaterTarget')?.textContent||2000);
+  const trainedToday=nfV2.trainingDates.has(todayISO()) || (Array.isArray(window.lastUserCalendarData)&&window.lastUserCalendarData.some(x=>fmtDate(x.date||x.Date)===todayISO()&&(x.trained||x.Training)));
+  const score=Math.round(((calT?Math.min(cal/calT,1):0)*35)+((protT?Math.min(prot/protT,1):0)*35)+((waterT?Math.min(water/waterT,1):0)*15)+(trainedToday?15:0));
+  const proteinStatus = protT? `${Math.round((prot/protT)*100)}%`:'--';
+  const trainingPace = `${nfV2.trainingDates.size}/${Number(userData?.Training_Days_Weekly||3)}`;
+  const next = !trainedToday?'Log training':(protT&&prot<protT?'Add protein':(water<waterT?'Drink water':'Stay consistent'));
+  [['heroTodayScore',score?score+'%':'--'],['heroProteinStatus',proteinStatus],['heroTrainingPace',trainingPace],['heroNextAction',next]].forEach(([id,val])=>{if($(id))$(id).textContent=val});
+  if($('insightNutritionTitle')) $('insightNutritionTitle').textContent = protT&&prot<protT?'Protein gap':'Nutrition';
+  if($('insightNutritionText')) $('insightNutritionText').textContent = protT&&prot<protT?`You logged ${prot}g of ${protT}g protein. Prioritize a lean protein meal next.`:`Calories/protein are on track based on current data.`;
+  if($('insightTrainingTitle')) $('insightTrainingTitle').textContent = trainedToday?'Training done':'Training opportunity';
+  if($('insightTrainingText')) $('insightTrainingText').textContent = trainedToday?'Today is marked as trained in your Calendar Hub.':'You have not logged training today. Use the top Log Training button.';
+  if($('insightBusinessTitle')) $('insightBusinessTitle').textContent = 'System Quality';
+  if($('insightBusinessText')) $('insightBusinessText').textContent = 'Best next product step: keep meals, training, progress and shopping synced in one weekly rhythm.';
+}
+
+window.switchDashboardCalendar=function(mode){ nfV2.activeCalendar=mode||'my'; document.querySelectorAll('[data-dash-cal]').forEach(b=>b.classList.toggle('active',b.dataset.dashCal===nfV2.activeCalendar)); renderDashboardCalendarHubV2(); };
+window.renderDashboardCalendarHub = renderDashboardCalendarHubV2;
+function renderDashboardCalendarHubV2(){
+  const grid=$('dashboardCalendarGrid'), wrap=$('dashboardWeeklyPlanWrap'), title=$('dashboardCalendarTitle'); if(!grid) return;
+  const mode=nfV2.activeCalendar||'my'; document.querySelectorAll('[data-dash-cal]').forEach(b=>b.classList.toggle('active',b.dataset.dashCal===mode));
+  if(mode==='week'){ grid.classList.add('hidden'); if(wrap){wrap.classList.remove('hidden'); wrap.innerHTML=buildWeeklyBoardHTML();} if(title) title.textContent='Printable weekly meal board from your planner.'; return; }
+  if(wrap) wrap.classList.add('hidden'); grid.classList.remove('hidden');
+  const data = mode==='family' ? (window.lastFamilyCalendarData||[]) : (window.lastUserCalendarData||[]);
+  const isFam = mode==='family'; if(title) title.textContent = isFam?'Family activity consolidated calendar.':'Your meals, training and progress activity.';
+  grid.className='nf-calendar-grid-v2'; grid.innerHTML=buildMonthHTML(data,isFam);
+}
+function buildMonthHTML(data=[],isFamily=false){
+  const now=new Date(); const y=now.getFullYear(), m=now.getMonth(); const first=new Date(y,m,1); const last=new Date(y,m+1,0); const today=todayISO();
+  const map={}; (data||[]).forEach(x=>{ const d=fmtDate(x.date||x.Date||x.Day); (map[d]=map[d]||[]).push(x); }); [...nfV2.trainingDates].forEach(d=>(map[d]=map[d]||[]).push({trained:true,Training:true}));
+  let html=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'].map(d=>`<div class="nf-day-name">${d}</div>`).join('');
+  for(let i=0;i<first.getDay();i++) html+=`<div class="nf-cal-day nf-empty-day"></div>`;
+  for(let day=1;day<=last.getDate();day++){ const d=`${y}-${String(m+1).padStart(2,'0')}-${String(day).padStart(2,'0')}`; const rows=map[d]||[]; const train=rows.some(r=>r.trained||r.Training); const meal=rows.some(r=>r.meals||r.Meals||r.mealLogged||r.Recipe_Name); const prog=rows.some(r=>r.progress||r.Progress||r.Weight); const fam=isFamily&&rows.length; html+=`<div class="nf-cal-day ${d===today?'today':''}"><div class="num">${day}</div><div class="nf-dot-row">${train?'<span class="nf-dot train"></span>':''}${meal?'<span class="nf-dot meal"></span>':''}${prog?'<span class="nf-dot progress"></span>':''}${fam?'<span class="nf-dot family"></span>':''}</div><div class="nf-cal-note">${train?'Training ':''}${meal?'Meals ':''}${prog?'Progress ':''}${fam?rows.length+' family item(s)':''}</div></div>`; }
+  return html;
+}
+function buildWeeklyBoardHTML(){
+  const days=['Sun','Mon','Tue','Wed','Thu','Fri','Sat']; const meals=['Breakfast','Snack 1','Lunch','Snack 2','Dinner','Dessert'];
+  let html='<div class="nf-week-board"><div class="nf-week-cell nf-week-head">Meal</div>'+days.map(d=>`<div class="nf-week-cell nf-week-head">${d}</div>`).join('');
+  meals.forEach(meal=>{ html+=`<div class="nf-week-cell nf-meal-label">${meal}</div>`; days.forEach((d,idx)=>{ const val=findPlannerMeal(idx,meal); html+=`<div class="nf-week-cell">${esc(val||'—')}</div>`; }); });
+  return html+'</div>';
+}
+function findPlannerMeal(dayIdx,meal){
+  const aliases={Breakfast:'Breakfast_ID','Snack 1':'Snack_1_ID',Lunch:'Lunch_ID','Snack 2':'Snack_2_ID',Dinner:'Dinner_ID',Dessert:'Dessert_ID'}; const key=aliases[meal]||meal;
+  try{ const arr=Object.values(window.plannerData||{}); const row=arr[dayIdx]||{}; return row[key]||row[meal]||'';}catch(e){return ''}
+}
+window.printCurrentCalendarView=function(){ window.print(); };
+
+const oldLoadPlanner=window.loadPlanner;
+window.loadPlanner=async function(){ if(oldLoadPlanner) await oldLoadPlanner(); beautifyPlanner(); renderDashboardCalendarHubV2(); };
+function beautifyPlanner(){ const grid=$('plannerGrid'); if(!grid) return; grid.classList.add('nf-planner-v2'); const head=document.querySelector('#view-planner .flex-between'); if(head && !document.getElementById('nfPlannerHint')){ head.insertAdjacentHTML('afterend','<div id="nfPlannerHint" class="card no-print" style="padding:1rem"><strong>Weekly Board</strong><p class="text-muted">Select meals, save the week, then print or generate shopping list.</p></div>'); }}
+window.printPlanner=function(){ switchView('planner'); setTimeout(()=>window.print(),150); };
+const oldSavePlanner=window.savePlanner; window.savePlanner=async function(){ if(oldSavePlanner) await oldSavePlanner(); renderDashboardCalendarHubV2(); toast('✅ Weekly plan saved / refreshed.'); };
+
+const oldRenderProgress=window.renderProgressHistory;
+window.renderProgressHistory=function(history){
+  const container=$('progressHistory'); if(!container){ if(oldRenderProgress) oldRenderProgress(history); return; }
+  const rows=(history||window.progressHistory||[]); window.progressHistory=rows;
+  if(!rows.length){container.innerHTML='<p class="text-muted">No entries yet.</p>';return;}
+  container.innerHTML='<div class="nf-progress-list">'+rows.map((r,i)=>`<div class="nf-row-card"><div><strong>${esc(fmtDate(r.Date||r.date||r.Timestamp))}</strong><br><small>Weight: ${esc(r.Weight_kg||r.Weight||r.weight||'--')} kg · Waist: ${esc(r.Waist_cm||r.Waist||r.waist||'--')} cm · Body Fat: ${esc(r.Body_Fat_Percent||r.BodyFat||r.bodyFat||'--')}%</small></div><div class="nf-action-row no-print"><button class="btn btn-outline btn-sm" onclick="editProgressEntry(${i})">Edit</button><button class="btn btn-danger btn-sm" onclick="deleteProgressEntry(${i})">Delete</button></div></div>`).join('')+'</div>';
+};
+window.openProgressForm=function(){ ensureV2Modals(); $('nfProgressIndex').value=''; $('nfProgDate').value=todayISO(); ['nfProgWeight','nfProgWaist','nfProgBodyFat'].forEach(id=>$(id).value=''); openModal('nfProgressModal'); };
+window.editProgressEntry=function(i){ ensureV2Modals(); const r=(window.progressHistory||[])[i]; if(!r)return; $('nfProgressIndex').value=i; $('nfProgDate').value=fmtDate(r.Date||r.date||r.Timestamp); $('nfProgWeight').value=r.Weight_kg||r.Weight||r.weight||''; $('nfProgWaist').value=r.Waist_cm||r.Waist||r.waist||''; $('nfProgBodyFat').value=r.Body_Fat_Percent||r.BodyFat||r.bodyFat||''; openModal('nfProgressModal'); };
+window.saveProgressV2=async function(){ const i=$('nfProgressIndex').value; const entry={Date:$('nfProgDate').value||todayISO(),Weight_kg:$('nfProgWeight').value,Waist_cm:$('nfProgWaist').value,Body_Fat_Percent:$('nfProgBodyFat').value}; if(i==='') window.progressHistory=[entry,...(window.progressHistory||[])]; else window.progressHistory[i]=entry; closeModal('nfProgressModal'); renderProgressHistory(window.progressHistory); renderDashboardCalendarHubV2(); await apiCall(i===''?'saveProgress':'updateProgress',{userId,familyCode,index:i,...entry},false).catch(()=>{}); toast('✅ Progress saved.'); };
+window.deleteProgressEntry=async function(i){ if(!confirm('Delete this progress entry?'))return; (window.progressHistory||[]).splice(i,1); renderProgressHistory(window.progressHistory); await apiCall('deleteProgress',{userId,familyCode,index:i},false).catch(()=>{}); toast('Deleted progress entry.','info'); };
+const oldSaveProgress=window.saveProgress; window.saveProgress=function(){ window.openProgressForm(); };
+
+window.addShoppingItem=function(){ ensureV2Modals(); $('nfShopName').value=''; $('nfShopQty').value=''; $('nfShopCat').value='Other'; openModal('nfShoppingModal'); };
+window.saveShoppingItemV2=async function(){ const item={id:Date.now(),Ingredient:$('nfShopName').value.trim(),Quantity:$('nfShopQty').value.trim(),Category:$('nfShopCat').value,Purchased:false}; if(!item.Ingredient){toast('Please enter item name.','error');return;} nfV2.shoppingLocal.unshift(item); persistShopping(); closeModal('nfShoppingModal'); renderShoppingV2(); await apiCall('addShoppingItem',{familyCode,ingredient:item.Ingredient,quantity:item.Quantity,category:item.Category},false).catch(()=>{}); toast('✅ Shopping item added.'); };
+function persistShopping(){try{localStorage.setItem('nf_shopping_'+(familyCode||'guest'),JSON.stringify(nfV2.shoppingLocal));}catch(e){}}
+const oldLoadShopping=window.loadShopping; window.loadShopping=async function(){ if(oldLoadShopping) await oldLoadShopping(); hydrateLocalState(); renderShoppingV2(); };
+function renderShoppingV2(){ const c=$('shoppingList'); if(!c)return; const base=Array.isArray(window.shoppingItems)?window.shoppingItems:[]; const rows=[...nfV2.shoppingLocal,...base]; if(!rows.length){c.innerHTML='<p class="text-muted">No shopping items yet.</p>';return;} c.innerHTML='<div class="nf-shopping-list">'+rows.map((x,i)=>`<div class="nf-row-card ${x.Purchased?'purchased':''}"><div><strong>${esc(x.Ingredient||x.name||x.ingredient)}</strong><br><small>${esc(x.Quantity||x.qty||'')} · ${esc(x.Category||'')}</small></div><div class="nf-action-row no-print"><button class="btn btn-outline btn-sm" onclick="toggleShoppingPurchased(${i})">${x.Purchased?'Undo':'Bought'}</button><button class="btn btn-danger btn-sm" onclick="deleteShoppingItemV2(${i})">Delete</button></div></div>`).join('')+'</div>'; }
+window.toggleShoppingPurchased=function(i){ nfV2.shoppingLocal[i].Purchased=!nfV2.shoppingLocal[i].Purchased; persistShopping(); renderShoppingV2(); };
+window.deleteShoppingItemV2=function(i){ nfV2.shoppingLocal.splice(i,1); persistShopping(); renderShoppingV2(); toast('Shopping item deleted.','info'); };
+const oldGenerateShopping=window.generateShoppingList; window.generateShoppingList=async function(){ if(oldGenerateShopping) await oldGenerateShopping(); renderShoppingV2(); toast('🛒 Shopping list generated/refreshed.'); };
+
+const oldLoadFamily=window.loadFamilyCalendar; window.loadFamilyCalendar=async function(filter='all'){ if(oldLoadFamily) await oldLoadFamily(filter); renderDashboardCalendarHubV2(); beautifyFamilyCalendar(); };
+function beautifyFamilyCalendar(){ const view=$('view-family'); if(view && !document.getElementById('nfFamilyPrintBtn')){ const h=view.querySelector('h2'); h?.insertAdjacentHTML('afterend','<div class="nf-toolbar no-print" id="nfFamilyPrintBtn" style="margin-bottom:1rem"><button class="btn btn-outline btn-sm" onclick="printFamilyCalendar()">🖨️ Print Family Calendar</button><span class="text-muted">Consolidated family training, meals and progress.</span></div>'); }}
+window.printFamilyCalendar=function(){ switchView('family'); setTimeout(()=>window.print(),150); };
+
+const oldSwitchView=window.switchView; window.switchView=function(view){ if(window.isGuestMode&&view!=='recipes'){toast('Guest mode can view recipes only.','info');view='recipes';} if(oldSwitchView) oldSwitchView(view); setTimeout(()=>{removeDuplicateTrainingArea(); if(view==='dashboard'){renderSmartCoach();renderDashboardCalendarHubV2();} if(view==='planner') beautifyPlanner(); if(view==='shopping') renderShoppingV2(); if(view==='family') beautifyFamilyCalendar();},50); };
+// Patch guest button text and ensure recipes-only remains.
+window.continueAsGuestRecipes = window.continueAsGuestRecipes || async function(){ window.isGuestMode=true; userId='guest'; userName='Guest'; familyCode='GUEST'; userData={Name:'Guest',Profile_Type:'Guest'}; $('loginScreen')?.classList.add('hidden'); $('mainApp')?.classList.remove('hidden'); setTheme('light'); await loadRecipes?.(); switchView('recipes'); toast('👀 Guest mode: recipes only.'); };
+
+// Re-render after known async loads.
+['loadDashboardData','loadTrainingCalendar','loadProgress','loadPlanner'].forEach(fn=>{ const old=window[fn]; if(typeof old==='function'){ window[fn]=async function(){ const r=await old.apply(this,arguments); hydrateLocalState(); removeDuplicateTrainingArea(); renderSmartCoach(); renderDashboardCalendarHubV2(); if(fn==='loadProgress') renderProgressHistory(window.progressHistory||[]); return r; }; }});
+})();
+</script>
+
 </body>
 </html>
