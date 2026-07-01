@@ -3118,5 +3118,217 @@ setTimeout(afterLogin,1500);
 })();
 </script>
 
+
+
+<!-- =====================================================================
+     NUTRIFLOW V3.2 SAFE STABILIZATION PATCH
+     Scope: visual/data-binding fixes only. Existing backend actions/functions are preserved.
+     ===================================================================== -->
+<style id="nf-v32-safe-style">
+  /* Keep the current good shell, hide only duplicated legacy dashboard blocks */
+  .nf-v32-hidden-legacy{display:none!important;}
+  .nf-v32-themebar{display:flex;align-items:center;gap:.45rem;flex-wrap:wrap;margin-left:auto;background:var(--bg-input);border:1px solid var(--border-color);padding:.25rem;border-radius:999px;box-shadow:var(--shadow)}
+  .nf-v32-themebar span{font-size:.68rem;font-weight:900;color:var(--text-muted);letter-spacing:.08em;text-transform:uppercase;padding:0 .35rem}
+  .nf-v32-themebar button{border:0;border-radius:999px;background:transparent;color:var(--text-secondary);font-weight:900;padding:.42rem .72rem;cursor:pointer}
+  .nf-v32-themebar button.active{background:var(--primary)!important;color:#fff!important}
+  .nf-v32-water-mini{display:flex;gap:.35rem;align-items:center;flex-wrap:wrap;margin-top:.55rem}
+  .nf-v32-water-mini input{width:90px!important;min-width:80px!important;padding:.38rem .55rem!important;border-radius:10px!important}
+  .nf-v32-water-mini button{padding:.38rem .62rem!important;font-size:.75rem!important;border-radius:10px!important}
+  .nf-v32-empty-chart{display:flex;align-items:center;justify-content:center;min-height:180px;border:1px dashed var(--border-color);border-radius:16px;color:var(--text-muted);font-weight:800;background:var(--bg-input)}
+  .nf-v32-recipe-tools{display:flex;gap:.5rem;flex-wrap:wrap;align-items:center;margin:.65rem 0 1rem}
+  .nf-v32-cat-chip{border:1px solid var(--border-color);background:var(--bg-input);color:var(--text-secondary);border-radius:999px;padding:.45rem .8rem;font-weight:900;cursor:pointer;font-size:.78rem}
+  .nf-v32-cat-chip.active{background:var(--primary)!important;border-color:var(--primary)!important;color:#fff!important}
+  .nf-v32-category-title{font-size:.75rem;letter-spacing:.08em;text-transform:uppercase;color:var(--text-muted);font-weight:1000;margin:1rem 0 .5rem}
+  .nf-v32-training-help{font-size:.8rem;color:var(--text-muted);margin:.35rem 0 .75rem}
+  @media print{.nf-v32-themebar,.nf-v32-no-print{display:none!important}}
+</style>
+<script id="nf-v32-safe-patch">
+(function(){
+'use strict';
+if(window.__nfV32SafePatchApplied) return; window.__nfV32SafePatchApplied=true;
+const $=id=>document.getElementById(id);
+const q=(s,r=document)=>r.querySelector(s);
+const qa=(s,r=document)=>Array.from(r.querySelectorAll(s));
+const txt=v=>String(v==null?'':v);
+const esc=v=>{const d=document.createElement('div');d.textContent=txt(v);return d.innerHTML};
+const toast=(m,t='success')=>{ if(typeof showToast==='function') showToast(m,t); else console.log(m); };
+const api=(action,payload)=>{ if(typeof apiCall==='function') return apiCall(action,payload||{}); return Promise.resolve({success:false}); };
+const profile=()=>window.userData||{};
+const uid=()=>window.userId||'';
+const fam=()=>window.familyCode||($('familyCodeDisplay')?.textContent||'');
+function getVal(obj,keys,def=''){
+  for(const k of keys){ if(obj && obj[k]!==undefined && obj[k]!==null && obj[k]!=='' ) return obj[k]; }
+  const norm={}; Object.keys(obj||{}).forEach(k=>{norm[String(k).toLowerCase().replace(/[^a-z0-9]/g,'')]=obj[k]});
+  for(const k of keys){ const n=String(k).toLowerCase().replace(/[^a-z0-9]/g,''); if(norm[n]!==undefined && norm[n]!==null && norm[n]!=='') return norm[n]; }
+  return def;
+}
+function targets(){
+  const u=profile();
+  const w=Number(getVal(u,['Weight_kg','Weight','Current_Weight','Body_Weight_kg'],0));
+  const h=Number(getVal(u,['Height_cm','Height','Height (cm)'],0));
+  const age=Number(getVal(u,['Age'],0));
+  const sex=String(getVal(u,['Sex','Gender'],'Male')).toLowerCase();
+  const activity=String(getVal(u,['Activity_Level','Activity Level','Activity'],'Moderate')).toLowerCase();
+  const goal=String(getVal(u,['Goal'],'Maintain')).toLowerCase();
+  const bmr=h&&w&&age?Math.round(10*w+6.25*h-5*age+(sex.startsWith('f')?-161:5)):0;
+  const mult=activity.includes('very')?1.725:activity.includes('active')?1.55:activity.includes('light')?1.375:activity.includes('sed')?1.2:1.45;
+  let tdee=bmr?Math.round(bmr*mult):0;
+  let cal=Number(getVal(u,['Target_Calories','Target Calories','Target_Calories_kcal','Calories_Target','Calorie_Target'],0));
+  if(!cal && tdee){ cal = goal.includes('loss')?tdee-450:goal.includes('bulk')||goal.includes('gain')?tdee+250:tdee; }
+  let prot=Number(getVal(u,['Protein_Target_g','Protein Target','Protein_Target','Target_Protein_g'],0));
+  if(!prot && w) prot=Math.round(w*(goal.includes('gain')||goal.includes('bulk')?1.9:goal.includes('loss')?1.7:1.4));
+  let water=Number(getVal(u,['Water_Target_ml','Water Target','Water_Target','Target_Water_ml'],0));
+  if(!water && w) water=Math.round(w*35);
+  const bmi=h&&w?(w/((h/100)**2)):0;
+  return {w,h,age,sex,bmr,tdee,cal,prot,water,bmi};
+}
+function setText(id,val){const el=$(id); if(el) el.textContent=(val===0?0:(val||'--'));}
+function syncProfileDisplaysV32(){
+  const u=profile(), t=targets();
+  setText('settingsName',getVal(u,['Name','User_Name','Full Name'],window.userName||''));
+  setText('settingsFamily',fam());
+  setText('settingsAge',getVal(u,['Age'],'')); setText('settingsSex',getVal(u,['Sex','Gender'],'')); setText('settingsGoal',getVal(u,['Goal'],''));
+  setText('settingsCalories',t.cal||'--'); setText('settingsProtein',t.prot||'--'); setText('settingsWater',t.water||'--');
+  setText('guideProteinTarget',t.prot||'--'); setText('guideWaterTarget',t.water||'--');
+  setText('displayBMI',t.bmi?t.bmi.toFixed(1):'--'); setText('displayBMR',t.bmr||'--'); setText('displayTDEE',t.tdee||'--');
+  setText('displayTargetCal',t.cal||'--'); setText('displayTargetProtein',t.prot||'--'); setText('displayTargetWater',t.water||'--');
+  setText('dashCalTarget',t.cal||0); setText('dashProtTarget',t.prot||0); setText('dashWaterTarget',t.water||0);
+}
+window.loadNutritionGuide=syncProfileDisplaysV32;
+function installVisibleThemeBar(){
+  const header=q('#mainApp > header'); if(!header || $('nfV32ThemeBar')) return;
+  const bar=document.createElement('div'); bar.id='nfV32ThemeBar'; bar.className='nf-v32-themebar';
+  bar.innerHTML='<span>Theme</span><button data-nf-theme="light">☀️ Light</button><button data-nf-theme="dark">🌙 Dark</button><button data-nf-theme="kids">⭐ Kids</button>';
+  header.appendChild(bar);
+  bar.onclick=e=>{const b=e.target.closest('button[data-nf-theme]'); if(b) setThemeV32(b.dataset.nfTheme)};
+  refreshThemeBar();
+}
+function refreshThemeBar(){const cur=localStorage.getItem('nutriflow-theme-v32')||localStorage.getItem('nutriflow-theme')||'light'; qa('#nfV32ThemeBar button').forEach(b=>b.classList.toggle('active',b.dataset.nfTheme===cur|| (cur==='emerald'&&b.dataset.nfTheme==='light') || (cur==='midnight'&&b.dataset.nfTheme==='dark')))}
+window.setThemeV32=function(theme){
+  const htmlTheme=theme==='dark'?'midnight':theme==='kids'?'kids':'light';
+  document.documentElement.setAttribute('data-theme',htmlTheme); document.body.setAttribute('data-nf-theme',theme);
+  localStorage.setItem('nutriflow-theme-v32',theme);
+  localStorage.setItem('nutriflow-theme',theme==='dark'?'midnight':theme==='kids'?'kids':'emerald');
+  const lbl=$('currentThemeLabel'); if(lbl) lbl.textContent=theme==='dark'?'Dark':theme==='kids'?'Kids':'Light';
+  refreshThemeBar();
+};
+const oldLoadTheme=window.loadTheme; window.loadTheme=function(){ const saved=localStorage.getItem('nutriflow-theme-v32'); if(saved){setThemeV32(saved); return;} if(oldLoadTheme) oldLoadTheme(); installVisibleThemeBar(); };
+function cleanLegacyDashboard(){
+  const view=$('view-dashboard'); if(!view) return;
+  const hero=q('.nf-v3-hero',view) || q('.nf-v3-hero');
+  qa(':scope > h2',view).forEach(h=>{ if(/dashboard/i.test(h.textContent)) h.classList.add('nf-v32-hidden-legacy'); });
+  qa(':scope > .grid-3',view).forEach(g=>{ if(/Calories|Protein|Water/i.test(g.textContent)) g.classList.add('nf-v32-hidden-legacy'); });
+  qa(':scope > .card',view).forEach(c=>{ if(c.querySelector('#dashBMI,#dashBMR,#dashTDEE,#dashWeeklyAvg,#trainingBtn,#calendarGrid')) c.classList.add('nf-v32-hidden-legacy'); });
+  // Improve empty chart cards without removing their function
+  qa('.chart-container canvas').forEach(cv=>{ const card=cv.closest('.card'); if(card && !cv.dataset.nfEmptyHandled){ cv.dataset.nfEmptyHandled='1'; }});
+  // Make sure hero remains visible
+  if(hero) hero.classList.remove('nf-v32-hidden-legacy');
+}
+function waterVal(){return Number(window.dailyWaterLog||Number($('dashWater')?.textContent)||0)||0;}
+function paintWater(){const v=waterVal(); ['dashWater','nfHeroWater'].forEach(id=>{const el=$(id); if(el) el.textContent=v;}); if(typeof updateWaterProgress==='function') updateWaterProgress();}
+window.adjustWaterV32=function(amount){
+  amount=Number(amount)||0; if(!amount) return;
+  if(amount>0 && typeof window.addWater==='function'){ window.addWater(amount); setTimeout(paintWater,80); return; }
+  window.dailyWaterLog=Math.max(0,waterVal()+amount); paintWater(); api('logWater',{userId:uid(),familyCode:fam(),amount}); toast('💧 Water adjusted');
+};
+window.resetWaterV32=function(){ if(typeof window.resetWater==='function') window.resetWater(); else {window.dailyWaterLog=0; paintWater(); api('resetWater',{userId:uid(),familyCode:fam()});} };
+function enhanceHeroWater(){
+  const hero=q('.nf-v3-hero'); if(!hero) return;
+  const waterCard=Array.from(hero.querySelectorAll('.nf-v3-kpi')).find(c=>/water/i.test(c.textContent)); if(!waterCard) return;
+  if(!waterCard.querySelector('.nf-v32-water-mini')){
+    const box=document.createElement('div'); box.className='nf-v32-water-mini';
+    box.innerHTML='<input id="nfWaterCustomV32" type="number" placeholder="ml"><button class="btn btn-primary" onclick="adjustWaterV32(Number(document.getElementById(\'nfWaterCustomV32\').value)||0)">Add</button><button class="btn btn-outline" onclick="adjustWaterV32(250)">+250</button><button class="btn btn-outline" onclick="adjustWaterV32(500)">+500</button><button class="btn btn-outline" onclick="adjustWaterV32(-250)">-250</button><button class="btn btn-danger" onclick="resetWaterV32()">Reset</button>';
+    waterCard.appendChild(box);
+  }
+}
+/* Training modal: free text, same save backend actions */
+function localTrainKey(){return 'nf_training_'+(uid()||'guest')+'_'+(fam()||'family')}
+function trainList(){try{return JSON.parse(localStorage.getItem(localTrainKey())||'[]')}catch(e){return []}}
+function setTrainList(v){localStorage.setItem(localTrainKey(),JSON.stringify(v||[]))}
+function todayISO(){return new Date().toISOString().slice(0,10)}
+window.openTrainingModalV32=function(){
+  let m=$('nfTrainingModal'); if(!m){m=document.createElement('div');m.id='nfTrainingModal';m.className='modal-overlay';document.body.appendChild(m)}
+  const rows=trainList().slice(-8).reverse().map(x=>'<tr><td>'+esc((x.date||'').slice(0,10))+'</td><td>'+esc(x.type||'Training')+'</td><td>'+esc(x.duration||'')+'</td><td><button class="btn btn-danger btn-sm" onclick="deleteTrainingV32(\''+esc(x.id)+'\')">Delete</button></td></tr>').join('') || '<tr><td colspan="4" class="text-muted">No training logs yet.</td></tr>';
+  m.innerHTML='<div class="modal-box"><button class="close-btn" onclick="closeModal(\'nfTrainingModal\')">✕</button><h2>💪 Log Training</h2><p class="nf-v32-training-help">Free text lets you write exactly what you trained without changing the existing save logic.</p><div class="nf-form-grid"><div><label>Date</label><input id="nfTrainDate" type="date" value="'+todayISO()+'"></div><div><label>Training</label><input id="nfTrainType" placeholder="e.g. Upper body, Chest & back, Walk" value="Strength Training"></div><div><label>Duration minutes</label><input id="nfTrainDuration" type="number" value="45"></div><div><label>Intensity</label><input id="nfTrainIntensity" placeholder="Easy / Moderate / Hard" value="Moderate"></div><div class="full"><label>Notes</label><input id="nfTrainNotes" placeholder="Optional notes"></div></div><div class="flex" style="justify-content:space-between;margin-top:1rem"><button class="btn btn-outline" onclick="undoTrainingTodayV32()">↩️ Undo Today</button><div><button class="btn btn-outline" onclick="closeModal(\'nfTrainingModal\')">Cancel</button> <button class="btn btn-primary" onclick="saveTrainingV32()">✅ Save Training</button></div></div><h3>Recent Training</h3><table class="progress-table"><thead><tr><th>Date</th><th>Training</th><th>Minutes</th><th></th></tr></thead><tbody>'+rows+'</tbody></table></div>';
+  m.classList.add('open');
+};
+window.openTrainingModalV3=window.openTrainingModalV32; window.openTrainingQuick=window.openTrainingModalV32; window.toggleTraining=window.openTrainingModalV32;
+window.saveTrainingV32=function(){
+  const e={id:'TR'+Date.now(),date:$('nfTrainDate')?.value||todayISO(),type:$('nfTrainType')?.value||'Training',duration:$('nfTrainDuration')?.value||'',intensity:$('nfTrainIntensity')?.value||'',notes:$('nfTrainNotes')?.value||''};
+  const list=trainList().filter(x=>!(String(x.date).slice(0,10)===e.date && x.type===e.type)); list.push(e); setTrainList(list);
+  if(typeof closeModal==='function') closeModal('nfTrainingModal');
+  if(typeof window.renderCalendar==='function') window.renderCalendar(window.nfCalendarMode||'my');
+  if(typeof window.syncHero==='function') window.syncHero({});
+  toast('✅ Training saved');
+  api('toggleTraining',{userId:uid(),familyCode:fam(),trained:true,notes:[e.type,e.duration?e.duration+' min':'',e.intensity,e.notes].filter(Boolean).join(' · '),trainingDate:e.date,type:e.type,duration:e.duration,intensity:e.intensity});
+  api('logTraining',{userId:uid(),familyCode:fam(),date:e.date,type:e.type,duration:e.duration,intensity:e.intensity,notes:e.notes});
+};
+window.saveTrainingV3=window.saveTrainingV32;
+window.deleteTrainingV32=function(id){setTrainList(trainList().filter(x=>x.id!==id)); if(typeof window.renderCalendar==='function') window.renderCalendar(window.nfCalendarMode||'my'); openTrainingModalV32(); toast('Training deleted')};
+window.undoTrainingTodayV32=function(){const d=todayISO(); setTrainList(trainList().filter(x=>String(x.date).slice(0,10)!==d)); if(typeof closeModal==='function') closeModal('nfTrainingModal'); if(typeof window.renderCalendar==='function') window.renderCalendar(window.nfCalendarMode||'my'); api('undoTraining',{userId:uid(),familyCode:fam()}); toast('↩️ Today training removed')};
+function getRecipeList(){return Array.isArray(window.allRecipes)?window.allRecipes:[]}
+function recipeName(r){return getVal(r,['Recipe_Name','Recipe Name','Name','Title'],'')}
+function recipeId(r){return getVal(r,['Recipe_ID','Recipe ID','ID'],'')}
+function recipeCat(r){return getVal(r,['Category','Meal_Type','Meal Type','Group'],'Other')}
+function recipeText(r){return [recipeId(r),recipeName(r),recipeCat(r),getVal(r,['Tags'],'')].join(' ').toLowerCase()}
+function classifyRecipeBuckets(){
+  const all=getRecipeList(); window.mealRecipes=window.mealRecipes||{};
+  const has=(r,arr)=>arr.some(w=>recipeText(r).includes(w));
+  const buckets={
+    Breakfast_ID: all.filter(r=>has(r,['breakfast','adult breakfast','ab'])),
+    Snack_1_ID: all.filter(r=>has(r,['snack','as'])),
+    Lunch_ID: all.filter(r=>has(r,['lunch','dinner','ald'])),
+    Dinner_ID: all.filter(r=>has(r,['dinner','lunch','ald'])),
+    Dessert_ID: all.filter(r=>has(r,['dessert','ad']))
+  };
+  buckets.Snack_2_ID=buckets.Snack_1_ID;
+  Object.keys(buckets).forEach(k=>{window.mealRecipes[k]=buckets[k].length?buckets[k]:all});
+}
+async function ensureRecipesLoaded(){
+  if(!getRecipeList().length){
+    try{const r=await api('getRecipes',{type:'adult'}); if(r&&r.success&&Array.isArray(r.recipes)) window.allRecipes=r.recipes;}catch(e){}
+  }
+  classifyRecipeBuckets(); populateRecipeFiltersV32();
+}
+const oldLoadMealRecipes=window.loadMealRecipes; window.loadMealRecipes=async function(){ if(oldLoadMealRecipes) try{await oldLoadMealRecipes()}catch(e){} await ensureRecipesLoaded(); };
+const oldLoadPlanner=window.loadPlanner; window.loadPlanner=async function(){
+  await ensureRecipesLoaded();
+  if(typeof getWeekDays!=='function' || typeof renderPlanner!=='function'){ if(oldLoadPlanner) return oldLoadPlanner(); return; }
+  const weekDays=getWeekDays(); const weekStart=weekDays[0]?.date||''; if($('weekLabel')) $('weekLabel').textContent=weekDays.length?weekDays[0].date+' – '+weekDays[6].date:'';
+  window.plannerData=window.plannerData||{};
+  try{ const result=await api('getPlanner',{familyCode:fam(),weekStart}); const data=(result&&result.success&&result.plannerData)||{}; weekDays.forEach(d=>{window.plannerData[d.date]=data[d.date]||window.plannerData[d.date]||{Breakfast_ID:'',Snack_1_ID:'',Lunch_ID:'',Snack_2_ID:'',Dinner_ID:'',Dessert_ID:''}}); }catch(e){ weekDays.forEach(d=>{window.plannerData[d.date]=window.plannerData[d.date]||{Breakfast_ID:'',Snack_1_ID:'',Lunch_ID:'',Snack_2_ID:'',Dinner_ID:'',Dessert_ID:''}}); }
+  renderPlanner(weekDays); if(typeof window.renderCalendar==='function') window.renderCalendar('week');
+};
+function populateRecipeFiltersV32(){
+  const sel=$('recipeCategory'); if(sel){
+    const fixed=['Breakfast','Snack','Lunch','Dinner','Dessert','Kids','High Protein','Low Carb','Quick & Easy','Family Friendly'];
+    const dyn=[...new Set(getRecipeList().map(r=>recipeCat(r)).filter(Boolean))];
+    const opts=[...new Set(['',...fixed,...dyn])];
+    const cur=sel.value; sel.innerHTML=opts.map(v=>'<option value="'+esc(v)+'">'+(v?esc(v):'All Categories')+'</option>').join(''); sel.value=opts.includes(cur)?cur:'';
+  }
+}
+const oldLoadRecipes=window.loadRecipes; window.loadRecipes=async function(){ if(oldLoadRecipes) await oldLoadRecipes(); await ensureRecipesLoaded(); if(typeof window.filterRecipes==='function') window.filterRecipes(); };
+window.filterRecipes=function(){
+  const search=($('recipeSearch')?.value||'').toLowerCase().trim(); const cat=$('recipeCategory')?.value||''; const grid=$('recipeGrid'); if(!grid) return;
+  let list=getRecipeList().filter(r=>{const hay=recipeText(r); if(search && !hay.includes(search))return false; if(cat && !hay.includes(cat.toLowerCase()))return false; return true;});
+  if(!list.length){grid.innerHTML='<p class="text-muted">No recipes found.</p>';return;}
+  const grouped={}; list.forEach(r=>{const c=recipeCat(r)||'Other'; (grouped[c]=grouped[c]||[]).push(r);});
+  grid.innerHTML=Object.entries(grouped).map(([c,items])=>'<div class="nf-v32-category-title">'+esc(c)+'</div>'+items.map(r=>'<div class="recipe-card" onclick="openRecipeDetail(\''+esc(recipeId(r))+'\')"><div class="title">'+esc(recipeName(r))+'</div><div style="font-size:.8rem;color:var(--text-secondary)">'+esc(recipeCat(r))+' · '+esc(recipeId(r))+'</div><div style="margin:.25rem 0"><span class="cal">'+esc(getVal(r,['Calories'],0))+' kcal</span> <span>P '+esc(getVal(r,['Protein_g','Protein'],0))+'g</span> <span>C '+esc(getVal(r,['Carbs_g','Carbs'],0))+'g</span> <span>F '+esc(getVal(r,['Fat_g','Fat'],0))+'g</span></div><div class="tags">'+String(getVal(r,['Tags'],'')).split(';').filter(Boolean).map(t=>'<span class="tag">'+esc(t.trim())+'</span>').join('')+'</div></div>').join('')).join('');
+};
+function prefixForGroup(g){g=String(g||'').toLowerCase(); if(g.includes('snack'))return'AS'; if(g.includes('dessert'))return'AD'; if(g.includes('kids')||g.includes('kid'))return'KB'; if(g.includes('lunch')||g.includes('dinner'))return'ALD'; return'AB'}
+function nextRecipeIdV32(group){const p=prefixForGroup(group); let max=0; getRecipeList().forEach(r=>{const id=String(recipeId(r)||'').toUpperCase().trim(); if(id.startsWith(p)){const n=Number((id.match(/(\d+)$/)||[])[1]||0); if(n>max)max=n;}}); return p+String(max+1).padStart(3,'0')}
+window.nextId=nextRecipeIdV32; window.generateRecipeId=nextRecipeIdV32;
+const oldOpenAdd=window.openAddRecipeModal; window.openAddRecipeModal=async function(){ await ensureRecipesLoaded(); if(oldOpenAdd) oldOpenAdd(); setTimeout(()=>{const cat=$('nfRecCat'); const id=$('nfRecId'); if(cat&&id){id.readOnly=true; id.value=nextRecipeIdV32(cat.value); cat.onchange=()=>{id.value=nextRecipeIdV32(cat.value)}}},80); };
+const oldSaveAdded=window.saveAddedRecipe; window.saveAddedRecipe=function(){const cat=$('nfRecCat')?.value||'Adult Breakfast', id=nextRecipeIdV32(cat); const idEl=$('nfRecId'); if(idEl) idEl.value=id; if(oldSaveAdded) return oldSaveAdded();};
+function wireButtons(){
+  qa('button').forEach(b=>{const t=(b.textContent||'').toLowerCase(); if(t.includes('log training')) b.onclick=window.openTrainingModalV32; if(t.includes('plan this week')) b.onclick=()=>{ if(typeof switchView==='function') switchView('planner'); setTimeout(()=>window.loadPlanner&&window.loadPlanner(),80); };});
+}
+const oldSwitchView=window.switchView; window.switchView=function(view){ if(oldSwitchView) oldSwitchView(view); setTimeout(()=>{installVisibleThemeBar(); cleanLegacyDashboard(); enhanceHeroWater(); syncProfileDisplaysV32(); populateRecipeFiltersV32(); wireButtons(); if(view==='planner') window.loadPlanner&&window.loadPlanner(); if(view==='recipes') window.loadRecipes&&window.loadRecipes();},90); };
+const oldLoadDash=window.loadDashboardData; window.loadDashboardData=async function(){ if(oldLoadDash) await oldLoadDash(); cleanLegacyDashboard(); enhanceHeroWater(); syncProfileDisplaysV32(); wireButtons(); };
+document.addEventListener('DOMContentLoaded',()=>{setTimeout(()=>{installVisibleThemeBar(); cleanLegacyDashboard(); enhanceHeroWater(); syncProfileDisplaysV32(); populateRecipeFiltersV32(); wireButtons();},900);});
+setInterval(()=>{cleanLegacyDashboard(); enhanceHeroWater(); installVisibleThemeBar();},2500);
+})();
+</script>
+
 </body>
 </html>
